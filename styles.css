@@ -1,0 +1,30 @@
+:root {
+	--bg1: rgb(235,235,235);
+	--bg2: rgb(215,215,215);
+	--bg3: white;
+	--border: silver;
+	--text: rgb(40,40,40);
+
+	@media (prefers-color-scheme: dark) {
+        --text: rgb(240,240,240);
+        --text2: rgb(60,60,60);
+        --bg1: rgb(20,20,20);
+        --bg2: rgb(40,40,40);
+        --bg3: rgb(60,60,60);
+        --border: dimgray;
+        --primary: none;
+    }
+}
+
+html, body {
+    background: white;
+	font-family: sans-serif;
+	font-size: 16px;
+    margin: 0;
+    height: 100%;
+    margin: 20px;
+
+    @media (prefers-color-scheme: dark) {
+        background: black;
+    }
+}
