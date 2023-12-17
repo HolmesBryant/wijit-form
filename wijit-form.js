@@ -1,18 +1,23 @@
 export default class WijitForm extends HTMLElement {
-	#options = {};
-	#waiting_attr = 'active';
-	#waiting_delay = 500;
-	dialog;
+	#fetchOptions = {};
+	#returnType = 'json';
+	#responseFromServer = true;
+	#modal = false;
+	confirmation = {
+		success: "<p>Thank you for sharing.</p>",
+		error: "<h2>Oopsie!</h2><p>There was an error. Please seek help.</p>",
+		waiting: "<p>Please Wait...</p>"
+	}
+
 	error;
-	form;
-	response;
 	success;
 	waiting;
-	waitingEffect;
+	dialog;
+	form;
 	wrapper;
 	showSuccessFromServer = false;
 	showErrorFromServer = false;
-	static observerAttributes = ['options', 'waiting_attr', 'waiting_delay'];
+	static observerAttributes = ['modal','fetch-options', 'return-type'];
 
 	constructor () {
 		super();
@@ -20,310 +25,61 @@ export default class WijitForm extends HTMLElement {
 		this.shadowRoot.innerHTML = `
 			<style>
 			:host {
-		        --bg1: rgb(250,250,250);
-		        --bg2: rgb(245,245,245);
-		        --bg3: white;
-		        --text: rgb(60,60,60);
-		        --focused: paleturquoise;
-		        --border: silver;
-		        --selected: lightgray ;
-		        --fail: darkred;
-		        --pass: limegreen;
-		        --primary: dodgerblue;
-		        --secondary: aliceblue ;
-		    }
+				--dialog-bg: lightgray;
+				--dialog-text: black;
+				--primary: dimgray;
+			}
 
-		    @media (prefers-color-scheme: dark) {
-		    	:host {
-		            --text: rgb(240,240,240);
-		            --bg1: rgb(20,20,20);
-		            --bg2: rgb(40,40,40);
-		            --bg3: rgb(60,60,60);
-		            --border: dimgray;
-		            --primary: none;
-		    	}
-		    }
+			dialog {
+				background-color: transparent;
+				border: none;
+				overflow: visible;
+				text-align: center;
+			}
 
-			@layer form {
-				/***** Color *****/
+			dialog.modeless {
+				backdrop-filter: blur(.15rem);
+				height: 100%;
+				max-width: 100%;
+				max-height: 100%;
+				object-fit: scale-down;
+				padding: 0;
+				position: absolute;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 100%;
+			}
 
-				button,
-				input,
-				select
-				{
-					background-color: var(--bg3);
-					color: var(--text);
-					&:user-invalid { border-color: var(--fail) }
-					&:user-valid {
-						border-color: var(--pass);
-					}
-				}
+			button {
+				padding: .5rem;
+				background-color: var(--primary);
+				border-radius: .5rem;
+				color: var(--text);
+				cursor: pointer;
+				margin-top: -1rem;
+			}
 
-				*[slot="response"]
-				{
-					background-color: var(--bg2);
-					border-width: 0;
-					border-radius: 10px;
-					color: var(--text);
-					text-align: center;
-					width: clamp(200px, 50vw, 800px);
-
-					&:focus { outline: none; }
-				}
-
-				fieldset
-				{ background-color: var(--bg2); }
-
-				form {
-					background: var(--bg1);
-					color: var(--text);
-
-					*:focus { outline: 2px solid var(--focused); }
-				}
-
-				input {
-					&:checked { border-color: var(--pass); }
-					&:checked::after {
-						background: var(--checked);
-						color: var(--bg1);
-					}
-
-				}
-
-				option:checked
-				{ background-color: var(--selected); }
-
-				.primary {
-					background-color: var(--primary);
-					background-image: linear-gradient(
-						rgba(255,255,255,0.3),
-						transparent,
-						rgba(0,0,0,0.4)
-					);
-
-					color: whitesmoke;
-					text-shadow: -1px -1px 1px gray;
-				}
-
-				.secondary {
-					background-color: var(--secondary);
-					background-image: linear-gradient(
-						rgba(250,250,250,0.5),
-						transparent,
-						rgba(0,0,0,0.2)
-					);
-					color: dimgray;
-				}
-
-				.required::after {
-					color: var(--error);
-				}
-
-				/***** Structure *****/
-
-				*[slot=response]
-				{ overflow: hidden; }
-
-				button,
-				input,
-				select,
-				textarea
-				{
-				    border: 1px solid var(--border);
-					border-radius: 5px;
-					font-size: inherit;
-					min-height: 35px;
-					min-width: 35px;
-				    padding: .25rem;
-				    vertical-align: middle;
-
-				    &:hover { box-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
-				    &:active { box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5); }
-				    &:disabled { opacity: 0.5 }
-				}
-
-				button,
-				input[type="checkbox"],
-				input[type="radio"],
-				input[type="reset"],
-				input[type="submit"],
-				label
-				{
-					cursor: pointer;
-					font-weight: bold;
-				}
-
-				div,
-				fieldset
-				{ margin: 1rem 0; }
-
-				fieldset
-				{
-					border: 1px solid var(--border);
-					border-radius: 5px;
-				}
-
-				form
-				{
-					border-radius: 10px;
-					padding: 1rem;
-				}
-
-				form *
-				{ box-sizing: border-box; }
-
-				input[type="checkbox"],
-				input[type="radio"]
-				{
-					appearance: none;
-					border: 1px solid var(--border);
-					padding: 10px;
-					display: inline-block;
-					overflow: hidden;
-					position: relative;
-
-					&::after
-					{
-						align-items: center;
-						border: none;
-						content: "";
-						color: var(--bg2);
-						display: flex;
-						justify-content: center;
-						line-height: 0;
-						position: absolute;
-						top: 0;
-						bottom: 0;
-						left: 0;
-						right: 0;
-					}
-
-					&:checked { background-color: var(--selected); }
-					&:checked::after { content: "⬤"; }
-				}
-
-				input[type="radio"]
-				{ border-radius: 50%; }
-
-				label {
-					margin: 0 .5rem;
-				}
-
-				legend
-				{ font-weight: bold; }
-
-				option /* multiple select */
-				{ padding: .5rem }
-
-				select
-				{
-					font-size: larger;
-					overflow: auto;
-
-					&:disabled { display: none; }
-					&:valid { border-color: var(--pass); }
-				}
-
-				.required:after
-				{
-					content: " Required";
-					font-size: xx-small;
-					font-weight: bold;
-					vertical-align: super;
-				}
-				} /* @form */
-
-			@layer dialog {
-			    ::slotted([slot=waiting]) {
-			    	width: 100%;
-			    	overflow: hidden;
-			    }
-
-				dialog {
-					backdrop-filter: blur(.3rem);
-					border-width: 0;
-			    	border-radius: 1rem;
-					box-sizing: border-box;
-					background: none;
-					overflow: hidden;
-					padding: 0;
-					text-align: center;
-					width: 100%;
-					height: 100%;
-				}
-
-				dialog #response,
-				dialog #waiting {
-					border-radius: 1rem;
-					margin: auto;
-					position: static;
-					opacity: 1;
-					padding: 0;
-					transition: all .5s;
-				}
-
-				dialog #response {
-					background-color: var(--bg3);
-					border: 1px solid var(--focused);
-					color: var(--text);
-					height: max-content;
-					margin: auto;
-					padding: 1rem;
-					width: max-content;
-				}
-
-				dialog #waiting {
-					width: 100%;
-					height: 100%;
-				}
-
-				dialog form {
-					background-color: transparent;
-					background-image: none;
-				}
-			} /* @dialog */
-
-			@layer flex {
-				.flex { display: flex; }
-				.column { flex-direction: column }
-				.column-reverse { flex-direction: column-reverse; }
-				.row { flex-direction: row; }
-				.row-reverse { flex-direction: row-reverse; }
-				.center {
-					align-content: center;
-					align-items: center;
-					gap: 1rem;
-					justify-content: center;
-					justify-items: center;
-				}
-				.start.column,
-				.start.row
-				{
-					align-items: center;
-					justify-content: flex-start;
-				}
-
-				.start.column-reverse,
-				.start.row-reverse
-				{
-					align-items: center;
-					justify-content: flex-end;
-				}
-
-				.end.column,
-				.end.row
-				 {
-					align-items: center;
-					justify-content: flex-end;
-				}
-
-				.end.column-reverse,
-				.end.row-reverse
-				{
-					align-items: center;
-					justify-content: flex-start;
-				}
-			} /* @flex */
+			::slotted(.success),
+			::slotted(.error),
+			::slotted(div.waiting),
+			::slotted(p.waiting),
+			::slotted(span.waiting),
+			::slotted(h1.waiting),
+			::slotted(h2.waiting),
+			::slotted(h3.waiting),
+			::slotted(h4.waiting)
+			{
+				background-color: var(--dialog-bg);
+				border-radius: .5rem;
+				color: var(--dialog-text);
+				height: max-content;
+				margin: auto;
+				padding: .5rem;
+				position: relative;
+				text-align: center;
+				transform: translateY(-25%);
+				width: max-content;
+			}
 
 			.hidden {
 				opacity: 0;
@@ -331,89 +87,97 @@ export default class WijitForm extends HTMLElement {
 				height: 0%;
 				padding: 0;
 			}
+
+			#wrapper {
+				position: relative;
+			}
 			</style>
 
 			<div id="wrapper">
 				<slot></slot>
+				<slot name="dialog">
+					<dialog class="modeless">
+						<slot name="message"></slot>
+						<form method="dialog" class="hidden"><button>OK</button></form>
+					</dialog>
+				</slot>
 			</div>
 
-			<dialog>
-				<div id="waiting">
-					<slot name="waiting"></slot>
-				</div>
-
-				<div id="response" class="hidden">
-					<slot name="response"></slot>
-					<form method="dialog">
-						<button type="submit">OK</button>
-					</form>
-				</div>
-			</dialog>
-
 			<div hidden id="responses" style="display:none">
+				<slot name="waiting"></slot>
 				<slot name="success"></slot>
 				<slot name="error"></slot>
 			</div>
 		`;
 
-		this.wrapper = this.shadowRoot.querySelector('#wrapper');
-		this.options = this.getAttribute('options') || {};
-		this.dialog = this.shadowRoot.querySelector('dialog');
-		this.waiting = this.dialog.querySelector('#waiting');
-		this.response = this.dialog.querySelector('#response');
-
-		this.wrapper.addEventListener('slotchange', (event) => {
-			const elems = this.wrapper.querySelector('slot').assignedElements();
-			for (const elem of elems) {
-				this.wrapper.prepend(elem);
-			}
-    	});
+		this.fetchOptions = this.getAttribute('fetch-options') || {};
+		this.returnType = this.getAttribute('return-type') || this.returnType;
+		this.diagForm = this.shadowRoot.querySelector('form[method=dialog]');
 	}
 
 	connectedCallback () {
-		this.error = this.querySelector('[slot=error]');
-		this.success = this.querySelector('[slot=success]');
-		this.waitingEffect = this.querySelector('[slot=waiting]');
-		this.waiting_attr = this.getAttribute('waiting_attr') || this.waiting_attr;
-		this.waiting_delay = this.getAttribute('waiting_delay') || this.waiting_delay;
+		this.dialog = this.querySelector('dialog') || this.shadowRoot.querySelector('dialog');
+		this.message = this.dialog.querySelector('[name=message]');
+		this.waiting = this.getElem('waiting');
+		this.success = this.getElem('success');
+		this.error = this.getElem('error');
 		this.form = this.querySelector('form');
-
 		this.form.addEventListener('submit', (event) => this.submitData(event));
 		this.form.addEventListener('response', (event) => this.showResponse(event));
-
-		if (this.success.textContent.indexOf('{{') > -1) {
-			this.showSuccessFromServer = true;
-		}
-
-		if (this.error.textContent.indexOf('{{') > -1) {
-			this.showErrorFromServer = true;
-		}
+		this.dialog.addEventListener('close', () => {
+			this.form.elements[0].focus();
+		});
 	}
 
 	attributeChangedCallback(attr, oldval, newval) {
+		attr = attr.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join("");
 		this[attr] = newval;
 	}
 
 	submitData (event) {
 		event.preventDefault();
-		const options = this.options;
-		const data = new FormData(event.target);
-		const url = event.target.action;
+		let url = event.target.action;
 		let status = 200;
+		let returnType;
+		const options = this.fetchOptions;
+		const data = new FormData(event.target);
+		// Accept header
+		const accept = (this.returnType === 'html') ? "text/html" : "application/json, application/xml";
 
-		this.waiting.classList.remove('hidden');
-		this.response.classList.add('hidden');
-		this.dialog.showModal();
-		this.waitingEffect.setAttribute(this.waiting_attr, 'true');
+		this.message.innerHTML = '';
+		this.setMessage(null, this.confirmation.waiting);
+
+		if (this.modal) {
+			this.dialog.showModal();
+		} else {
+			this.dialog.show();
+		}
 
 		options.method = event.target.method || 'GET';
-		options.body = data;
+		options.method = options.method.toUpperCase();
+		options.headers = options.headers || {};
 
+		if (options.method === 'GET' || options.method === 'HEAD') {
+			let i = 0;
+			url += '?';
+			for (const entry of data.entries()) {
+				url += (i === 0) ? entry.join('=') : `&${entry.join('=')}`;
+				i++;
+			}
+
+			url = encodeURI(url);
+		} else {
+			options.body = data;
+		}
+
+		// options.headers overrides 'accept' var
+		options.headers.Accept = options.headers.Accept || accept;
+	// return;
 		fetch (url, options)
 		.then (response => {
-			const ctype = response.headers.get('Content-Type');
+			returnType = response.headers.get('Content-Type') ?? accept;
 			status = response.status;
-			if (ctype.indexOf('application/json') > -1) {
+			if (returnType.indexOf('json') > -1) {
 				return response.json();
 			} else {
 				return response.text();
@@ -421,7 +185,7 @@ export default class WijitForm extends HTMLElement {
 		})
 		.then (result => {
 			const evt = new CustomEvent('response', {
-				detail: {status:status, response:result}
+				detail: {status:status, response:result, contentType: returnType}
 			});
 
 			this.form.dispatchEvent(evt);
@@ -432,61 +196,102 @@ export default class WijitForm extends HTMLElement {
 		let matches;
 		let response = event.detail.response;
 		const status = event.detail.status;
-
-		if (status > 399) {
-			// if (this.showErrorFromServer) {
-				this.error.innerHTML = this.replaceWithServerResponse(this.error, response);
-			// }
-
-			this.error.setAttribute('slot', 'response');
-		} else {
-			// if (this.showSuccessFromServer) {
-				this.success.innerHTML = this.replaceWithServerResponse(this.success, response);
-			// }
-
-			this.success.setAttribute('slot', 'response');
-		}
-
-		this.waitingEffect.removeAttribute(this.waiting_attr);
-
-		setTimeout (() => {
-			this.waiting.classList.add('hidden');
-			this.response.classList.remove('hidden');
-		}, this.waiting_delay);
-
+		const contentType = event.detail.contentType;
+		this.message.innerHTML = '';
+		this.setMessage(status, response);
+		this.diagForm.classList.remove('hidden');
 		this.form.reset();
-		this.form.elements[0].focus();
 	}
 
-	replaceWithServerResponse(elem, response) {
-		let matches = elem.textContent.match(/{{([^{}]+)}}/g);
+	/**
+	 * Sets the confirmation message.
+	 * @param {integer|null} status The http status code. Null if setting the 'waiting' message.
+	 *
+	 * @return {Void}
+	 */
+	setMessage(status, response) {
+		let type, replaced;
+		this.clearMessage();
+		switch (status) {
+			case null:
+				type = 'waiting';
+				break;
+			case status > 400:
+				type = 'error';
+				break;
+			default:
+				type = 'success';
+		}
 
-		const fn = function (matches) {
-			if (typeof matches !== 'object' || matches === null) {
-				// Why is matches someimes null, but relacement still works?
-				// console.debug('matches:', matches);
-				return;
-			}
 
-			for (const match of matches) {
-				const prop = match.substring(2, match.indexOf('}}'));
-				const keys = prop.split('.');
-				let result = response;
+		replaced = this.replacePlaceholders(this[type], response);
+	console.log(replaced);
+		for (const su of replaced) {
+			su.classList.add(type);
+			su.setAttribute('slot', 'message')
+		}
+	}
 
-				for (let key of keys) {
-					result = result[key];
+	clearMessage() {
+		this.diagForm.classList.add('hidden');
+		for (const e of this.error) e.setAttribute('slot', 'error');
+		for (const s of this.success) s.setAttribute('slot', 'success');
+		for (const w of this.waiting) w.setAttribute('slot', 'waiting');
+	}
+
+	replacePlaceholders(nodelist, response) {
+		const fn = function (node, matches) {
+			if (matches !== null) {
+				for (const match of matches) {
+					const prop = match.substring(2, match.indexOf('}}'));
+					const keys = prop.split('.');
+					let result = response;
+					for (const key of keys) result = result[key];
+					node.innerHTML = node.innerHTML.replace(match, result);
 				}
-
-				elem.innerHTML = elem.innerHTML.replace(match, result);
 			}
 		}
 
-		fn (matches);
-		return elem.innerHTML;
+		for (const node of nodelist) {
+			let matches = node.textContent.match(/{{([^{}]+)}}/g);
+			fn (node, matches);
+		}
+
+		return nodelist;
 	}
 
-	get options () { return this.#options; }
-	set options (value) {
+	getElem(type) {
+		let elems = this.querySelectorAll(`[slot=${type}]`);
+
+		if (elems.length === 0) {
+			const div = document.createElement('div');
+			div.innerHTML = this.confirmation[type];
+			div.classList.add(type);
+			div.setAttribute('slot', type);
+			this.append(div);
+			elems = this.querySelectorAll(`[slot=${type}]`);
+		}
+
+		return elems;
+	}
+
+	get modal () { return this.#modal; }
+	set modal (value) {
+		switch (value) {
+		case '':
+		case 'true':
+			value = true;
+			this.dialog.classList.remove('modeless');
+			break;
+		default:
+			value = false;
+		}
+
+		this.#modal = value;
+	}
+
+	get fetchOptions () { return this.#fetchOptions; }
+	set fetchOptions (value) {
 		if (typeof value === 'string') {
 			try {
 				value = JSON.parse(value);
@@ -497,17 +302,12 @@ export default class WijitForm extends HTMLElement {
 			}
 		}
 
-		this.#options = value;
+		this.#fetchOptions = value;
 	}
 
-	get waiting_attr () { return this.#waiting_attr; }
-	set waiting_attr (value) {
-		this.#waiting_attr = value;
-	}
-
-	get waiting_delay () { return this.#waiting_delay; }
-	set waiting_delay (value) {
-		this.#waiting_delay = parseFloat(value);
+	get returnType () { return this.#returnType; }
+	set returnType (value) {
+		this.#returnType = value;
 	}
 }
 

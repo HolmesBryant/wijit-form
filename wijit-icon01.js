@@ -10,6 +10,8 @@ export default class WijitIcon01 extends HTMLElement {
 		<style>
 			:host {
 				--color: ${this.color};
+				display: block;
+				height: 100%;
 			}
 
 	        @keyframes rotate {
@@ -17,12 +19,18 @@ export default class WijitIcon01 extends HTMLElement {
 	            100% { transform: rotate(360deg); }
 	        }
 
+	        svg {
+	        	max-height: 100%;
+	        	max-width: 100%;
+	        }
+
 	        svg.animate { animation: rotate 1.5s infinite linear; }
 	        svg circle, svg line { stroke: var(--color); }
 
 	        #wrapper {
-	        	position: relative;
-	        }
+				height: 100%;
+				text-align: center;
+			}
 
 	        #content {
 	        	align-items: center;

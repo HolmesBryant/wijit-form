@@ -7,7 +7,7 @@ $accept = $headers['Accept'] ?? 'application/json';
 
 $status = ($pass) ? 'success' : 'error';
 $title = ($pass) ? 'Success!' : 'Error!';
-$message = ($pass) ? 'Thank you for your input' : "I'm sorry, there was a problem processing your form.";
+$message = ($pass) ? 'Success message from server.' : "Error message from server";
 
 $data = (object) [
 	'status' => $status,
@@ -22,7 +22,7 @@ if ($pass) {
 	http_response_code(500);
 }
 
-sleep(2);
+sleep(0);
 
 header("Content-Type: $accept; charset=UTF-8");
 

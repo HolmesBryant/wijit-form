@@ -8,83 +8,200 @@
     <script type="module" src="wijit-form.js"></script>
     <script type="module" src="wijit-icon01.js"></script>
     <script type="module" src="sliding-doors.js"></script>
+
+    <!-----------------------------------------
+     You can change the colors of the form by changing the values of these css variables
+    ------------------------------------------->
+    <style>
+        :root {
+            --bg1: rgb(250,250,250);
+            --bg2: rgb(245,245,245);
+            --bg3: white;
+            --text: rgb(60,60,60);
+            --focused: paleturquoise;
+            --border: silver;
+            --selected: lightgray ;
+            --fail: hsl(6, 93%, 80%);
+            --pass: hsl(112, 70%, 75%);
+            --primary: dodgerblue;
+            --secondary: aliceblue ;
+
+            @media (prefers-color-scheme: dark) {
+                --text: rgb(240,240,240);
+                --bg1: rgb(20,20,20);
+                --bg2: rgb(40,40,40);
+                --bg3: rgb(60,60,60);
+                --border: dimgray;
+                --primary: transparent;
+            }
+
+        }
+
+        wijit-form {
+            /**** Backgrounds ****/
+
+            button
+            { background-color: var(--primary); }
+
+            input,
+            select,
+            textarea
+            { background-color: var(--bg3); }
+
+            /**** Borders ****/
+
+            button,
+            input,
+            fieldset,
+            select,
+            textarea,
+            .error,
+            .success
+            {
+                border: 1px solid var(--border);
+                border-radius: .5rem;
+            }
+
+            /**** Text ****/
+
+            label.required:after
+            { color: var(--fail) }
+
+            button,
+            input,
+            fieldset,
+            label,
+            legend,
+            select,
+            textarea
+            {
+                color: var(--text);
+                font-size: 1rem;
+            }
+
+            label.required
+            { font-size: small }
+
+            label,
+            legend
+            { font-weight:bold; }
+
+            .error,
+            .success
+            { text-align: center; }
+
+            /**** Shadows ****/
+            button:hover,
+            input[type="submit"]:hover,
+            input[type="reset"]:hover
+            { box-shadow: 2px 2px 5px black; }
+
+            button:active,
+            input[type="submit"]:active,
+            input[type="reset"]:active
+            { box-shadow: none; }
+
+            /**** Cursor ****/
+
+            input[type="color"],
+            input[type="range"],
+            label,
+            button,
+            select
+            { cursor: pointer; }
+
+            [disabled]
+            { cursor: not-allowed; }
+
+            /**** Structure ****/
+
+            button,
+            input,
+            option,
+            select,
+            textarea
+            {
+                min-height: 35px;
+                min-width: 35px;
+                padding: .5rem;
+            }
+
+            fieldset
+            { display: inline-block; }
+
+            fieldset label
+            { display: block; }
+
+            fieldset > select,
+            fieldset > input
+            { width: 100%; }
+
+            button,
+            label
+            {
+                display: inline-block;
+                margin: .5rem;
+            }
+
+            label.required:after
+            {
+                content: "Required";
+                color: var(--fail);
+                vertical-align: super;
+            }
+
+            textarea
+            {
+                height: 100%;
+                width: 100%;
+            }
+
+            .error,
+            .success
+            { padding: 1rem; }
+        }
+    </style>
 </head>
 <body>
     <details>
-        <summary><h1>Sliding Doors Web Component</h1></summary>
-        <p>This component creates a sliding door effect to reveal or hide some content. It provides three stock themes, "default", "light" and "dark". You may also define your own custom theme by setting some css variables. You may set these variables on "sliding-doors" in a css stylesheet.</p>
+        <summary><h1>Wijit Form Web Component</h1></summary>
+        <p>This component serves simply as a convenience to make styling forms and adding waiting effects and confirmation/error messages less time consuming</p>
 
-        <blockquote>
-        <pre>
-            sliding-doors {
-                --tintOuter: red;
-                --tintMiddle: green;
-                --tintInner: blue;
-            }
-        </pre>
-        </blockquote>
 
-        <p>Or you may set the variables in the "style" attribute of the custom element itself. Don't forget to add the double hyphons (--).</p>
-
-        <blockquote><code>
-            &lt;sliding-doors style="--tintInner:red;--tintMiddle:green;--tintOuter:blue">&lt;/sliding-doors>
-        </code></blockquote>
-
-        <p>You can also include any image, SVG, custom element or standard DOM element as an overlay on top of the doors. Any css rules applied to the element, including css animations, will be preserved. In order to do this, you must add an element having the attribute <code>[slot="effect"]</code>.</p>
-
-        <blockquote>
-        <pre>
-            &lt;sliding-doors>
-                &lt;p>Some content behind the doors&lt;/p>
-                &lt;div slot="effect" class="animated-icon">&lt;/div>
-            &lt;/sliding-doors>
-        </pre>
-        </blockquote>
-
-        <p>The component exposes three custom attributes: "active", "speed" and "theme" which will be described below. You may add one or more of these attributes to the component like this:
-        </p>
-
-        <blockquote>
-            <code>&lt;sliding-doors active speed="1" theme="light">...&lt;/sliding-doors></code>
-        </blockquote>
 
         <h2>Attributes</h2>
         <div>
             <ul>
-                <li><b>active (default: "true")</b> Acceptable values: ["true", "false", null]. The doors are closed when the "active" attribute is present. This attribute may have no value or may have any value other than "false". The doors are open when active is "false" or the attribute is removed. By default, the doors are open on initialization. If you would like to initialize the component with the doors closed, add this attribute to the HTML tag</li>
+                <li><b>fetch_options (default: null)</b> Acceptable values: [Any valid fetch option from: <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/fetch#options">https://developer.mozilla.org/en-US/docs/Web/API/fetch#options</a>]. For example, if you are submitting the form to the same server, you might want to add <code>{"mode":"same-origin"}</code>. You don't have to add the double quotes around every value, but it cuts down a little on processing if you do. The component will first try to parse it as JSON, then if it fails, it will add double quotes in an attempt to make it valid JSON and parse it again.</li>
 
-                <li><b>speed (default: ".5s")</b> Acceptable values: [any valid css time value]. The speed at which the doors open and close. ".5s" means half a second. "1000ms" means 1000 milliseconds. If you just use a number with no measurement, such as "3", it will be interpreted as seconds.</li>
-                <li><b>theme (default: "default")</b> Acceptable values: ["default", "light", "dark", "auto"]. The gradient on the doors is composed of three color stops. "Theme" refers to the colors applied to these stops. The component includes three themes: "default", "light" and "dark". "auto" will automatically choose "dark" if [prefers-color-scheme] in the client is set to "dark"; otherwise it will choose "light".</li>
+                <li><b>waiting_attr (default: "active")</b> Acceptable values: [any string].</li>
+
+                <li><b>waiting_delay (default: "500")</b> Acceptable values: [any integer]. This is the number of milliseconds that will pass between receiving a response from the server after the form is submitted, and showing the confirmation message. Some "waiting" effects may need a little time to finish doing their thing before removing them.</li>
             </ul>
         </div>
     </details>
+
     <aside>
         <h2>Demo</h2>
         <div id="settings">
             <form id="settings" method="dialog">
                 <fieldset>
-                    <legend>speed</legend>
-                    <select onchange="change(event, 'speed')">
-                        <option value=".5s">Default (.5s)</option>
-                        <option>0</option>
-                        <option>1</option>
-                        <option>3</option>
-                        <option>5s</option>
-                        <option>100ms</option>
-                        <option>300ms</option>
-                    </select>
+                    <legend>fetch_options</legend>
+                    <textarea
+                        oninput="change(event, 'options')"
+                        placeholder="Example: {headers:{Accept:'text/html'}}"></textarea>
                 </fieldset>
 
                 <fieldset>
-                    <legend>theme</legend>
+                    <legend></legend>
                     <label>
-                    <input checked type="radio" name="theme" value="" onchange="change(event, 'theme')"> null (default)
+                        <b>waiting_attr</b><br>
+                        <input disabled name="waiting_attr" value="auto">
                     </label>
+                    <p> </p>
                     <label>
-                    <input type="radio" name="theme" value="light" onchange="change(event, 'theme')"> light
-                    </label>
-                    <label>
-                    <input type="radio" name="theme" value="dark" onchange="change(event, 'theme')"> dark
+                        <b>waiting_delay</b> <small>(milliseconds)</small><br>
+                        <input type="number" value="500" oninput="change(event, 'waiting_delay)">
                     </label>
                 </fieldset>
 
@@ -106,86 +223,132 @@
 
     <section>
         <article>
-        <wijit-form waiting_attr="active" waiting_delay="500" options="{headers:{Accept:'text/html'}}">
-            <form id="test-form" method="post" action="/test-server.php">
+            <h3>Basic Example</h3>
+            <wijit-form return-type="html">
+                <form action="/test-server.php">
+                    <label for="ex1-name">Name</label>
+                    <input id="ex1-name" name="name">
 
-                <div class="flex column">
-                    <label for="name">Name</label>
-                    <input required type="text" id="name" name="Name" autocomplete="_name" value="Foo Barr">
+                    <label for="ex1-email">Email</label>
+                    <input type="email" id="ex1-email" name="email">
+
+                    <button>Spam Me!</button>
+                </form>
+            </wijit-form>
+        </article>
+    </section>
+
+    <section>
+        <article>
+            <h3>With User Supplied "Waiting", "Success" and "Error" messages</h3>
+            <wijit-form return-type="json">
+                <form action="/test-server.php">
+                    <label for="ex2-name">Name</label>
+                    <input id="ex2-name" name="name" value="Foo">
+
+                    <label for="ex2-email">Email</label>
+                    <input type="email" name="email">
+
+                    <button>Spam Me!</button></form>
+                </form>
+
+                <wijit-icon01 animate color="lime" slot="waiting"></wijit-icon01>
+
+                <div slot="success">
+                    <p>Hi {{data.name}}, Thank you for your information.</p>
                 </div>
 
-                <div class="flex column">
-                    <label class="required" for="email">Email</label>
-                    <input required type="email" id="email" name="Email" autocomplete="_email" value="foo@barr.com">
+                <div slot="error">
+                    <h2>Ummm, something went wrong.</h2>
+                    <p>Your submission was not processed.</p>
                 </div>
+            </wijit-form>
+        </article>
+    </section>
 
-                <div class="flex row-reverse start">
-                    <label for="checkbox">Checkbox</label>
-                    <input type="checkbox" name="Checkbox" id="checkbox" value="Yes" aria-role="checkbox" tabindex="0">
-                </div>
+    <!-- <section>
+        <article>
+            <wijit-form waiting_attr="active" waiting_delay="500" options="{headers:{Accept:'text/html'}}">
+                <form id="test-form" method="post" action="/test-server.php">
 
-                <fieldset>
-                    <legend>Choose One</legend>
+                    <div class="flex column">
+                        <label for="name">Name</label>
+                        <input required type="text" id="name" name="Name" autocomplete="_name" value="Foo Barr">
+                    </div>
+
+                    <div class="flex column">
+                        <label class="required" for="email">Email</label>
+                        <input required type="email" id="email" name="Email" autocomplete="_email" value="foo@barr.com">
+                    </div>
 
                     <div class="flex row-reverse start">
-                        <label for="ochoice1">One</label>
-                        <input checked type="radio" name="Other Choice" id="ochoice1" value="One" aria-role="radio" tabindex="0">
+                        <label for="checkbox">Checkbox</label>
+                        <input type="checkbox" name="Checkbox" id="checkbox" value="Yes" aria-role="checkbox" tabindex="0">
                     </div>
-                    <div class="flex row-reverse start">
-                        <label for="ochoice2">Two</label>
-                        <input type="radio" name="Other Choice" id="ochoice2" value="Two" aria-role="radio" tabindex="0">
+
+                    <fieldset>
+                        <legend>Choose One</legend>
+
+                        <div class="flex row-reverse start">
+                            <label for="ochoice1">One</label>
+                            <input checked type="radio" name="Other Choice" id="ochoice1" value="One" aria-role="radio" tabindex="0">
+                        </div>
+                        <div class="flex row-reverse start">
+                            <label for="ochoice2">Two</label>
+                            <input type="radio" name="Other Choice" id="ochoice2" value="Two" aria-role="radio" tabindex="0">
+                        </div>
+                    </fieldset>
+
+                    <div class="flex column">
+                        <label for="select-one">Select</label>
+                        <select id="select-one">
+                            <option disabled selected></option>
+                            <option>one</option>
+                            <option>two</option>
+                            <option>three</option>
+                        </select>
                     </div>
-                </fieldset>
 
-                <div class="flex column">
-                    <label for="select-one">Select</label>
-                    <select id="select-one">
-                        <option disabled selected></option>
-                        <option>one</option>
-                        <option>two</option>
-                        <option>three</option>
-                    </select>
+                    <div class="flex column">
+                        <label for="favorite-color">Fav Color</label>
+                        <input name="Favorite Color" id="favorite-color" list="fav-colors" placeholder="Favorite Color">
+                        <datalist id="fav-colors">
+                            <option>red</option>
+                            <option>blue</option>
+                            <option>green</option>
+                            <option>yellow</option>
+                        </datalist>
+                    </div>
+
+                    <div class="flex column">
+                        <label for="multi-choices">Multiple Choice</label>
+                        <select multiple name="Multi Choices" id="multi-choices">
+                            <option>One</option>
+                            <option selected>Two</option>
+                            <option>Three</option>
+                        </select>
+                    </div>
+
+                    <div class="flex center">
+                        <button type="submit" class="primary">Submit</button>
+                        <button type="reset" class="secondary">Reset</button>
+                    </div>
+                </form>
+
+                <sliding-doors slot="waiting" theme="auto" style="height:100%">
+                    <wijit-icon01 animate color="lime" slot="effect">
+                        <b>Check out this eye candy<br>while you wait</b>
+                    </wijit-icon01>
+                </sliding-doors>
+
+                <div slot="success"><h1>Hi {{Name}}</h1><p>Thanks for sharing! Here is what you submitted:</p><pre>{{data}}</pre></div>
+
+                <div slot="error">
+                    <h1>Oopsie!</h1>
+                    <p>There was an error. Please get help from someone who has a clue.</p>
                 </div>
-
-                <div class="flex column">
-                    <label for="favorite-color">Fav Color</label>
-                    <input name="Favorite Color" id="favorite-color" list="fav-colors" placeholder="Favorite Color">
-                    <datalist id="fav-colors">
-                        <option>red</option>
-                        <option>blue</option>
-                        <option>green</option>
-                        <option>yellow</option>
-                    </datalist>
-                </div>
-
-                <div class="flex column">
-                    <label for="multi-choices">Multiple Choice</label>
-                    <select multiple name="Multi Choices" id="multi-choices">
-                        <option>One</option>
-                        <option selected>Two</option>
-                        <option>Three</option>
-                    </select>
-                </div>
-
-                <div class="flex center">
-                    <button type="submit" class="primary">Submit</button>
-                    <button type="reset" class="secondary">Reset</button>
-                </div>
-            </form>
-
-            <sliding-doors slot="waiting" theme="auto" style="height:100%">
-                <wijit-icon01 animate color="lime" slot="effect">
-                    <b>Check out this eye candy while you wait</b>
-                </wijit-icon01>
-            </sliding-doors>
-
-            <div slot="success"><h1>Hi {{Name}}</h1><p>Thanks for sharing! Here is what you submitted:</p><pre>{{data}}</pre></div>
-
-            <div slot="error">
-                <h1>Oopsie!</h1>
-                <p>There was an error. Please get help from someone who has a clue.</p>
-            </div>
-        </wijit-form>
-    </article>
+            </wijit-form>
+        </article>
+    </section> -->
 </body>
 </html>
