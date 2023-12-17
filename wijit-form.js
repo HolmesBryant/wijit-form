@@ -1,12 +1,11 @@
 export default class WijitForm extends HTMLElement {
 	#fetchOptions = {};
-	#returnType = 'json';
-	#responseFromServer = true;
+	#response = 'json';
 	#modal = false;
 	confirmation = {
-		success: "<p>Thank you for sharing.</p>",
+		success: "<p>Thank you!.</p>",
 		error: "<h2>Oopsie!</h2><p>There was an error. Please seek help.</p>",
-		waiting: "<p>Please Wait...</p>"
+		waiting: "<h3>Please Wait...</h3>"
 	}
 
 	error;
@@ -17,7 +16,7 @@ export default class WijitForm extends HTMLElement {
 	wrapper;
 	showSuccessFromServer = false;
 	showErrorFromServer = false;
-	static observerAttributes = ['modal','fetch-options', 'return-type'];
+	static observedAttributes = ['modal','fetch-options', 'response'];
 
 	constructor () {
 		super();
@@ -25,9 +24,31 @@ export default class WijitForm extends HTMLElement {
 		this.shadowRoot.innerHTML = `
 			<style>
 			:host {
-				--dialog-bg: lightgray;
-				--dialog-text: black;
-				--primary: dimgray;
+				--waiting-text: rgb(60,60,60);
+			}
+
+			::backdrop {
+				background-color: white;
+				opacity: .75;
+
+			}
+
+			@media (prefers-color-scheme: dark) {
+				::backdrop
+				{ background-color: black; }
+
+				:host {
+					--waiting-text: lightgray;
+				}
+
+			}
+
+			button {
+				padding: .5rem;
+				border-radius: .5rem;
+				cursor: pointer;
+				font-weight: bold;
+				margin-top: -1rem;
 			}
 
 			dialog {
@@ -38,7 +59,7 @@ export default class WijitForm extends HTMLElement {
 			}
 
 			dialog.modeless {
-				backdrop-filter: blur(.15rem);
+				backdrop-filter: blur(.3rem);
 				height: 100%;
 				max-width: 100%;
 				max-height: 100%;
@@ -50,14 +71,6 @@ export default class WijitForm extends HTMLElement {
 				width: 100%;
 			}
 
-			button {
-				padding: .5rem;
-				background-color: var(--primary);
-				border-radius: .5rem;
-				color: var(--text);
-				cursor: pointer;
-				margin-top: -1rem;
-			}
 
 			::slotted(.success),
 			::slotted(.error),
@@ -74,12 +87,16 @@ export default class WijitForm extends HTMLElement {
 				color: var(--dialog-text);
 				height: max-content;
 				margin: auto;
+				min-width: 200px;
 				padding: .5rem;
 				position: relative;
 				text-align: center;
 				transform: translateY(-25%);
-				width: max-content;
+				width: min-content;
 			}
+
+			::slotted(div.waiting)
+			{ color: var(--waiting-text); }
 
 			.hidden {
 				opacity: 0;
@@ -111,7 +128,7 @@ export default class WijitForm extends HTMLElement {
 		`;
 
 		this.fetchOptions = this.getAttribute('fetch-options') || {};
-		this.returnType = this.getAttribute('return-type') || this.returnType;
+		this.response = this.getAttribute('response') || this.response;
 		this.diagForm = this.shadowRoot.querySelector('form[method=dialog]');
 	}
 
@@ -122,6 +139,7 @@ export default class WijitForm extends HTMLElement {
 		this.success = this.getElem('success');
 		this.error = this.getElem('error');
 		this.form = this.querySelector('form');
+
 		this.form.addEventListener('submit', (event) => this.submitData(event));
 		this.form.addEventListener('response', (event) => this.showResponse(event));
 		this.dialog.addEventListener('close', () => {
@@ -130,24 +148,27 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	attributeChangedCallback(attr, oldval, newval) {
-		attr = attr.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join("");
+		// if attribute name has hypons, camel-case it.
+		if (attr.indexOf('-') > -1) {
+			attr = attr.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join("");
+		}
 		this[attr] = newval;
+		// console.log(attr, this[attr], newval);
 	}
 
 	submitData (event) {
 		event.preventDefault();
 		let url = event.target.action;
 		let status = 200;
-		let returnType;
 		const options = this.fetchOptions;
 		const data = new FormData(event.target);
-		// Accept header
-		const accept = (this.returnType === 'html') ? "text/html" : "application/json, application/xml";
+		// for Accept header
+		const accept = (this.response === 'html') ? "text/html" : "application/json, application/xml";
 
 		this.message.innerHTML = '';
 		this.setMessage(null, this.confirmation.waiting);
-
 		if (this.modal) {
+			this.dialog.classList.remove('modeless');
 			this.dialog.showModal();
 		} else {
 			this.dialog.show();
@@ -172,12 +193,14 @@ export default class WijitForm extends HTMLElement {
 
 		// options.headers overrides 'accept' var
 		options.headers.Accept = options.headers.Accept || accept;
-	// return;
+
+		let contentType;
+
 		fetch (url, options)
 		.then (response => {
-			returnType = response.headers.get('Content-Type') ?? accept;
+			contentType = response.headers.get('Content-Type') ?? accept;
 			status = response.status;
-			if (returnType.indexOf('json') > -1) {
+			if (contentType.indexOf('json') > -1) {
 				return response.json();
 			} else {
 				return response.text();
@@ -185,7 +208,7 @@ export default class WijitForm extends HTMLElement {
 		})
 		.then (result => {
 			const evt = new CustomEvent('response', {
-				detail: {status:status, response:result, contentType: returnType}
+				detail: {status:status, response:result, contentType: contentType}
 			});
 
 			this.form.dispatchEvent(evt);
@@ -193,7 +216,6 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	showResponse(event) {
-		let matches;
 		let response = event.detail.response;
 		const status = event.detail.status;
 		const contentType = event.detail.contentType;
@@ -210,25 +232,31 @@ export default class WijitForm extends HTMLElement {
 	 * @return {Void}
 	 */
 	setMessage(status, response) {
-		let type, replaced;
+		let type, nodes;
 		this.clearMessage();
-		switch (status) {
-			case null:
-				type = 'waiting';
-				break;
-			case status > 400:
-				type = 'error';
-				break;
-			default:
-				type = 'success';
+
+		switch (true) {
+		case status === null:
+			type = 'waiting';
+			break;
+		case status > 399:
+			type = 'error';
+			break;
+		default:
+			type = 'success';
+			break;
 		}
 
+		if (this.response === 'html') {
+			this[type][0].innerHTML = response;
+			nodes = this[type];
+		} else {
+			nodes = this.replacePlaceholders(this[type], response);
+		}
 
-		replaced = this.replacePlaceholders(this[type], response);
-	console.log(replaced);
-		for (const su of replaced) {
-			su.classList.add(type);
-			su.setAttribute('slot', 'message')
+		for (const node of nodes) {
+			node.classList.add(type);
+			node.setAttribute('slot', 'message')
 		}
 	}
 
@@ -272,6 +300,12 @@ export default class WijitForm extends HTMLElement {
 			elems = this.querySelectorAll(`[slot=${type}]`);
 		}
 
+		for (const elem of elems) {
+			elem.addEventListener('slotchange', (event) => {
+				console.log(event);
+			});
+		}
+
 		return elems;
 	}
 
@@ -281,7 +315,6 @@ export default class WijitForm extends HTMLElement {
 		case '':
 		case 'true':
 			value = true;
-			this.dialog.classList.remove('modeless');
 			break;
 		default:
 			value = false;
@@ -305,9 +338,9 @@ export default class WijitForm extends HTMLElement {
 		this.#fetchOptions = value;
 	}
 
-	get returnType () { return this.#returnType; }
-	set returnType (value) {
-		this.#returnType = value;
+	get response () { return this.#response; }
+	set response (value) {
+		this.#response = value;
 	}
 }
 

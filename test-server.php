@@ -1,13 +1,11 @@
 <?php
-error_reporting(E_ALL);
 
-$pass = true;
+$fail = $_REQUEST['fail'] ?? false;
 $headers = getallheaders();
 $accept = $headers['Accept'] ?? 'application/json';
 
-$status = ($pass) ? 'success' : 'error';
-$title = ($pass) ? 'Success!' : 'Error!';
-$message = ($pass) ? 'Success message from server.' : "Error message from server";
+$status = ($fail) ? 'error' : 'success';
+$message = ($fail) ? "Error message from server" : 'Success message from server.';
 
 $data = (object) [
 	'status' => $status,
@@ -16,19 +14,19 @@ $data = (object) [
 	'data' => $_REQUEST
 ];
 
-if ($pass) {
-	http_response_code(200);
+if ($fail && $fail === 'true') {
+	http_response_code(503);
 } else {
-	http_response_code(500);
+	http_response_code(200);
 }
 
-sleep(0);
+sleep(1);
 
 header("Content-Type: $accept; charset=UTF-8");
 
 switch ($accept) {
 	case 'text/html':
-		echo "<h3>$title</h3><p>$message</p>";
+		echo "<h4>HTML $message</h4>";
 		break;
 	default:
 		echo json_encode($data);

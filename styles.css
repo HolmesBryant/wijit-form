@@ -33,6 +33,12 @@ body *
     textarea
     { border: 1px solid var(--border); }
 
+    :user-valid
+    { border-color: var(--pass) }
+
+    :user-invalid
+    { border-color: var(--fail) }
+
     article,
     button,
     details > *,
@@ -41,6 +47,18 @@ body *
     select,
     textarea
     { border-radius: .5rem; }
+
+    figure
+	{ border-radius: 10px 10px 0 0; }
+
+	figcaption
+	{ border-radius: 0 0 10px 10px; }
+
+	figcaption > button:first-child
+	{ border-radius: 0 0 0 10px; }
+
+	figcaption > button:last-child
+	{ border-radius: 0 0 10px 0; }
 
 /**** Text ****/
     label.required:after
@@ -110,11 +128,11 @@ body *
         padding: .5rem;
     }
 
-    button,
-    label
+    button
     {
         display: inline-block;
         margin: .5rem;
+        vertical-align: middle;
     }
 
     details
@@ -126,150 +144,146 @@ body *
 		padding: 1rem;
 	}
 
-    fieldset
-    { display: inline-block; }
-
-    fieldset label
-    { display: block; }
+	fieldset
+	{ display: inline-block; }
 
     fieldset > select,
     fieldset > input
     { width: 100%; }
 
-    input[type="color"]
-    { padding: 0; }
+	figure
+	{ text-align: center; }
 
-    label.required:after
-    {
-        content: "Required";
-        color: var(--fail);
-        vertical-align: super;
-    }
+	figcaption
+	{
+		align-items: stretch;
+		display: flex;
+	}
 
-    textarea
-    {
-        height: 100%;
-        width: 100%;
-    }
+	figcaption > *
+	{ flex: 1; }
 
+	form
+	{ width: 100%;}
 
+	h1
+	{
+		display: inline-block;
+		margin: 0;
+		vertical-align: middle;
+	}
 
+	h2, h3
+	{ margin: 1rem; }
 
+	input[type="color"]
+	{ padding: 0; }
 
+	input,
+	select
+	{
+		min-height: 35px;
+		min-width: 35px;
+		vertical-align: middle;
+	}
 
+	label
+	{
+		display: inline-block;
+		margin: .5rem;
+		vertical-align: middle;
+	}
 
+	label.required:after
+	{
+	    content: "Required";
+	    font-size: small;
+	    vertical-align: super;
+	}
 
+	li
+	{ margin-bottom: 1rem; }
 
+	option
+	{ font-size: 1.2rem; }
 
+	section
+	{
+		display: flex;
+		flex-wrap: wrap;
+		align-items: stretch;
+		gap: 10px;
+		margin: 10px;
+	}
 
-fieldset
-{
-	border: 1px solid var(--border);
-	border-radius: 10px;
-	display: inline-block;
-}
+	textarea
+	{
+		height: 100%;
+		width: 100%;
+	}
 
-fieldset label
-{ display: block; }
+	ul, ol
+	{
+		margin: 1rem;
+		padding: 1rem;
+	}
 
-fieldset > select,
-fieldset > input
-{ width: 100%; }
+@layer flex {
+	.flex { display: flex; gap: 1rem;}
+	.column { flex-direction: column }
+	.column-reverse { flex-direction: column-reverse; }
+	.row {
+		flex-direction: row;
+		justify-content: space-evenly;
+	}
 
-figure
-{
-	border-radius: 10px 10px 0 0;
-	text-align: center;
-}
+	.row-reverse {
+		flex-direction: row-reverse;
+	}
 
-figcaption
-{
-	align-items: stretch;
-	border-radius: 0 0 10px 10px;
-	display: flex;
-}
+	.row.bottom {
+		align-items: flex-end;
+	}
 
-figcaption > *
-{
-	flex: 1;
-}
+	.center {
+		align-items: center;
+	}
 
-figcaption > button:first-child {
-	border-radius: 0 0 0 10px;
-}
+	.column.center {
+		align-content: center;
+		align-items: center;
+		justify-content: center;
+		justify-items: center;
+	}
 
-figcaption > button:last-child {
-	border-radius: 0 0 10px 0;
-}
+	.start.column,
+	.start.row
+	{
+		align-items: center;
+		justify-content: flex-start;
+	}
 
-h1
-{
-	display: inline-block;
-	margin: 0;
-	vertical-align: middle;
-}
+	.start.column-reverse,
+	.start.row-reverse
+	{
+		align-items: center;
+		justify-content: flex-end;
+	}
 
-h2,
-h3
-{ margin: 1rem; }
+	.end.column,
+	.end.row
+	 {
+		align-items: center;
+		justify-content: flex-end;
+	}
 
-input,
-select
-{
-	border: 1px solid var(--border);
-	border-radius: 5px;
-	min-height: 35px;
-	min-width: 35px;
-}
-
-label
-{
-	cursor: pointer;
-	display: inline-block;
-	margin: .5rem 0;
-}
-
-label[required]:after
-{
-	content: "*";
-	color: var(--fail);
-	font-size: 1.25rem;
-	font-weight: bold;
-}
-
-legend
-{ font-weight:bold; }
-
-li
-{ margin-bottom: 1rem; }
-
-option
-{
-	font-size: 1.2rem;
-}
-
-section
-{
-	display: flex;
-	flex-wrap: wrap;
-	align-items: stretch;
-	gap: 10px;
-	margin: 10px;
-}
-
-textarea
-{
-	border: 1px solid var(--border);
-	border-radius: 10px;
-	height: 100%;
-	width: 100%;
-}
-
-ul, ol
-{
-	margin: 1rem;
-	padding: 1rem;
-}
+	.end.column-reverse,
+	.end.row-reverse
+	{
+		align-items: center;
+		justify-content: flex-start;
+	}
+} /* @flex */
 
 @layer settings {
 	#settings
@@ -282,16 +296,4 @@ ul, ol
 
 	#settings > *
 	{ flex: 1; }
-}
-
-.success
-{
-	background-color: var(--pass);
-	font-weight: bold;
-}
-
-.error
-{
-	background-color: var(--fail);
-	font-weight: bold;
 }
