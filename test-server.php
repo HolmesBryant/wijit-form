@@ -26,7 +26,7 @@ header("Content-Type: $accept; charset=UTF-8");
 
 switch ($accept) {
 	case 'text/html':
-		echo "<h4>HTML $message</h4>";
+		echo "<h3>HTML</h3><p>$message</p>";
 		break;
 	default:
 		echo json_encode($data);

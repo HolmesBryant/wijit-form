@@ -2,112 +2,122 @@ export default class WijitForm extends HTMLElement {
 	#fetchOptions = {};
 	#response = 'json';
 	#modal = false;
+	#reset = true;
+	#waiting;
+	#success;
+	#error;
+
 	confirmation = {
-		success: "<p>Thank you!.</p>",
-		error: "<h2>Oopsie!</h2><p>There was an error. Please seek help.</p>",
-		waiting: "<h3>Please Wait...</h3>"
+		success: "<h3>Submission Received</h3><p>Thank you!.</p>",
+		error: "<h3>Oopsie!</h3><p>There was an error. Please seek help.</p>",
+		waiting: "<p>Please Wait...</p>"
 	}
 
-	error;
-	success;
-	waiting;
+	errorElems;
+	successElems;
+	waitingElems;
 	dialog;
 	form;
 	wrapper;
 	showSuccessFromServer = false;
 	showErrorFromServer = false;
-	static observedAttributes = ['modal','fetch-options', 'response'];
+	static observedAttributes = ['modal','fetch-options', 'response', 'reset'];
 
 	constructor () {
 		super();
 		this.attachShadow({mode:'open'});
 		this.shadowRoot.innerHTML = `
 			<style>
-			:host {
-				--waiting-text: rgb(60,60,60);
-			}
-
-			::backdrop {
-				background-color: white;
-				opacity: .75;
-
-			}
-
-			@media (prefers-color-scheme: dark) {
-				::backdrop
-				{ background-color: black; }
-
 				:host {
-					--waiting-text: lightgray;
+					--waiting-text: rgb(60,60,60);
 				}
 
-			}
+				::backdrop {
+					background-color: white;
+					opacity: .75;
 
-			button {
-				padding: .5rem;
-				border-radius: .5rem;
-				cursor: pointer;
-				font-weight: bold;
-				margin-top: -1rem;
-			}
+				}
 
-			dialog {
-				background-color: transparent;
-				border: none;
-				overflow: visible;
-				text-align: center;
-			}
+				@media (prefers-color-scheme: dark) {
+					::backdrop
+					{ background-color: black; }
 
-			dialog.modeless {
-				backdrop-filter: blur(.3rem);
-				height: 100%;
-				max-width: 100%;
-				max-height: 100%;
-				object-fit: scale-down;
-				padding: 0;
-				position: absolute;
-				top: 50%;
-				transform: translateY(-50%);
-				width: 100%;
-			}
+					:host {
+						--waiting-text: lightgray;
+					}
+
+				}
+
+				button {
+					padding: .5rem;
+					border-radius: .5rem;
+					cursor: pointer;
+					font-weight: bold;
+					margin-top: -1rem;
+				}
+
+				dialog {
+					background-color: transparent;
+					border: none;
+					overflow: visible;
+					text-align: center;
+				}
+
+				dialog.modeless {
+					backdrop-filter: blur(.3rem);
+					height: 100%;
+					max-width: 100%;
+					max-height: 100%;
+					object-fit: scale-down;
+					padding: 0;
+					position: absolute;
+					top: 50%;
+					transform: translateY(-50%);
+					width: 100%;
+				}
 
 
-			::slotted(.success),
-			::slotted(.error),
-			::slotted(div.waiting),
-			::slotted(p.waiting),
-			::slotted(span.waiting),
-			::slotted(h1.waiting),
-			::slotted(h2.waiting),
-			::slotted(h3.waiting),
-			::slotted(h4.waiting)
-			{
-				background-color: var(--dialog-bg);
-				border-radius: .5rem;
-				color: var(--dialog-text);
-				height: max-content;
-				margin: auto;
-				min-width: 200px;
-				padding: .5rem;
-				position: relative;
-				text-align: center;
-				transform: translateY(-25%);
-				width: min-content;
-			}
+				::slotted(.success),
+				::slotted(.error),
+				::slotted(div.waiting),
+				::slotted(p.waiting),
+				::slotted(span.waiting),
+				::slotted(h1.waiting),
+				::slotted(h2.waiting),
+				::slotted(h3.waiting),
+				::slotted(h4.waiting)
+				{
+					background-color: var(--dialog-bg);
+					border-radius: .5rem;
+					color: var(--dialog-text);
+					font-weight: bold;
+					height: max-content;
+					margin: auto;
+					min-width: 200px;
+					padding: .5rem;
+					position: relative;
+					text-align: center;
+					top: 50%;
+					transform: translateY(-50%);
+					width: min-content;
+				}
 
-			::slotted(div.waiting)
-			{ color: var(--waiting-text); }
+				::slotted(div.waiting)
+				{
+					color: var(--waiting-text);
+					font-size: x-large;
+				}
 
-			.hidden {
-				opacity: 0;
-				position: fixed;
-				height: 0%;
-				padding: 0;
-			}
+				.hidden {
+					opacity: 0;
+					position: fixed;
+					height: 0%;
+					padding: 0;
+				}
 
-			#wrapper {
-				position: relative;
-			}
+				#wrapper {
+					position: relative;
+				}
 			</style>
 
 			<div id="wrapper">
@@ -115,12 +125,12 @@ export default class WijitForm extends HTMLElement {
 				<slot name="dialog">
 					<dialog class="modeless">
 						<slot name="message"></slot>
-						<form method="dialog" class="hidden"><button>OK</button></form>
 					</dialog>
 				</slot>
 			</div>
 
 			<div hidden id="responses" style="display:none">
+				<button aria-label="close" form="dialog-form">OK</button>
 				<slot name="waiting"></slot>
 				<slot name="success"></slot>
 				<slot name="error"></slot>
@@ -129,17 +139,20 @@ export default class WijitForm extends HTMLElement {
 
 		this.fetchOptions = this.getAttribute('fetch-options') || {};
 		this.response = this.getAttribute('response') || this.response;
-		this.diagForm = this.shadowRoot.querySelector('form[method=dialog]');
 	}
 
 	connectedCallback () {
 		this.dialog = this.querySelector('dialog') || this.shadowRoot.querySelector('dialog');
+		this.closeDialogButton =
+			this.dialog.querySelector('form[method=dialog] button, form[method=dialog] input[type=submit]')
+			|| this.shadowRoot.querySelector('#responses button');
 		this.message = this.dialog.querySelector('[name=message]');
-		this.waiting = this.getElem('waiting');
-		this.success = this.getElem('success');
-		this.error = this.getElem('error');
+		this.waitingElems = this.getElem('waiting');
+		this.successElems = this.getElem('success');
+		this.errorElems = this.getElem('error');
 		this.form = this.querySelector('form');
 
+		this.closeDialogButton.setAttribute('onclick', `console.log(${this.dialog})`);
 		this.form.addEventListener('submit', (event) => this.submitData(event));
 		this.form.addEventListener('response', (event) => this.showResponse(event));
 		this.dialog.addEventListener('close', () => {
@@ -153,7 +166,6 @@ export default class WijitForm extends HTMLElement {
 			attr = attr.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join("");
 		}
 		this[attr] = newval;
-		// console.log(attr, this[attr], newval);
 	}
 
 	submitData (event) {
@@ -166,7 +178,10 @@ export default class WijitForm extends HTMLElement {
 		const accept = (this.response === 'html') ? "text/html" : "application/json, application/xml";
 
 		this.message.innerHTML = '';
-		this.setMessage(null, this.confirmation.waiting);
+
+		this.waiting = this.waiting || this.confirmation.waiting;
+		this.setMessage(null, this.waiting);
+
 		if (this.modal) {
 			this.dialog.classList.remove('modeless');
 			this.dialog.showModal();
@@ -221,8 +236,7 @@ export default class WijitForm extends HTMLElement {
 		const contentType = event.detail.contentType;
 		this.message.innerHTML = '';
 		this.setMessage(status, response);
-		this.diagForm.classList.remove('hidden');
-		this.form.reset();
+		if (this.reset) this.form.reset();
 	}
 
 	/**
@@ -231,42 +245,54 @@ export default class WijitForm extends HTMLElement {
 	 *
 	 * @return {Void}
 	 */
-	setMessage(status, response) {
-		let type, nodes;
+	setMessage(status, responseMsg) {
+		let nodelist, lastIdx, type, nodes;
 		this.clearMessage();
 
 		switch (true) {
 		case status === null:
-			type = 'waiting';
+			type = "waiting";
+			nodelist = this.waitingElems;
 			break;
 		case status > 399:
-			type = 'error';
+			type = "error";
+			nodelist = this.errorElems;
 			break;
 		default:
-			type = 'success';
+			type = "success";
+			nodelist = this.successElems;
+			const clone = this.closeDialogButton.cloneNode(true);
+			lastIdx = nodelist.length -1;
+			nodelist[lastIdx].append(clone);
+			console.log(clone);
 			break;
 		}
 
 		if (this.response === 'html') {
-			this[type][0].innerHTML = response;
-			nodes = this[type];
+			nodelist[0].innerHTML = responseMsg;
+			nodes = nodelist;
 		} else {
-			nodes = this.replacePlaceholders(this[type], response);
+			nodes = this.replacePlaceholders(nodelist, responseMsg);
 		}
 
 		for (const node of nodes) {
 			node.classList.add(type);
-			node.setAttribute('slot', 'message')
+			node.setAttribute('slot', 'message');
 		}
 	}
 
 	clearMessage() {
-		this.diagForm.classList.add('hidden');
-		for (const e of this.error) e.setAttribute('slot', 'error');
-		for (const s of this.success) s.setAttribute('slot', 'success');
-		for (const w of this.waiting) w.setAttribute('slot', 'waiting');
+		for (const e of this.errorElems) e.setAttribute('slot', 'error');
+		for (const s of this.successElems) s.setAttribute('slot', 'success');
+		for (const w of this.waitingElems) w.setAttribute('slot', 'waiting');
 	}
 
+	/**
+	 * Replace innerHTML contents of elem containing {{ }} placeholders with json data coming from server.
+	 * @param  {NodeList} 	nodelist Collection of nodes assigned to a named slot
+	 * @param  {String} 	response The response from the server
+	 * @return {NodeList}			 The collection with placeholders replaced with data
+	 */
 	replacePlaceholders(nodelist, response) {
 		const fn = function (node, matches) {
 			if (matches !== null) {
@@ -290,20 +316,22 @@ export default class WijitForm extends HTMLElement {
 
 	getElem(type) {
 		let elems = this.querySelectorAll(`[slot=${type}]`);
+		// const clone = this.closeDialogButton.cloneNode(true);
+		// clone.addEventListener('click', () => this.dialog.close());
 
 		if (elems.length === 0) {
 			const div = document.createElement('div');
 			div.innerHTML = this.confirmation[type];
 			div.classList.add(type);
 			div.setAttribute('slot', type);
+			// if (type !== 'waiting') div.append(clone);
 			this.append(div);
 			elems = this.querySelectorAll(`[slot=${type}]`);
-		}
-
-		for (const elem of elems) {
-			elem.addEventListener('slotchange', (event) => {
-				console.log(event);
-			});
+		} else if(type !== 'waiting') {
+			// const lastIdx = elems.length -1;
+			// clone.addEventListener('click', ()=>{console.log('foo')});
+			// console.log(clone);
+			// elems[lastIdx].append(clone);
 		}
 
 		return elems;
@@ -339,8 +367,38 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	get response () { return this.#response; }
-	set response (value) {
-		this.#response = value;
+	set response (value) { this.#response = value; }
+
+	get reset () { return this.#reset; }
+	set reset (value) {
+		switch (value) {
+		case '':
+		case 'true':
+			value = true;
+			break;
+		default:
+			value = false;
+		}
+
+		this.#reset = value;
+	}
+
+	get waiting () { return this.#waiting; }
+	set waiting (value) {
+		this.#waiting = value;
+		this.waitingElems[0].innerHTML = value;
+	}
+
+	get succcess () { return this.#success; }
+	set success (value) {
+		this.#success = value;
+		this.successElems[0].innerHTML = value;
+	}
+
+	get error () { return this.#error; }
+	set error (value) {
+		this.#error = value;
+		this.errorElems[0].innerHTML = value;
 	}
 }
 

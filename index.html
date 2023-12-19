@@ -152,8 +152,8 @@
             fieldset
             { display: inline-block; }
 
-            fieldset label
-            { display: block; }
+            div > label
+            { display: inline-block; }
 
             fieldset > select,
             fieldset > input
@@ -199,7 +199,7 @@
         </div>
     </details>
 
-    <wijit-form id="demoform">
+    <wijit-form id="demoform" reset="false">
         <form action="/test-server.php">
             <fieldset>
                 <legend>Demo Form</legend>
@@ -215,17 +215,17 @@
                     <legend>Custom Messages</legend>
                         <div>
                         <label for="demo-waiting">waiting</label>
-                        <input name="waiting" id="demo-waiting" oninput="change(event, 'waiting')">
+                        <textarea name="waiting" id="demo-waiting" oninput="change(event, 'waiting')"></textarea>
                         </div>
 
                         <div>
                             <label for="demo-success">success</label>
-                            <input name="success" id="demo-success" oninput="change(event, 'success')">
+                            <textarea name="success" id="demo-success" oninput="change(event, 'success')"></textarea>
                         </div>
 
                         <div>
                             <label for="demo-error">error</label>
-                            <input name="error" id="demo-error" oninput="change(event, 'error')">
+                            <textarea name="error" id="demo-error" oninput="change(event, 'error')"></textarea>
                         </div>
                     </fieldset>
 
@@ -256,11 +256,11 @@
                 <section  class="flex row bottom">
                     <span>
                         <label for="demo-name1">First</label>
-                        <input name="FirstName" id="demo-name1" value="Foo" autocomplete="_given-name">
+                        <input name="first" id="demo-name1" value="Foo" autocomplete="_given-name">
                     </span>
                     <span>
                         <label for="demo-name2">Last</label>
-                        <input name="LastName" id="demo-name2" value="Bar" autocomplete="_family-name">
+                        <input name="last" id="demo-name2" value="Bar" autocomplete="_family-name">
                     </span>
 
                     <button>Submit</button>
@@ -272,7 +272,7 @@
     <section>
         <article>
             <h3>Basic Example</h3>
-            <wijit-form>
+            <!-- <wijit-form>
                 <form action="/test-server.php">
                     <label for="ex1-name">Name</label>
                     <input id="ex1-name" name="name">
@@ -282,7 +282,7 @@
 
                     <button>Spam Me!</button>
                 </form>
-            </wijit-form>
+            </wijit-form> -->
         </article>
 
         <article>
@@ -317,7 +317,7 @@
 
         <article>
             <h3>HTML response from server</h3>
-            <wijit-form response="html">
+            <!-- <wijit-form response="html">
                 <form action="/test-server.php">
                     <div>
                         <label for="ex3-name">Name</label>
@@ -331,12 +331,12 @@
                         <button>Spammie!</button>
                     </div>
                 </form>
-            </wijit-form>
+            </wijit-form> -->
         </article>
 
         <article>
             <h3>Modal Dialog</h3>
-            <wijit-form modal>
+            <!-- <wijit-form modal>
                 <form action="/test-server.php">
                     <div>
                         <label for="ex4-name">Name</label>
@@ -350,7 +350,7 @@
                         <button>Spammie!</button>
                     </div>
                 </form>
-            </wijit-form>
+            </wijit-form> -->
         </article>
     </section>
 
@@ -443,17 +443,17 @@
         function change (event, attr) {
             const elem = document.querySelector('#demoform');
             let div = event.target.querySelector(`[slot=${attr}]`);
-            console.log(elem.waiting);
+
             switch (attr) {
             case 'waiting':
             case 'success':
             case 'error':
-                if (!div) div = document.createElement('div');
-                div.setAttribute('slot', attr);
-                div.innerHTML = event.target.value;
+                elem[attr] = event.target.value;
+                break;
+            default:
+                elem.setAttribute(attr, event.target.value);
                 break;
             }
-            elem.setAttribute(attr, event.target.value);
         }
     </script>
 </body>
