@@ -6,22 +6,17 @@ export default class WijitForm extends HTMLElement {
 	#waiting;
 	#success;
 	#error;
-
-	confirmation = {
-		success: "<h3>Submission Received</h3><p>Thank you!.</p>",
-		error: "<h3>Oopsie!</h3><p>There was an error. Please seek help.</p>",
-		waiting: "<p>Please Wait...</p>"
-	}
-
+	#dialogMessageId = "dialog-message";
 	errorElems;
 	successElems;
 	waitingElems;
 	dialog;
-	form;
-	wrapper;
-	showSuccessFromServer = false;
-	showErrorFromServer = false;
-	static observedAttributes = ['modal','fetch-options', 'response', 'reset'];
+	default = {
+		success: "<h3>Submission Received</h3><p>Thank you!.</p>",
+		error: "<h3>Oopsie!</h3><p>There was an error. Please seek help.</p>",
+		waiting: "<h1>Please Wait...</h1>"
+	}
+	static observedAttributes = ['modal','fetch-options', 'response', 'reset', 'dialog-message-id'];
 
 	constructor () {
 		super();
@@ -29,7 +24,8 @@ export default class WijitForm extends HTMLElement {
 		this.shadowRoot.innerHTML = `
 			<style>
 				:host {
-					--waiting-text: rgb(60,60,60);
+					--message-text: rgb(40,40,40);
+					--message-bg: ivory;
 				}
 
 				::backdrop {
@@ -43,7 +39,8 @@ export default class WijitForm extends HTMLElement {
 					{ background-color: black; }
 
 					:host {
-						--waiting-text: lightgray;
+						--message-text: ivory;
+						--message-bg: dimgray;
 					}
 
 				}
@@ -77,35 +74,28 @@ export default class WijitForm extends HTMLElement {
 				}
 
 
-				::slotted(.success),
-				::slotted(.error),
-				::slotted(div.waiting),
-				::slotted(p.waiting),
-				::slotted(span.waiting),
-				::slotted(h1.waiting),
-				::slotted(h2.waiting),
-				::slotted(h3.waiting),
-				::slotted(h4.waiting)
-				{
-					background-color: var(--dialog-bg);
-					border-radius: .5rem;
-					color: var(--dialog-text);
-					font-weight: bold;
-					height: max-content;
+				#dialog-message {
+					background-color: var(--message-bg);
+					border-radius: 1rem;
+					color: var(--message-text);
 					margin: auto;
-					min-width: 200px;
-					padding: .5rem;
+					padding: 1rem;
 					position: relative;
-					text-align: center;
 					top: 50%;
 					transform: translateY(-50%);
-					width: min-content;
+
 				}
 
-				::slotted(div.waiting)
-				{
-					color: var(--waiting-text);
-					font-size: x-large;
+				#dialog-message.waiting {
+					aspect-ratio: 1/1;
+					background-color: transparent;
+					max-height: 100%;
+					max-width: 100%;
+					overflow: hidden;
+					padding: 0;
+					top: 0;
+					transform: none;
+					width: 100%;
 				}
 
 				.hidden {
@@ -124,7 +114,12 @@ export default class WijitForm extends HTMLElement {
 				<slot></slot>
 				<slot name="dialog">
 					<dialog class="modeless">
-						<slot name="message"></slot>
+						<div id="dialog-message">
+							<slot name="message"></slot>
+						</div>
+						<form method="dialog" class="hidden">
+							<button>OK</button>
+						</form>
 					</dialog>
 				</slot>
 			</div>
@@ -139,59 +134,46 @@ export default class WijitForm extends HTMLElement {
 
 		this.fetchOptions = this.getAttribute('fetch-options') || {};
 		this.response = this.getAttribute('response') || this.response;
+		this.mainAbortController = new AbortController();
 	}
 
 	connectedCallback () {
+		this.waitingElems = this.querySelectorAll('[slot=waiting]');
+		this.successElems = this.querySelectorAll('[slot=success]');
+		this.errorElems = this.querySelectorAll('[slot=error]');
 		this.dialog = this.querySelector('dialog') || this.shadowRoot.querySelector('dialog');
-		this.closeDialogButton =
-			this.dialog.querySelector('form[method=dialog] button, form[method=dialog] input[type=submit]')
-			|| this.shadowRoot.querySelector('#responses button');
-		this.message = this.dialog.querySelector('[name=message]');
-		this.waitingElems = this.getElem('waiting');
-		this.successElems = this.getElem('success');
-		this.errorElems = this.getElem('error');
+		this.container = this.dialog.querySelector(`#${this.dialogMessageId}`);
 		this.form = this.querySelector('form');
 
-		this.closeDialogButton.setAttribute('onclick', `console.log(${this.dialog})`);
-		this.form.addEventListener('submit', (event) => this.submitData(event));
-		this.form.addEventListener('response', (event) => this.showResponse(event));
-		this.dialog.addEventListener('close', () => {
-			this.form.elements[0].focus();
-		});
+		this.form.addEventListener('submit', (event) => this.submitData(event), {signal: this.mainAbortController.signal});
+		this.dialog.addEventListener('close', (event) => {
+			if (this.reset) this.resetForm(this.form);
+		}, {signal: this.mainAbortController.signal});
 	}
 
-	attributeChangedCallback(attr, oldval, newval) {
+	attributeChangedCallback (attr, oldval, newval) {
 		// if attribute name has hypons, camel-case it.
 		if (attr.indexOf('-') > -1) {
 			attr = attr.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join("");
+			attr = attr.replace(attr.charAt(0), attr.charAt(0).toLowerCase());
 		}
+
+		// console.log(attr, newval);
 		this[attr] = newval;
 	}
 
-	submitData (event) {
+	disconnectedCallback () {
+		this.mainAbortController.abort();
+	}
+
+	submitData(event) {
 		event.preventDefault();
 		let url = event.target.action;
-		let status = 200;
-		const options = this.fetchOptions;
-		const data = new FormData(event.target);
-		// for Accept header
+		const data = new FormData (event.target);
 		const accept = (this.response === 'html') ? "text/html" : "application/json, application/xml";
+		const options = this.setFetchOptions(event, accept);
 
-		this.message.innerHTML = '';
-
-		this.waiting = this.waiting || this.confirmation.waiting;
-		this.setMessage(null, this.waiting);
-
-		if (this.modal) {
-			this.dialog.classList.remove('modeless');
-			this.dialog.showModal();
-		} else {
-			this.dialog.show();
-		}
-
-		options.method = event.target.method || 'GET';
-		options.method = options.method.toUpperCase();
-		options.headers = options.headers || {};
+		this.showDialog(this.waiting, null);
 
 		if (options.method === 'GET' || options.method === 'HEAD') {
 			let i = 0;
@@ -200,100 +182,155 @@ export default class WijitForm extends HTMLElement {
 				url += (i === 0) ? entry.join('=') : `&${entry.join('=')}`;
 				i++;
 			}
-
 			url = encodeURI(url);
 		} else {
 			options.body = data;
 		}
 
-		// options.headers overrides 'accept' var
-		options.headers.Accept = options.headers.Accept || accept;
-
-		let contentType;
+		let status = 200;
 
 		fetch (url, options)
 		.then (response => {
-			contentType = response.headers.get('Content-Type') ?? accept;
 			status = response.status;
-			if (contentType.indexOf('json') > -1) {
-				return response.json();
-			} else {
-				return response.text();
-			}
+			return this.response === 'json' ? response.json() : response.text();
 		})
 		.then (result => {
-			const evt = new CustomEvent('response', {
-				detail: {status:status, response:result, contentType: contentType}
-			});
-
-			this.form.dispatchEvent(evt);
-		})
+			this.showDialog (result, status);
+		});
 	}
 
-	showResponse(event) {
-		let response = event.detail.response;
-		const status = event.detail.status;
-		const contentType = event.detail.contentType;
-		this.message.innerHTML = '';
-		this.setMessage(status, response);
-		if (this.reset) this.form.reset();
+	setFetchOptions(event, accept) {
+		const options = JSON.parse (JSON.stringify (this.fetchOptions));
+		const method = event.target.getAttribute('method') || 'POST';
+		options.method = method.toUpperCase();
+		options.headers = options.headers || {};
+		// options.headers overrides 'accept' var
+		options.headers.Accept = options.headers.Accept || accept;
+		return options;
 	}
 
-	/**
-	 * Sets the confirmation message.
-	 * @param {integer|null} status The http status code. Null if setting the 'waiting' message.
-	 *
-	 * @return {Void}
-	 */
-	setMessage(status, responseMsg) {
-		let nodelist, lastIdx, type, nodes;
+	showDialog(dataFromServer, statusCode) {
+		const message = this.setMessage (dataFromServer, statusCode);
+		const closeDialogForm = this.dialog.querySelector('form[method=dialog]');
+		const btn = closeDialogForm.querySelector('input[type=submit], button');
+
+		if (message) this.container.innerHTML = message;
+
+		// this.container.append(closeDialogForm.cloneNode(true));
+		this.container.append(closeDialogForm);
+
+		if (statusCode) {
+			closeDialogForm.classList.remove('hidden');
+			btn.focus();
+		} else {
+			closeDialogForm.classList.add('hidden');
+		}
+
+		if (this.modal) {
+			this.dialog.classList.remove('modeless');
+			this.dialog.showModal();
+		} else {
+			this.dialog.classList.add('modeless');
+			this.dialog.show();
+		}
+	}
+
+	setMessage (dataFromServer, statusCode) {
+		let message, type, nodelist;
 		this.clearMessage();
 
-		switch (true) {
-		case status === null:
-			type = "waiting";
+		switch (statusCode) {
+		case null:
+			type = 'waiting';
 			nodelist = this.waitingElems;
+			this.container.classList.add('waiting');
 			break;
-		case status > 399:
-			type = "error";
+		case statusCode > 399:
+			type = 'error';
 			nodelist = this.errorElems;
+			this.container.classList.remove('waiting');
 			break;
 		default:
-			type = "success";
+			type = 'success';
 			nodelist = this.successElems;
-			const clone = this.closeDialogButton.cloneNode(true);
-			lastIdx = nodelist.length -1;
-			nodelist[lastIdx].append(clone);
-			console.log(clone);
+			this.container.classList.remove('waiting');
 			break;
 		}
 
-		if (this.response === 'html') {
-			nodelist[0].innerHTML = responseMsg;
-			nodes = nodelist;
+
+		if (this[type]) {
+			////////////////////////////////////////////////////
+			// if user supplied custom message via attributes //
+			////////////////////////////////////////////////////
+			if (this.response === 'json') {
+				// replace placeholders in user message with json data from server
+				message = this.replacePlaceholders (this[type], dataFromServer)
+			} else {
+				// if this.response is 'html', use user message as-is
+				message = this[type];
+			}
+
+		} else if (nodelist.length > 0) {
+			///////////////////////////////////////////////
+			// if user supplied custom message via slots //
+			///////////////////////////////////////////////
+			if (this.response === 'json') {
+				this.replaceNodeContents(nodelist, dataFromServer);
+			}
+
+			for (const node of nodelist) {
+				node.setAttribute('slot', 'message');
+			}
+
+		} else if (this.response === 'html') {
+			if (statusCode === null) {
+				// this is a waiting message
+				message = this.default[type]
+			} else {
+			// use message sent from server
+			message = dataFromServer;
+		}
 		} else {
-			nodes = this.replacePlaceholders(nodelist, responseMsg);
+			// use default message
+			message = this.default[type];
 		}
 
-		for (const node of nodes) {
-			node.classList.add(type);
-			node.setAttribute('slot', 'message');
-		}
+		return message;
 	}
 
-	clearMessage() {
-		for (const e of this.errorElems) e.setAttribute('slot', 'error');
-		for (const s of this.successElems) s.setAttribute('slot', 'success');
-		for (const w of this.waitingElems) w.setAttribute('slot', 'waiting');
+	replacePlaceholders (userdata, jsondata) {
+		const fn = function (string, matches) {
+			if (matches !== null) {
+				for (const match of matches) {
+					const prop = match.substring(2, match.indexOf('}}'));
+					const keys = prop.split('.');
+					let result = jsondata;
+					for (const key of keys) {
+						result = result[key] ?? result;
+					}
+
+					if (typeof result === 'object') {
+						string = JSON.stringify(result);
+					} else {
+						string = string.replace(match, result);
+					}
+				}
+			}
+
+			return string;
+		}
+
+		let matches = userdata.match(/{{([^{}]+)}}/g);
+		return fn (userdata, matches);
 	}
 
 	/**
-	 * Replace innerHTML contents of elem containing {{ }} placeholders with json data coming from server.
-	 * @param  {NodeList} 	nodelist Collection of nodes assigned to a named slot
-	 * @param  {String} 	response The response from the server
-	 * @return {NodeList}			 The collection with placeholders replaced with data
+	 * Replace innerHTML contents of elements containing {{ }} placeholders with json data coming from server.
+	 * @param  {NodeList} 	nodelist	Collection of nodes assigned to a named slot
+	 * @param  {String} 	response	The response from the server
+	 * @return {NodeList}				The collection with placeholders replaced with data
 	 */
-	replacePlaceholders(nodelist, response) {
+	replaceNodeContents(nodelist, response) {
 		const fn = function (node, matches) {
 			if (matches !== null) {
 				for (const match of matches) {
@@ -314,27 +351,80 @@ export default class WijitForm extends HTMLElement {
 		return nodelist;
 	}
 
-	getElem(type) {
-		let elems = this.querySelectorAll(`[slot=${type}]`);
-		// const clone = this.closeDialogButton.cloneNode(true);
-		// clone.addEventListener('click', () => this.dialog.close());
+	resetForm(form) {
+		// for some reason this.form.reset() is not a function ???
+		const inputs = form.querySelectorAll('input, select, textarea');
+		for (const input of inputs) {
+			input.value = input.defaultValue || '';
+		}
+	}
 
-		if (elems.length === 0) {
-			const div = document.createElement('div');
-			div.innerHTML = this.confirmation[type];
-			div.classList.add(type);
-			div.setAttribute('slot', type);
-			// if (type !== 'waiting') div.append(clone);
-			this.append(div);
-			elems = this.querySelectorAll(`[slot=${type}]`);
-		} else if(type !== 'waiting') {
-			// const lastIdx = elems.length -1;
-			// clone.addEventListener('click', ()=>{console.log('foo')});
-			// console.log(clone);
-			// elems[lastIdx].append(clone);
+	clearMessage() {
+		// this.container.innerHTML = '';
+		for (const w of this.waitingElems) w.setAttribute('slot', 'waiting');
+		for (const e of this.errorElems) e.setAttribute('slot', 'error');
+		for (const s of this.successElems) s.setAttribute('slot', 'success');
+	}
+
+	cleanHTML(html) {
+		const tmp = document.createElement('div');
+		tmp.innerHTML = html;
+		const childNodes = tmp.childNodes;
+		const allowedElements = ['p', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'b', 'strong', 'i', 'hr', 'br'];
+		const allowedAttributes = ['id', 'class', 'style'];
+
+		for (let i = childNodes.length - 1; i >= 0; i--) {
+			let node = childNodes[i];
+			if (node.nodeType === Node.ELEMENT_NODE && !allowedElements.includes(node.localName)) {
+				let textNode = document.createTextNode(node.textContent);
+	      		tmp.replaceChild(textNode, node);
+	    	}
+	  	}
+
+	  	return tmp.innerHTML;
+	}
+
+	sanitizeJSON (jsonData) {
+console.log(jsonData);
+		if (!jsonData) return;
+
+		let parsedData;
+
+		try {
+			parsedData = JSON.parse(jsonData);
+		} catch (error) {
+			jsonData = jsonData.replaceAll(/([\w/]+)/g, '"$&"');
+			jsonData = jsonData.replaceAll("'", "");
+			parsedData = JSON.parse(jsonData);
 		}
 
-		return elems;
+return parsedData;
+
+		function sanitizeValue(value) {
+			if (typeof value === "object") {
+				// If the value is an object, recursively sanitize its properties
+				for (let key in value) {
+					if (value.hasOwnProperty(key)) {
+						value[key] = sanitizeValue(value[key]);
+					}
+				}
+			} else if (typeof value === "string") {
+				// If the value is a string, sanitize it by removing any potentially harmful characters
+				value = value.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+			}
+
+			return value;
+		}
+
+		for (let key in parsedData) {
+			if (parsedData.hasOwnProperty(key)) {
+				parsedData[key] = sanitizeValue(parsedData[key]);
+			}
+		}
+
+		const sanitizedJSON = JSON.stringify(parsedData);
+
+		return sanitizedJSON;
 	}
 
 	get modal () { return this.#modal; }
@@ -353,21 +443,20 @@ export default class WijitForm extends HTMLElement {
 
 	get fetchOptions () { return this.#fetchOptions; }
 	set fetchOptions (value) {
-		if (typeof value === 'string') {
-			try {
-				value = JSON.parse(value);
-			} catch (e) {
-				value = value.replaceAll(/([\w/]+)/g, '"$&"');
-				value = value.replaceAll("'", "");
-				value = JSON.parse(value);
-			}
-		}
+		// if (typeof value === 'string') {
+			value = this.sanitizeJSON (value);
+			console.log(value);
+		// } else {
+			// value = {};
+		// }
 
 		this.#fetchOptions = value;
 	}
 
 	get response () { return this.#response; }
-	set response (value) { this.#response = value; }
+	set response (value) {
+		this.#response = value.toLowerCase();
+	}
 
 	get reset () { return this.#reset; }
 	set reset (value) {
@@ -385,20 +474,25 @@ export default class WijitForm extends HTMLElement {
 
 	get waiting () { return this.#waiting; }
 	set waiting (value) {
+		value = this.cleanHTML(value);
 		this.#waiting = value;
-		this.waitingElems[0].innerHTML = value;
 	}
 
-	get succcess () { return this.#success; }
+	get success () { return this.#success; }
 	set success (value) {
+		value = this.cleanHTML(value);
 		this.#success = value;
-		this.successElems[0].innerHTML = value;
 	}
 
 	get error () { return this.#error; }
 	set error (value) {
+		value = this.cleanHTML(value);
 		this.#error = value;
-		this.errorElems[0].innerHTML = value;
+	}
+
+	get dialogMessageId () { return this.#dialogMessageId }
+	set dialogMessageId (value) {
+		this.#dialogMessageId = value;
 	}
 }
 

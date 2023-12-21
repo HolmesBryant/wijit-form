@@ -9,9 +9,13 @@ $message = ($fail) ? "Error message from server" : 'Success message from server.
 
 $data = (object) [
 	'status' => $status,
-	'title' => $title,
 	'message' => $message,
-	'data' => $_REQUEST
+	'data' => $_REQUEST,
+	'deeply' => [
+		'nested' => [
+			'property' => 'deeply nested value'
+		]
+	]
 ];
 
 if ($fail && $fail === 'true') {

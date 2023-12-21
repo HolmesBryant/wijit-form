@@ -13,7 +13,8 @@
      You can change the colors of the form by changing the values of these css variables
     ------------------------------------------->
     <style>
-        :root {
+
+        wijit-form {
             --bg1: rgb(250,250,250);
             --bg2: rgb(245,245,245);
             --bg3: white;
@@ -34,20 +35,29 @@
                 --border: dimgray;
             }
 
-        }
-
-        wijit-form {
             width: 100%;
 
+            /*********************/
             /**** Backgrounds ****/
+            /*********************/
+
+            article,
+            details > *,
+            fieldset
+            { background-color: var(--bg2); }
+
+            input,
+            input[type="checkbox"]::before,
+            input[type="radio"]::before,
+            select,
+            textarea
+            { background-color: var(--bg3); }
 
             button
             { background-color: var(--primary); }
 
-            input,
-            select,
-            textarea
-            { background-color: var(--bg3); }
+            .secondary
+            { background-color: var(--secondary) }
 
             .error
             { background-color: var(--fail); }
@@ -55,7 +65,9 @@
             .success
             { background-color: var(--pass); }
 
-            /**** Borders ****/
+            /*********************/
+            /****** Borders ******/
+            /*********************/
 
             button,
             input,
@@ -69,13 +81,31 @@
                 border-radius: .5rem;
             }
 
+            input[type="checkbox"]::before
+            {
+                border: 1px solid var(--border);
+                border-radius: 5px;
+            }
+
+            input[type="radio"]::before
+            {
+                border: 1px solid var(--border);
+                border-radius: 50%;
+            }
+
+            article,
+            section
+            { border-radius: 1rem; }
+
             :user-valid
             { border-color: var(--pass) }
 
             :user-invalid
             { border-color: var(--fail) }
 
-            /**** Text ****/
+            /*********************/
+            /******* Text ********/
+            /*********************/
 
             button,
             input,
@@ -92,6 +122,10 @@
             label.required:after
             { color: var(--fail) }
 
+            input[type="checkbox"]::before,
+            input[type="radio"]::before
+            { font-size: 28px; }
+
             label.required
             { font-size: small }
 
@@ -105,7 +139,9 @@
             .success
             { text-align: center; }
 
-            /**** Shadows ****/
+            /*********************/
+            /****** Shadows ******/
+            /*********************/
 
             button:hover,
             input[type="submit"]:hover,
@@ -117,7 +153,9 @@
             input[type="reset"]:active
             { box-shadow: none; }
 
-            /**** Cursor ****/
+            /*********************/
+            /******* Cursor ******/
+            /*********************/
 
             input[type="color"],
             input[type="range"],
@@ -129,7 +167,15 @@
             [disabled]
             { cursor: not-allowed; }
 
-            /**** Structure ****/
+            /*********************/
+            /***** Structure *****/
+            /*********************/
+
+            article
+            { padding: 10px; }
+
+            article.flex > textarea
+            { height: 100%; }
 
             button,
             input,
@@ -143,171 +189,340 @@
             }
 
             button,
-            label
+            span
             {
-                display: block;
+                display: inline-block;
                 margin: .5rem;
+                vertical-align: middle;
+                overflow: visible;
+                overflow-wrap: anywhere;
             }
 
-            fieldset
-            { display: inline-block; }
+            details
+            { margin: 0 10px; }
 
-            div > label
-            { display: inline-block; }
+            details > *
+            {
+                margin: 1rem 0;
+                padding: 1rem;
+            }
 
-            fieldset > select,
-            fieldset > input
-            { width: 100%; }
+            figure
+            { text-align: center; }
 
-            input
-            { margin-bottom: .5rem }
+            figcaption
+            {
+                align-items: stretch;
+                display: flex;
+            }
+
+            figcaption > *
+            { flex: 1; }
+
+            form
+            { width: 100%;}
+
+            input[type="color"]
+            { padding: 0; }
+
+            input,
+            select
+            {
+                min-height: 35px;
+                min-width: 35px;
+                vertical-align: middle;
+            }
+
+            input[type="checkbox"]::before,
+            input[type="radio"]::before
+             {
+                content: "";
+                min-width: inhert;
+                min-height: inherit;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 0;
+            }
+
+            input[type="checkbox"]:checked::before,
+            input[type="radio"]:checked::before {
+                content: "⬤";
+            }
 
             label.required:after
             {
                 content: "Required";
+                font-size: small;
                 vertical-align: super;
             }
 
-            textarea
+            option
+            { font-size: 1.2rem; }
+
+            section
             {
-                height: 100%;
-                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+                margin-top: 10px;
             }
 
-            .error,
-            .success
-            { padding: 1rem; }
+            section > *
+            { flex: 1 0 200px}
+
+            textarea
+            { min-height: 5rem; }
+
+            ul, ol
+            {
+                margin: 1rem;
+                padding: 1rem;
+            }
+
+            :user-valid
+            { border-color: var(--pass) }
+
+            :user-invalid
+            { border-color: var(--fail) }
+
+            /*********************/
+            /******** Flex *******/
+            /*********************/
+
+            @layer flex {
+                .flex
+                { display: flex; }
+
+                .between
+                { justify-content: space-between; }
+
+                .flex.center
+                {
+                    align-content: center;
+                    align-items: center;
+                    justify-content: center;
+                    justify-items: center;
+                }
+
+                .column
+                { flex-direction: column }
+
+                .column-reverse
+                { flex-direction: column-reverse; }
+
+                .row
+                {
+                    flex-direction: row;
+                    justify-content: space-evenly;
+                }
+
+                .row-reverse
+                { flex-direction: row-reverse; }
+
+                .bottom
+                { align-items: flex-end; }
+
+                .start.column,
+                .start.row
+                {
+                    align-items: center;
+                    justify-content: flex-start;
+                }
+
+                .start.column-reverse,
+                .start.row-reverse
+                {
+                    align-items: center;
+                    justify-content: flex-end;
+                }
+
+                .end.row,
+                .end.row-reverse
+                { align-items: center; }
+
+                .end.column,
+                .end.row
+                 { justify-content: flex-end; }
+
+                .end.column-reverse,
+                .end.row-reverse
+                { justify-content: flex-start; }
+
+            } /* @flex */
         } /**** wijit-form ****/
     </style>
 </head>
 <body>
     <details>
         <summary><h1>Wijit Form Web Component</h1></summary>
-        <p>This component serves simply as a convenience to make styling forms and adding waiting effects and confirmation/error messages less time consuming</p>
+        <p>This component serves simply as a convenience to make styling forms and adding waiting effects and confirmation/error messages less time consuming.</p>
 
-
-
-        <h2>Attributes</h2>
-        <div>
+        <article>
+            <h2>Attributes</h2>
+            <p>All of these attributes are optional</p>
             <ul>
-                <li><b>fetch_options (default: null)</b> Acceptable values: [Any valid fetch option from: <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/fetch#options">https://developer.mozilla.org/en-US/docs/Web/API/fetch#options</a>]. For example, if you are submitting the form to the same server, you might want to add <code>{"mode":"same-origin"}</code>. You don't have to add the double quotes around every value, but it cuts down a little on processing if you do. The component will first try to parse it as JSON, then if it fails, it will add double quotes in an attempt to make it valid JSON and parse it again.</li>
+                <li><b>fetch-options (default: null)</b> Acceptable values: [Any valid fetch option from: <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/fetch#options">The MDN Docs</a>]. For example, if you are submitting the form to the same server, you might want to add <code>{"mode":"same-origin"}</code>. You don't have to add the double quotes around every value, but it cuts down a little on processing if you do. The component will first try to parse it as JSON, then if it fails, will attempt to convert it to valid JSON.</li>
 
-                <li><b>waiting_attr (default: "active")</b> Acceptable values: [any string].</li>
+                <li>User Supplied Confirmation Messages. These attributes accept strings or basic html. You may include custom confirmation messages via slots as well as attributes. Usage of the slots will be described below.
+                    <ul>
+                        <li><b>waiting (default: null)</b> Acceptable values: [any string or basic html] This is the message displayed after the form is submitted, while the page is waiting for a response from the server.</li>
 
-                <li><b>waiting_delay (default: "500")</b> Acceptable values: [any integer]. This is the number of milliseconds that will pass between receiving a response from the server after the form is submitted, and showing the confirmation message. Some "waiting" effects may need a little time to finish doing their thing before removing them.</li>
+                        <li><b>success (default: null)</b> Acceptable values: [any string or basic HTML] This is the message displayed upon a successful response from the server, meaning the server sent an http status code lower than 400</li>
+
+                        <li><b>error (default: null)</b> Acceptable values: [any string or basic HTML] This is the message displayed when the server reports an error, meaning it sent an http status code greater than 399.
+                        </li>
+                    </ul>
+                </li>
+
+                <li><b>response (default: "json")</b> Acceptable values: ["html", "json"] The Content Type expected from the server response.</li>
+
+                <li><b>modal (default: "false")</b> Acceptable values: ["true", "false"] Whether to open the confirmation dialog as a modal. A modal dialog/overlay covers the entire screen. When this value is false, the confirmation dialog/overlay only covers the form which was submitted.</li>
+
+                <li><b>reset (default: "true")</b> Acceptable value: ["true", "false"] Whether to reset the form after it is submitted.</li>
             </ul>
-        </div>
+        </article>
     </details>
 
-    <wijit-form id="demoform" reset="false">
-        <form action="/test-server.php">
-            <fieldset>
-                <legend>Demo Form</legend>
-                <section id="settings">
-                    <fieldset>
-                    <legend>fetch-options</legend>
-                        <textarea
-                            oninput="change(event, 'options')"
-                            placeholder="Example: {headers:{Accept:'text/html'}}"></textarea>
-                    </fieldset>
+    <section>
+        <article>
+            <h2>Demo Form</h2>
+            <wijit-form id="demoform" reset="false">
+                <form action="/test-server.php">
+                    <section id="settings">
+                        <article class="flex column">
+                            <label>fetch-options</label>
+                            <textarea
+                                name="fetch-options"
+                                oninput="change(event, 'fetch-options')"
+                                placeholder="Example: {headers:{Accept:'text/html'}}"></textarea>
+                        </article>
 
-                    <fieldset>
-                    <legend>Custom Messages</legend>
-                        <div>
-                        <label for="demo-waiting">waiting</label>
-                        <textarea name="waiting" id="demo-waiting" oninput="change(event, 'waiting')"></textarea>
-                        </div>
+                        <fieldset class="column">
+                        <legend>Custom Messages</legend>
+                            <p class="flex column end">
+                                <label for="demo-waiting">waiting</label>
+                                <textarea name="waiting" id="demo-waiting" placeholder="Example: <h1>Waiting</h1>" oninput="change(event, 'waiting')"></textarea>
+                            </p>
+                            <p class="flex column">
+                                <label for="demo-success">success</label>
+                                <textarea name="success" id="demo-success" placeholder="Example: <p>Thanks!</p>" oninput="change(event, 'success')"></textarea>
+                            </p>
+                            <p class="flex column">
+                                <label for="demo-error">error</label>
+                                <textarea name="error" id="demo-error" placeholder="Example: <p>Nope!</p>" oninput="change(event, 'error')"></textarea>
+                            </p>
+                        </fieldset>
 
-                        <div>
-                            <label for="demo-success">success</label>
-                            <textarea name="success" id="demo-success" oninput="change(event, 'success')"></textarea>
-                        </div>
+                        <article class="flex column between">
+                            <fieldset>
+                            <legend>response</legend>
+                                <div>
+                                    <input type="radio" name="response" value="html" id="demo-response-html" onchange="change(event, 'response')">
+                                    <label for="demo-response-html">html</label>
+                                </div>
+                                <div>
+                                    <input checked type="radio" name="response" value="json" id="demo-response-json" onchange="change(event, 'response')">
+                                    <label for="demo-response-json">json</label>
+                                </div>
+                                <hr>
+                                <div>
+                                    <input type="checkbox" name="fail" value="true" id="demo-force-error">
+                                    <label for="demo-force-error">Force Error</label>
+                                </div>
+                            </fieldset>
 
-                        <div>
-                            <label for="demo-error">error</label>
-                            <textarea name="error" id="demo-error" oninput="change(event, 'error')"></textarea>
-                        </div>
-                    </fieldset>
+                            <fieldset>
+                            <legend>modal</legend>
+                                <div>
+                                    <input type="radio" id="demo-modal-true" name="modal" value="true" onchange="change(event, 'modal')">
+                                    <label for="demo-modal-true">true</label>
+                                </div>
+                                <div>
+                                    <input checked type="radio" id="demo-modal-false" name="modal" value="false" onchange="change(event, 'modal')">
+                                    <label for="demo-modal-false">false</label>
+                                </div>
+                            </fieldset>
 
-                    <fieldset>
-                    <legend>Response Type</legend>
-                        <div>
-                            <input type="radio" name="response" value="html" id="demo-response-html" onchange="change(event, 'response')">
-                            <label for="demo-response-html">html</label>
-                        </div>
-                        <div>
-                            <input checked type="radio" name="response" value="json" id="demo-response-json" onchange="change(event, 'response')">
-                            <label for="demo-response-json">json</label>
-                        </div>
-                    </fieldset>
+                            <fieldset>
+                            <legend>reset</legend>
+                                <div>
+                                    <input type="radio" id="demo-reset-true" name="reset" value="true" onchange="change(event, 'reset')">
+                                    <label for="demo-reset-true">true</label>
+                                </div>
+                                <div>
+                                    <input checked type="radio" id="demo-reset-false" name="reset" value="false" onchange="change(event, 'reset')">
+                                    <label for="demo-reset-false">false</label>
+                                </div>
+                            </fieldset>
+                        </article>
+                    </section>
 
-                    <fieldset>
-                    <legend>Modal Dialog</legend>
-                        <div>
-                            <input type="radio" id="demo-modal-true" name="modal" value="true" onchange="change(event, 'modal')">
-                            <label for="demo-modal-true">true</label>
-                        </div>
-                        <div>
-                            <input checked type="radio" id="demo-modal-false" name="modal" value="false" onchange="change(event, 'modal')">
-                            <label for="demo-modal-false">false</label>
-                        </div>
-                    </fieldset>
-                </section>
-                <section  class="flex row bottom">
-                    <span>
-                        <label for="demo-name1">First</label>
-                        <input name="first" id="demo-name1" value="Foo" autocomplete="_given-name">
-                    </span>
-                    <span>
-                        <label for="demo-name2">Last</label>
-                        <input name="last" id="demo-name2" value="Bar" autocomplete="_family-name">
-                    </span>
+                    <section>
+                        <span>
+                            <label for="demo-name1">First</label>
+                            <input name="first" id="demo-name1" value="Foo" autocomplete="given-name">
+                        </span>
+                        <span>
+                            <label for="demo-name2">Last</label>
+                            <input name="last" id="demo-name2" value="Bar" autocomplete="family-name">
+                        </span>
 
-                    <button>Submit</button>
-                </section>
-            </fieldset>
-        </form>
-    </wijit-form>
+                        <button>Submit</button>
+                    </section>
+
+                </form>
+            </wijit-form>
+        <article>
+    </section>
 
     <section>
         <article>
             <h3>Basic Example</h3>
-            <!-- <wijit-form>
+            <wijit-form>
                 <form action="/test-server.php">
-                    <label for="ex1-name">Name</label>
-                    <input id="ex1-name" name="name">
-
-                    <label for="ex1-email">Email</label>
-                    <input type="email" id="ex1-email" name="email">
-
-                    <button>Spam Me!</button>
+                    <p>
+                        <label for="ex1-name">Name</label>
+                        <input id="ex1-name" name="name" autocomplete="name">
+                    </p>
+                    <p>
+                        <label for="ex1-email">Email</label>
+                        <input type="email" id="ex1-email" name="email" autocomplete="email">
+                    </p>
+                    <p>
+                        <button>Spam Me!</button>
+                    </p>
                 </form>
-            </wijit-form> -->
+            </wijit-form>
         </article>
 
         <article>
             <h3>User Supplied Messages</h3>
             <wijit-form>
                 <form action="/test-server.php">
-                    <label for="ex2-name">Name</label>
-                    <input id="ex2-name" name="name" value="Foo">
-
-                    <label for="ex2-email">Email</label>
-                    <input type="email" id="ex2-email" name="email">
-
-                    <button>Spam Me!</button>
+                    <p>
+                        <label for="ex2-name">Name</label>
+                        <input id="ex2-name" name="name" value="Foo" autocomplete="name">
+                    </p>
+                    <p>
+                        <label for="ex2-email">Email</label>
+                        <input type="email" id="ex2-email" name="email" autocomplete="email">
+                    </p>
+                    <p>
+                        <button>Spam Me!</button>
+                    </p>
                 </form>
 
-                <!-- This element's slot is assign to "waiting". It is shown while awaiting a response from the server -->
-                <wijit-icon01 animate color="lime" slot="waiting"></wijit-icon01>
+                <p>This example provides slots for "waiting", "success" and "error".</p>
+                <p>The contents of these slots are shown while awaiting a response and upon receiving a response from the server.</p>
 
-                <!-- This element's slot is assignt to "success". It is shown when the server sends a status code less than 400 (not an error) -->
+                <wijit-icon01 animate color="lime" slot="waiting">Please Wait</wijit-icon01>
+
                 <div slot="success">
                     <div>Name: {{data.name}}</div>
                     <p>I'm using data.name from the json data sent from the server.</p>
                 </div>
 
-                <!-- This element's slot is assigned to "error". It is shown when the server sends a status code greater than 399 (error) -->
                 <div slot="error">
                     <h2>Something went wrong.</h2>
                     <p>Your submission was not processed.</p>
@@ -317,40 +532,42 @@
 
         <article>
             <h3>HTML response from server</h3>
-            <!-- <wijit-form response="html">
+            <wijit-form response="html">
                 <form action="/test-server.php">
-                    <div>
+                    <p>
                         <label for="ex3-name">Name</label>
-                        <input id="ex3-name" name="name">
-                    </div>
-                    <div>
+                        <input id="ex3-name" name="name" autocomplete="name">
+                    </p>
+                    <p>
                         <label for="ex3-email">Email</label>
-                        <input type="email" id="ex3-email" name="enail">
-                    </div>
-                    <div style="text-align:center">
+                        <input type="email" id="ex3-email" name="email" autocomplete="email">
+                    </p>
+                    <p>
                         <button>Spammie!</button>
-                    </div>
+                    </p>
                 </form>
-            </wijit-form> -->
+            </wijit-form>
+            <p>This example assumes an HTML response from the server.</p>
         </article>
 
         <article>
             <h3>Modal Dialog</h3>
-            <!-- <wijit-form modal>
+            <wijit-form modal>
                 <form action="/test-server.php">
-                    <div>
+                    <p>
                         <label for="ex4-name">Name</label>
-                        <input id="ex4-name" name="name">
-                    </div>
-                    <div>
+                        <input id="ex4-name" name="name" autocomplete="name">
+                    </p>
+                    <p>
                         <label for="ex4-email">Email</label>
-                        <input type="email" id="ex4-email" name="enail">
-                    </div>
-                    <div style="text-align:center">
+                        <input type="email" id="ex4-email" name="enail" autocomplete="email">
+                    </p>
+                    <p>
                         <button>Spammie!</button>
-                    </div>
+                    </p>
                 </form>
-            </wijit-form> -->
+            </wijit-form>
+            <p>This example opens the waiting and confirmation dialogs as modals</p>
         </article>
     </section>
 
