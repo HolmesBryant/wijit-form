@@ -239,24 +239,19 @@ export default class WijitForm extends HTMLElement {
 		let message, type, nodelist;
 		this.clearMessage();
 
-		switch (statusCode) {
-		case null:
+		if (statusCode === null) {
 			type = 'waiting';
 			nodelist = this.waitingElems;
 			this.container.classList.add('waiting');
-			break;
-		case statusCode > 399:
+		} else if (statusCode > 399) {
 			type = 'error';
 			nodelist = this.errorElems;
 			this.container.classList.remove('waiting');
-			break;
-		default:
+		} else {
 			type = 'success';
 			nodelist = this.successElems;
 			this.container.classList.remove('waiting');
-			break;
 		}
-
 
 		if (this[type]) {
 			////////////////////////////////////////////////////
@@ -384,47 +379,15 @@ export default class WijitForm extends HTMLElement {
 	  	return tmp.innerHTML;
 	}
 
-	sanitizeJSON (jsonData) {
-console.log(jsonData);
-		if (!jsonData) return;
-
-		let parsedData;
-
+	validateJson(string) {
+		let parsed = false;
 		try {
-			parsedData = JSON.parse(jsonData);
-		} catch (error) {
-			jsonData = jsonData.replaceAll(/([\w/]+)/g, '"$&"');
-			jsonData = jsonData.replaceAll("'", "");
-			parsedData = JSON.parse(jsonData);
-		}
+			string = string.replaceAll(/['"<>;\s\t\n\r?()]/g, "");
+			string = string.replaceAll(/([\w/\\]+)/g, '"$&"');
+			parsed = JSON.parse(string);
+		} catch {}
 
-return parsedData;
-
-		function sanitizeValue(value) {
-			if (typeof value === "object") {
-				// If the value is an object, recursively sanitize its properties
-				for (let key in value) {
-					if (value.hasOwnProperty(key)) {
-						value[key] = sanitizeValue(value[key]);
-					}
-				}
-			} else if (typeof value === "string") {
-				// If the value is a string, sanitize it by removing any potentially harmful characters
-				value = value.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-			}
-
-			return value;
-		}
-
-		for (let key in parsedData) {
-			if (parsedData.hasOwnProperty(key)) {
-				parsedData[key] = sanitizeValue(parsedData[key]);
-			}
-		}
-
-		const sanitizedJSON = JSON.stringify(parsedData);
-
-		return sanitizedJSON;
+		return parsed;
 	}
 
 	get modal () { return this.#modal; }
@@ -443,14 +406,11 @@ return parsedData;
 
 	get fetchOptions () { return this.#fetchOptions; }
 	set fetchOptions (value) {
-		// if (typeof value === 'string') {
-			value = this.sanitizeJSON (value);
-			console.log(value);
-		// } else {
-			// value = {};
-		// }
-
-		this.#fetchOptions = value;
+		let result;
+		value = this.validateJson(value);
+		if (typeof value === 'object') {
+			this.#fetchOptions = value;
+		}
 	}
 
 	get response () { return this.#response; }

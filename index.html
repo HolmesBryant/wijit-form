@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="/styles.css">
     <script type="module" src="wijit-form.js"></script>
     <script type="module" src="wijit-icon01.js"></script>
-    <script type="module" src="sliding-doors.js"></script>
 
     <!-----------------------------------------
      You can change the colors of the form by changing the values of these css variables
@@ -362,7 +361,7 @@
             <h2>Attributes</h2>
             <p>All of these attributes are optional</p>
             <ul>
-                <li><b>fetch-options (default: null)</b> Acceptable values: [Any valid fetch option from: <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/fetch#options">The MDN Docs</a>]. For example, if you are submitting the form to the same server, you might want to add <code>{"mode":"same-origin"}</code>. You don't have to add the double quotes around every value, but it cuts down a little on processing if you do. The component will first try to parse it as JSON, then if it fails, will attempt to convert it to valid JSON.</li>
+                <li><b>fetch-options (default: null)</b> Acceptable values: [Any valid fetch option from: <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/fetch#options">The MDN Docs</a>]. This should be formatted as valid JSON. For example, if you are submitting the form to the same server, you might want to add <code>{"mode":"same-origin"}</code>.</li>
 
                 <li>User Supplied Confirmation Messages. These attributes accept strings or basic html. You may include custom confirmation messages via slots as well as attributes. Usage of the slots will be described below.
                     <ul>
