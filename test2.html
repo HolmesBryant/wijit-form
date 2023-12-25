@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+</head>
+<body>
+	<my-component></my-component>
+
+	<script>
+		class MyComponent extends HTMLElement {
+  			constructor() {
+    			super();
+    			this.attachShadow({mode:'open'});
+			    this.shadowRoot.innerHTML = `
+			      <button id="myButton">Click me</button>
+			    `;
+			}
+
+			connectedCallback() {
+			    this.shadowRoot.querySelector('#myButton').addEventListener('click',
+			    	() => { this.sayHello(); });
+			}
+
+			sayHello() {
+		    	return 'Hello from MyComponent!';
+			}
+		}
+
+		customElements.define('my-component', MyComponent);
+	</script>
+
+	<script>
+		const elem = document.querySelector('my-component');
+		// const shadow = elem.shadowRoot;
+		// const result = shadow.host.sayHello();
+		const result = elem.sayHello();
+		console.log(result)
+	</script>
+</body>
+</html>

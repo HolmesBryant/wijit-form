@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Unit Tests</title>
+	<script type="module">
+		import WijitForm from "/wijit-form.js";
+		import Tester from "/tester.js";
+		const component = new WijitForm();
+		const tester = await new Tester(component);
+		const instance = tester.instance;
+
+		const form = document.createElement('form');
+		const input = document.createElement('input');
+		const button = document.createElement('button');
+		form.action = '/test-server.php';
+		input.name = 'name';
+		input.value = 'Foobar';
+		button.innerText = 'Submit';
+		form.append(input);
+		form.append(button);
+		instance.append(form);
+		document.body.append(instance);
+		instance.testing = true;
+
+		tester.test('fetchOptions should be object', () => {
+			tester.isEqual(typeof instance.fetchOptions, "object");
+		});
+
+		tester.test('modal should be false', () => {
+			tester.isBool(instance.modal);
+		});
+
+		tester.test('reset should be Boolean', () => {
+			tester.isBool(instance.reset);
+		});
+
+		tester.test('response should be one of [json, html]', () => {
+			tester.isOneOf(instance.response, ['json', 'html']);
+		});
+
+		tester.test('error should be undefined or string', () => {
+			tester.isType(instance.error, ["undefined", "string"]);
+		});
+
+		tester.test('success should be undefined or string', () => {
+			tester.isType(instance.success, ["undefined", "string"]);
+		});
+
+		tester.test('waiting should be undefined or string', () => {
+			tester.isType(instance.waiting, ["undefined", "string"]);
+		});
+
+		tester.test('errorElems should be a NodeList', () => {
+			tester.is(instance.errorElems, NodeList);
+		});
+
+		tester.test('successElems should be a NodeList', () => {
+			tester.is(instance.successElems, NodeList);
+		});
+
+		tester.test('waitingElems should be a NodeList', () => {
+			tester.is(instance.waitingElems, NodeList);
+		});
+
+		tester.test('dialog should be HTMLElement', () => {
+			tester.is(instance.dialog, HTMLElement)
+		});
+
+
+
+
+	</script>
+</head>
+<body>
+
+
+
+</body>
+</html>

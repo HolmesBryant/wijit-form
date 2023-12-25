@@ -1,21 +1,22 @@
 export default class WijitForm extends HTMLElement {
+	#dialogMessageId = "dialog-message";
 	#fetchOptions = {};
-	#response = 'json';
 	#modal = false;
 	#reset = true;
-	#waiting;
-	#success;
+	#response = 'json';
 	#error;
-	#dialogMessageId = "dialog-message";
+	#success;
+	#waiting;
 	errorElems;
 	successElems;
 	waitingElems;
-	dialog;
 	default = {
 		success: "<h3>Submission Received</h3><p>Thank you!.</p>",
-		error: "<h3>Oopsie!</h3><p>There was an error. Please seek help.</p>",
+		error: "<h3>Oopsie!</h3><p>There was an error. Please get help.</p>",
 		waiting: "<h1>Please Wait...</h1>"
 	}
+	dialog;
+	testing = false;
 	static observedAttributes = ['modal','fetch-options', 'response', 'reset', 'dialog-message-id'];
 
 	constructor () {
@@ -24,8 +25,10 @@ export default class WijitForm extends HTMLElement {
 		this.shadowRoot.innerHTML = `
 			<style>
 				:host {
-					--message-text: rgb(40,40,40);
+					--error: darkred;
 					--message-bg: ivory;
+					--message-text: rgb(40,40,40);
+					--success: limegreen;
 				}
 
 				::backdrop {
@@ -73,6 +76,12 @@ export default class WijitForm extends HTMLElement {
 					width: 100%;
 				}
 
+				.hidden {
+					opacity: 0;
+					position: fixed;
+					height: 0%;
+					padding: 0;
+				}
 
 				#dialog-message {
 					background-color: var(--message-bg);
@@ -83,7 +92,6 @@ export default class WijitForm extends HTMLElement {
 					position: relative;
 					top: 50%;
 					transform: translateY(-50%);
-
 				}
 
 				#dialog-message.waiting {
@@ -98,12 +106,14 @@ export default class WijitForm extends HTMLElement {
 					width: 100%;
 				}
 
-				.hidden {
-					opacity: 0;
-					position: fixed;
-					height: 0%;
-					padding: 0;
+				#dialog-message.error {
+					outline: 2px solid var(--error);
 				}
+
+				#dialog-message.success {
+					outline: 2px solid var(--success);
+				}
+
 
 				#wrapper {
 					position: relative;
@@ -132,18 +142,18 @@ export default class WijitForm extends HTMLElement {
 			</div>
 		`;
 
-		this.fetchOptions = this.getAttribute('fetch-options') || {};
-		this.response = this.getAttribute('response') || this.response;
 		this.mainAbortController = new AbortController();
 	}
 
 	connectedCallback () {
-		this.waitingElems = this.querySelectorAll('[slot=waiting]');
-		this.successElems = this.querySelectorAll('[slot=success]');
-		this.errorElems = this.querySelectorAll('[slot=error]');
+		this.fetchOptions = this.getAttribute('fetch-options') || {};
+		this.response = this.getAttribute('response') || this.response;
+		this.form = this.querySelector('form');
 		this.dialog = this.querySelector('dialog') || this.shadowRoot.querySelector('dialog');
 		this.container = this.dialog.querySelector(`#${this.dialogMessageId}`);
-		this.form = this.querySelector('form');
+		this.errorElems = this.querySelectorAll('[slot=error]');
+		this.successElems = this.querySelectorAll('[slot=success]');
+		this.waitingElems = this.querySelectorAll('[slot=waiting]');
 
 		this.form.addEventListener('submit', (event) => this.submitData(event), {signal: this.mainAbortController.signal});
 		this.dialog.addEventListener('close', (event) => {
@@ -166,14 +176,14 @@ export default class WijitForm extends HTMLElement {
 		this.mainAbortController.abort();
 	}
 
-	submitData(event) {
+	async submitData(event) {
 		event.preventDefault();
 		let url = event.target.action;
 		const data = new FormData (event.target);
 		const accept = (this.response === 'html') ? "text/html" : "application/json, application/xml";
 		const options = this.setFetchOptions(event, accept);
 
-		this.showDialog(this.waiting, null);
+		if (!this.testing) this.showDialog(this.waiting, null);
 
 		if (options.method === 'GET' || options.method === 'HEAD') {
 			let i = 0;
@@ -187,16 +197,24 @@ export default class WijitForm extends HTMLElement {
 			options.body = data;
 		}
 
-		let status = 200;
+		const result = await this.fetchData(url, options);
+		if (this.testing) {
+			return this.test(result.data, result.status);
+		} else {
+			this.showDialog(result.data, result.status);
+		}
+	}
 
-		fetch (url, options)
-		.then (response => {
-			status = response.status;
-			return this.response === 'json' ? response.json() : response.text();
-		})
-		.then (result => {
-			this.showDialog (result, status);
-		});
+	async fetchData(url, options) {
+		try {
+			const response = await fetch (url, options);
+			const status = response.status;
+			const contentType = response.headers.get('Content-Type') || this.response;
+			const data = contentType.includes('json') ? await response.json() : await response.text();
+			return {data:data, status:status};
+		} catch (error) {
+			console.error (error);
+		}
 	}
 
 	setFetchOptions(event, accept) {
@@ -207,6 +225,10 @@ export default class WijitForm extends HTMLElement {
 		// options.headers overrides 'accept' var
 		options.headers.Accept = options.headers.Accept || accept;
 		return options;
+	}
+
+	test (dataFromServer, statusCode) {
+		return this.setMessage (dataFromServer, statusCode);
 	}
 
 	showDialog(dataFromServer, statusCode) {
@@ -233,6 +255,8 @@ export default class WijitForm extends HTMLElement {
 			this.dialog.classList.add('modeless');
 			this.dialog.show();
 		}
+
+		return message;
 	}
 
 	setMessage (dataFromServer, statusCode) {
@@ -246,10 +270,12 @@ export default class WijitForm extends HTMLElement {
 		} else if (statusCode > 399) {
 			type = 'error';
 			nodelist = this.errorElems;
+			this.container.classList.add('error');
 			this.container.classList.remove('waiting');
 		} else {
 			type = 'success';
 			nodelist = this.successElems;
+			this.container.classList.add('success');
 			this.container.classList.remove('waiting');
 		}
 
@@ -355,7 +381,9 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	clearMessage() {
-		// this.container.innerHTML = '';
+		this.container.classList.remove('error');
+		this.container.classList.remove('success');
+
 		for (const w of this.waitingElems) w.setAttribute('slot', 'waiting');
 		for (const e of this.errorElems) e.setAttribute('slot', 'error');
 		for (const s of this.successElems) s.setAttribute('slot', 'success');
