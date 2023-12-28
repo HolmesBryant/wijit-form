@@ -21,8 +21,8 @@
 		form.append(input);
 		form.append(button);
 		instance.append(form);
-		document.body.append(instance);
 		instance.testing = true;
+		document.body.append(instance);
 
 		tester.test('fetchOptions should be object', () => {
 			tester.isEqual(typeof instance.fetchOptions, "object");

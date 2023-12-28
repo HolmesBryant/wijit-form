@@ -1,6 +1,7 @@
 export default class WijitForm extends HTMLElement {
 	#dialogMessageId = "dialog-message";
 	#fetchOptions = {};
+	#forceError = false;
 	#modal = false;
 	#reset = true;
 	#response = 'json';
@@ -17,7 +18,7 @@ export default class WijitForm extends HTMLElement {
 	}
 	dialog;
 	testing = false;
-	static observedAttributes = ['modal','fetch-options', 'response', 'reset', 'dialog-message-id'];
+	static observedAttributes = ['modal','fetch-options', 'response', 'reset', 'dialog-message-id', 'force-error'];
 
 	constructor () {
 		super();
@@ -199,7 +200,7 @@ export default class WijitForm extends HTMLElement {
 
 		const result = await this.fetchData(url, options);
 		if (this.testing) {
-			return this.test(result.data, result.status);
+			return this.setMessage(result.data, result.status);
 		} else {
 			this.showDialog(result.data, result.status);
 		}
@@ -481,6 +482,30 @@ export default class WijitForm extends HTMLElement {
 	get dialogMessageId () { return this.#dialogMessageId }
 	set dialogMessageId (value) {
 		this.#dialogMessageId = value;
+	}
+
+	get forceError() { return this.#forceError; }
+	set forceError(value) {
+		let input = this.form.querySelector('input[name=fail]');
+
+		switch (value) {
+		case '':
+		case 'true':
+			value = true;
+			if (!input) {
+				input = document.createElement('input');
+				input.name = 'fail';
+				input.value = 'true';
+				input.disabled = true;
+				this.form.append(input);
+			}
+			break;
+		default:
+			value = false;
+			if (input) input.remove();
+		}
+
+		this.#forceError = value;
 	}
 }
 

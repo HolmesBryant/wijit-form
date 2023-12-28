@@ -1,6 +1,8 @@
 <?php
 
 $fail = $_REQUEST['fail'] ?? false;
+$test = $_REQUEST['test'] ?? false;
+
 $headers = getallheaders();
 $accept = $headers['Accept'] ?? 'application/json';
 
@@ -24,7 +26,7 @@ if ($fail && $fail === 'true') {
 	http_response_code(200);
 }
 
-sleep(1);
+if (!$test) { sleep(1); }
 
 header("Content-Type: $accept; charset=UTF-8");
 

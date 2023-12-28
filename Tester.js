@@ -11,16 +11,16 @@
  */
 export default class Tester {
     instance;
-    componentClass;
+    // componentClass;
     testResults = [];
 
     constructor(instance) {
         this.instance = instance;
-        this.init();
+        // this.init();
     }
 
     async init() {
-        this.componentClass = await customElements.whenDefined(this.instance.localName);
+        // this.componentClass = await customElements.whenDefined(this.instance.localName);
     }
 
     test(description, callback) {
@@ -82,7 +82,28 @@ export default class Tester {
         }
     }
 
-  // More assertion methods as needed (e.g., assertTrue, assertFalse)
+
+    getAllCombinations(options) {
+        return Object.entries(options).reduce(
+            (acc, [key, values]) =>
+            acc.flatMap((combination) =>
+                values.map((value) => ({ ...combination, [key]: value }))
+            ),
+            [[]]
+        );
+    }
+
+    camelToKebab(str) {
+        return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+    }
+
+    setAttributes(attrs) {
+        for (let attr in attrs) {
+            attr = this.camelToKebab(attr);
+            this.instance.setAttribute(attr, attrs[attr]);
+        }
+    }
+
 
     printResults() {
         console.log("Test Results:");
