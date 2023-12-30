@@ -8,6 +8,14 @@
 export default class WijitForm extends HTMLElement {
 	/**
 	 * @private
+	 * @type {boolean}
+	 * @default false
+	 * @summary Whether to add default css. "true" means do not add default css and let user style to form with their own css.
+	 */
+	#customCss = false;
+
+	/**
+	 * @private
 	 * @type {string}
 	 * @default "dialog-message"
 	 * @summary The ID of the element to use for dialog messages.
@@ -120,113 +128,12 @@ export default class WijitForm extends HTMLElement {
 	 * @type {string[]}
 	 * @summary A list of attributes that should be observed for changes.
 	 */
-	static observedAttributes = ['modal','fetch-options', 'response', 'reset', 'dialog-message-id', 'force-error'];
+	static observedAttributes = ['modal','fetch-options', 'response', 'reset', 'dialog-message-id', 'force-error', 'custom-css'];
 
 	constructor () {
 		super();
 		this.attachShadow({mode:'open'});
 		this.shadowRoot.innerHTML = `
-			<style>
-				:host {
-					--error: darkred;
-					--message-bg: ivory;
-					--message-text: rgb(40,40,40);
-					--success: limegreen;
-				}
-
-				::backdrop {
-					background-color: white;
-					opacity: .75;
-
-				}
-
-				@media (prefers-color-scheme: dark) {
-					::backdrop
-					{ background-color: black; }
-
-					:host {
-						--message-text: ivory;
-						--message-bg: dimgray;
-					}
-
-				}
-
-				button {
-					padding: .5rem;
-					border-radius: .5rem;
-					cursor: pointer;
-					font-weight: bold;
-					margin-top: -1rem;
-				}
-
-				dialog {
-					background-color: transparent;
-					border: none;
-					overflow: visible;
-					text-align: center;
-				}
-
-				dialog.modeless {
-					backdrop-filter: blur(.3rem);
-					height: 100%;
-					max-width: 100%;
-					max-height: 100%;
-					object-fit: scale-down;
-					padding: 0;
-					position: absolute;
-					top: 50%;
-					transform: translateY(-50%);
-					width: 100%;
-				}
-
-				dialog form {
-					margin: 1rem auto;
-				}
-
-				.hidden {
-					opacity: 0;
-					position: fixed;
-					height: 0%;
-					padding: 0;
-				}
-
-				#dialog-message {
-					background-color: var(--message-bg);
-					border-radius: 1rem;
-					color: var(--message-text);
-					margin: auto;
-					padding: 1rem;
-					position: relative;
-					top: 50%;
-					transform: translateY(-50%);
-				}
-
-				#dialog-message.waiting {
-					aspect-ratio: 1/1;
-					background-color: transparent;
-					max-height: 100%;
-					max-width: 100%;
-					overflow: hidden;
-					padding: 0;
-					top: 0;
-					transform: none;
-					width: 100%;
-				}
-
-				#dialog-message.error {
-					outline: 2px solid var(--error);
-				}
-
-				#dialog-message.success {
-					outline: 2px solid var(--success);
-				}
-
-
-				#wrapper {
-					position: relative;
-				}
-			</style>
-
 			<div id="wrapper">
 				<slot></slot>
 				<slot name="dialog">
@@ -272,6 +179,7 @@ export default class WijitForm extends HTMLElement {
 		this.errorElems = this.querySelectorAll('[slot=error]');
 		this.successElems = this.querySelectorAll('[slot=success]');
 		this.waitingElems = this.querySelectorAll('[slot=waiting]');
+		if (!this.customCss) document.head.append(this.defaultCss());
 
 		this.form.addEventListener('submit', (event) => this.submitData(event), {signal: this.mainAbortController.signal});
 		this.dialog.addEventListener('close', (event) => {
@@ -666,20 +574,395 @@ export default class WijitForm extends HTMLElement {
 		}
 	}
 
-	get modal () { return this.#modal; }
-	set modal (value) {
+	/**
+	 * @summary Returns a Style element with css rules.
+	 * @returns {HTMLStyleElement}
+	 */
+	defaultCss() {
+		const style = `
+			<style>
+			wijit-form {
+			    --bg1: rgb(250,250,250);
+			    --bg2: rgb(245,245,245);
+			    --bg3: white;
+			    --text: rgb(60,60,60);
+			    --focused: paleturquoise;
+			    --border: silver;
+			    --selected: lightgray ;
+			    --fail: hsl(6, 93%, 80%);
+			    --pass: hsl(112, 70%, 75%);
+			    --primary: dodgerblue;
+			    --secondary: aliceblue ;
+
+			    @media (prefers-color-scheme: dark) {
+			        --text: rgb(240,240,240);
+			        --bg1: rgb(20,20,20);
+			        --bg2: rgb(40,40,40);
+			        --bg3: rgb(60,60,60);
+			        --border: dimgray;
+			    }
+
+			    background-color: var(--bg1);
+			    border-radius: 10px;
+			    display: inline-block;
+			    padding: 1rem;
+			    width: max-content;
+
+			    /*********************/
+			    /**** Backgrounds ****/
+			    /*********************/
+
+			    article,
+			    details > *,
+			    fieldset
+			    { background-color: var(--bg2); }
+
+			    div { margin: 1rem 0; }
+
+			    input,
+			    input[type="checkbox"]::before,
+			    input[type="radio"]::before,
+			    select,
+			    textarea
+			    { background-color: var(--bg3); }
+
+			    button
+			    { background-color: var(--primary); }
+
+			    .secondary
+			    { background-color: var(--secondary) }
+
+			    .error
+			    { background-color: var(--fail); }
+
+			    .success
+			    { background-color: var(--pass); }
+
+			    /*********************/
+			    /****** Borders ******/
+			    /*********************/
+
+			    button,
+			    input,
+			    fieldset,
+			    select,
+			    textarea,
+			    .error,
+			    .success
+			    {
+			        border: 1px solid var(--border);
+			        border-radius: .5rem;
+			    }
+
+			    input[type="checkbox"]::before
+			    {
+			        border: 1px solid var(--border);
+			        border-radius: 5px;
+			    }
+
+			    input[type="radio"]::before
+			    {
+			        border: 1px solid var(--border);
+			        border-radius: 50%;
+			    }
+
+			    article,
+			    section
+			    { border-radius: 1rem; }
+
+			    :user-valid
+			    { border-color: var(--pass) }
+
+			    :user-invalid
+			    { border-color: var(--fail) }
+
+			    /*********************/
+			    /******* Text ********/
+			    /*********************/
+
+			    button,
+			    input,
+			    fieldset,
+			    label,
+			    legend,
+			    select,
+			    textarea
+			    {
+			        color: var(--text);
+			        font-size: 1rem;
+			    }
+
+			    label.required:after
+			    { color: var(--fail) }
+
+			    input[type="checkbox"]::before,
+			    input[type="radio"]::before
+			    { font-size: 28px; }
+
+			    label.required
+			    { font-size: small }
+
+			    label,
+			    legend,
+			    .error,
+			    .success
+			    { font-weight:bold; }
+
+			    .error,
+			    .success
+			    { text-align: center; }
+
+			    /*********************/
+			    /****** Shadows ******/
+			    /*********************/
+
+			    button:hover,
+			    input[type="submit"]:hover,
+			    input[type="reset"]:hover
+			    { box-shadow: 2px 2px 5px black; }
+
+			    button:active,
+			    input[type="submit"]:active,
+			    input[type="reset"]:active
+			    { box-shadow: none; }
+
+			    /*********************/
+			    /******* Cursor ******/
+			    /*********************/
+
+			    input[type="color"],
+			    input[type="range"],
+			    label,
+			    button,
+			    select
+			    { cursor: pointer; }
+
+			    [disabled]
+			    { cursor: not-allowed; }
+
+			    /*********************/
+			    /***** Structure *****/
+			    /*********************/
+
+			    article
+			    { padding: 10px; }
+
+			    article.flex > textarea
+			    { height: 100%; }
+
+			    button,
+			    input,
+			    option,
+			    select,
+			    textarea
+			    {
+			        min-height: 35px;
+			        min-width: 35px;
+			        padding: .5rem;
+			    }
+
+			    button,
+			    span
+			    {
+			        display: inline-block;
+			        margin: .5rem;
+			        vertical-align: middle;
+			        overflow: visible;
+			        overflow-wrap: anywhere;
+			    }
+
+			    details
+			    { margin: 0 10px; }
+
+			    details > *
+			    {
+			        margin: 1rem 0;
+			        padding: 1rem;
+			    }
+
+			    figure
+			    { text-align: center; }
+
+			    figcaption
+			    {
+			        align-items: stretch;
+			        display: flex;
+			    }
+
+			    figcaption > *
+			    { flex: 1; }
+
+			    form
+			    { width: 100%;}
+
+			    input[type="color"]
+			    { padding: 0; }
+
+			    input,
+			    select
+			    {
+			        min-height: 35px;
+			        min-width: 35px;
+			        vertical-align: middle;
+			    }
+
+			    input[type="checkbox"]::before,
+			    input[type="radio"]::before
+			     {
+			        content: "";
+			        min-width: inhert;
+			        min-height: inherit;
+			        display: flex;
+			        align-items: center;
+			        justify-content: center;
+			        line-height: 0;
+			    }
+
+			    input[type="checkbox"]:checked::before,
+			    input[type="radio"]:checked::before {
+			        content: "⬤";
+			    }
+
+			    label.required:after
+			    {
+			        content: "Required";
+			        font-size: small;
+			        vertical-align: super;
+			    }
+
+			    option
+			    { font-size: 1.2rem; }
+
+			    section
+			    {
+			        display: flex;
+			        flex-wrap: wrap;
+			        gap: 1rem;
+			        margin-top: 10px;
+			    }
+
+			    section > *
+			    { flex: 1 0 200px}
+
+			    textarea
+			    { min-height: 5rem; }
+
+			    ul, ol
+			    {
+			        margin: 1rem;
+			        padding: 1rem;
+			    }
+
+			    :user-valid
+			    { border-color: var(--pass) }
+
+			    :user-invalid
+			    { border-color: var(--fail) }
+
+			    /*********************/
+			    /******** Flex *******/
+			    /*********************/
+
+			    @layer flex {
+			        .flex
+			        { display: flex; }
+
+			        .between
+			        { justify-content: space-between; }
+
+			        .flex.center
+			        {
+			            align-content: center;
+			            align-items: center;
+			            justify-content: center;
+			            justify-items: center;
+			        }
+
+			        .column
+			        { flex-direction: column }
+
+			        .column-reverse
+			        { flex-direction: column-reverse; }
+
+			        .row
+			        {
+			            flex-direction: row;
+			            justify-content: space-evenly;
+			        }
+
+			        .row-reverse
+			        { flex-direction: row-reverse; }
+
+			        .bottom
+			        { align-items: flex-end; }
+
+			        .start.column,
+			        .start.row
+			        {
+			            align-items: center;
+			            justify-content: flex-start;
+			        }
+
+			        .start.column-reverse,
+			        .start.row-reverse
+			        {
+			            align-items: center;
+			            justify-content: flex-end;
+			        }
+
+			        .end.row,
+			        .end.row-reverse
+			        { align-items: center; }
+
+			        .end.column,
+			        .end.row
+			         { justify-content: flex-end; }
+
+			        .end.column-reverse,
+			        .end.row-reverse
+			        { justify-content: flex-start; }
+
+			    } /* @flex */
+			} /**** wijit-form ****/
+            </style>
+		`;
+
+		return document.createRange().createContextualFragment(style);
+	}
+
+	/**
+	 * @returns {boolean}
+	 */
+	get customCss () { return this.#customCss }
+
+	set customCss (value) {
 		switch (value) {
 		case '':
 		case 'true':
 			value = true;
+			this.shadowRoot.prepend(this.defaultCss());
 			break;
 		default:
 			value = false;
+			const style = this.shadowRoot.querySelector('style');
+			if (style) style.remove();
 		}
 
-		this.#modal = value;
+		this.#customCss = value;
 	}
 
+	/**
+	 * @returns {string}
+	 */
+	get dialogMessageId () { return this.#dialogMessageId }
+
+	set dialogMessageId (value) {
+		this.#dialogMessageId = value;
+	}
+
+	/**
+	 * @returns {object}
+	 */
 	get fetchOptions () { return this.#fetchOptions; }
 	set fetchOptions (value) {
 		let result;
@@ -689,55 +972,15 @@ export default class WijitForm extends HTMLElement {
 		}
 	}
 
-	get response () { return this.#response; }
-	set response (value) {
-		this.#response = value.toLowerCase();
-	}
-
-	get reset () { return this.#reset; }
-	set reset (value) {
-		switch (value) {
-		case '':
-		case 'true':
-			value = true;
-			break;
-		default:
-			value = false;
-		}
-
-		this.#reset = value;
-	}
-
-	get waiting () { return this.#waiting; }
-	set waiting (value) {
-		value = this.cleanHTML(value);
-		this.#waiting = value;
-	}
-
-	get success () { return this.#success; }
-	set success (value) {
-		value = this.cleanHTML(value);
-		this.#success = value;
-	}
-
-	get error () { return this.#error; }
-	set error (value) {
-		value = this.cleanHTML(value);
-		this.#error = value;
-	}
-
-	get dialogMessageId () { return this.#dialogMessageId }
-	set dialogMessageId (value) {
-		this.#dialogMessageId = value;
-	}
-
+	/**
+	 * @returns {boolean}
+	 */
 	get forceError() { return this.#forceError; }
 
 	/**
 	 * @summary Adds to the form a hidden input having a name of "fail"
-	 * @description If you use this, make sure the server script handles it and returns a status code greater than 399.
+	 * @description If you use this, make sure the server script handles it and returns an http status code greater than 399.
 	 * @param  {string} value Empty string or "true" for true, any other string for false
-	 * @returns {Void}
 	 */
 	set forceError(value) {
 		let input = this.form.querySelector('input[name=fail]');
@@ -760,6 +1003,75 @@ export default class WijitForm extends HTMLElement {
 		}
 
 		this.#forceError = value;
+	}
+
+	/**
+	 * @returns {boolean}
+	 */
+	get modal () { return this.#modal; }
+	set modal (value) {
+		switch (value) {
+		case '':
+		case 'true':
+			value = true;
+			break;
+		default:
+			value = false;
+		}
+
+		this.#modal = value;
+	}
+
+	/**
+	 * @returns {boolean}
+	 */
+	get reset () { return this.#reset; }
+	set reset (value) {
+		switch (value) {
+		case '':
+		case 'true':
+			value = true;
+			break;
+		default:
+			value = false;
+		}
+
+		this.#reset = value;
+	}
+
+	/**
+	 * @returns {string}
+	 */
+	get response () { return this.#response; }
+	set response (value) {
+		this.#response = value.toLowerCase();
+	}
+
+	/**
+	 * @returns {string}
+	 */
+	get error () { return this.#error; }
+	set error (value) {
+		value = this.cleanHTML(value);
+		this.#error = value;
+	}
+
+	/**
+	 * @returns {string}
+	 */
+	get success () { return this.#success; }
+	set success (value) {
+		value = this.cleanHTML(value);
+		this.#success = value;
+	}
+
+	/**
+	 * @returns {string}
+	 */
+	get waiting () { return this.#waiting; }
+	set waiting (value) {
+		value = this.cleanHTML(value);
+		this.#waiting = value;
 	}
 }
 
