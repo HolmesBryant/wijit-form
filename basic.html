@@ -6,38 +6,41 @@
 	<title></title>
 	<script type="module" src="/wijit-form.js"></script>
 	<style>
-			wijit-form * { box-sizing: border-box; }
+/*		body { background-color: rgb(30,30,30) }*/
+		wijit-form * { box-sizing: border-box; }
 
-			wijit-form {
-			    --bg1: rgb(250,250,250);
-			    --bg2: rgb(245,245,245);
-			    --bg3: white;
-			    --text: rgb(60,60,60);
-			    --focused: paleturquoise;
-			    --border: silver;
-			    --selected: lightgray ;
-			    --fail: hsl(6, 93%, 80%);
-			    --pass: hsl(112, 70%, 75%);
-			    --primary: dodgerblue;
-			    --secondary: aliceblue ;
+		wijit-form {
+		    --bg1: rgb(250,250,250);
+		    --bg2: rgb(245,245,245);
+		    --bg3: white;
+		    --text: rgb(60,60,60);
+		    --focused: paleturquoise;
+		    --border: silver;
+		    --selected: lightgray ;
+		    --fail: hsl(6, 93%, 80%);
+		    --pass: hsl(112, 70%, 75%);
+		    --primary: dodgerblue;
+		    --secondary: aliceblue;
+		    --min: 2.5rem;
+		    --pad: .5rem;
 
-			    @media (prefers-color-scheme: dark) {
-			        --text: rgb(240,240,240);
-			        --bg1: rgb(20,20,20);
-			        --bg2: rgb(40,40,40);
-			        --bg3: rgb(60,60,60);
-			        --border: dimgray;
-			    }
+		    @media (prefers-color-scheme: dark) {
+		        --text: rgb(240,240,240);
+		        --bg1: rgb(35,35,35);
+		        --bg2: rgb(40,40,40);
+		        --bg3: rgb(60,60,60);
+		        --border: dimgray;
+		    }
 
-			    background-color: var(--bg1);
-			    border-radius: 10px;
-			    display: inline-block;
-			    padding: 1rem;
-			    width: max-content;
+		    background-color: var(--bg1);
+		    border-radius: 10px;
+		    display: inline-block;
+		    padding: 1rem;
+		    width: max-content;
 
-			    /*********************/
-			    /**** Backgrounds ****/
-			    /*********************/
+		    /*********************/
+		    /**** Backgrounds ****/
+		    /*********************/
 
 			    article,
 			    details > *,
@@ -64,37 +67,20 @@
 			    .success
 			    { background-color: var(--pass); }
 
-			    /*********************/
-			    /****** Borders ******/
-			    /*********************/
+		    /*********************/
+		    /****** Borders ******/
+		    /*********************/
 
 			    button,
-			    input,
 			    fieldset,
+			    input,
+			    input[type="checkbox"]::before,
+			    input[type="radio"]::before,
 			    select,
 			    textarea,
 			    .error,
 			    .success
-			    {
-			        border: 1px solid var(--border);
-			        border-radius: .5rem;
-			    }
-
-			    input[type="checkbox"]::before
-			    {
-			        border: 1px solid var(--border);
-			        border-radius: 5px;
-			    }
-
-			    input[type="radio"]::before
-			    {
-			        border: 1px solid var(--border);
-			        border-radius: 50%;
-			    }
-
-			    article,
-			    section
-			    { border-radius: 1rem; }
+			    { border: 1px solid var(--border); }
 
 			    input:user-valid:not([type="submit"]):not([type="reset"])
 			    { border-color: var(--pass) }
@@ -102,9 +88,27 @@
 			    :user-invalid
 			    { border-color: var(--fail) }
 
-			    /*********************/
-			    /******* Text ********/
-			    /*********************/
+			    button,
+			    fieldset,
+			    input,
+			    input[type="checkbox"]::before,
+			    option,
+			    select,
+			    textarea,
+			    .error,
+			    .success
+			    { border-radius: .5rem; }
+
+			    input[type="radio"]::before
+			    { border-radius: 50%; }
+
+		    /*********************/
+		    /******* Text ********/
+		    /** Color/Font Size/Font Weight **/
+		    /*********************/
+
+			    label.required:after
+			    { color: var(--fail) }
 
 			    button,
 			    input,
@@ -118,8 +122,9 @@
 			        font-size: 1rem;
 			    }
 
-			    label.required:after
-			    { color: var(--fail) }
+			     option
+			    { font-size: 1.2rem; }
+
 
 			    input[type="checkbox"]::before,
 			    input[type="radio"]::before
@@ -128,19 +133,19 @@
 			    label.required
 			    { font-size: small }
 
+			    button,
+			    .button,
+			    input[type="reset"],
+			    input[type="submit"],
 			    label,
 			    legend,
 			    .error,
 			    .success
 			    { font-weight:bold; }
 
-			    .error,
-			    .success
-			    { text-align: center; }
-
-			    /*********************/
-			    /****** Shadows ******/
-			    /*********************/
+		    /*********************/
+		    /****** Shadows ******/
+		    /*********************/
 
 			    button:hover,
 			    input[type="submit"]:hover,
@@ -152,10 +157,12 @@
 			    input[type="reset"]:active
 			    { box-shadow: none; }
 
-			    /*********************/
-			    /******* Cursor ******/
-			    /*********************/
+		    /*********************/
+		    /******* Cursor ******/
+		    /*********************/
 
+			    input[type="checkbox"],
+			    input[type="radio"],
 			    input[type="color"],
 			    input[type="range"],
 			    input[type="reset"],
@@ -168,28 +175,22 @@
 			    [disabled]
 			    { cursor: not-allowed; }
 
-			    /*********************/
-			    /***** Structure *****/
-			    /*********************/
+		    /*********************/
+		    /***** Structure *****/
+		    /*********************/
 
-			    button,
-			    input,
-			    option,
-			    select,
-			    textarea
+			    button
 			    {
-			        min-height: 45px;
-			        min-width: 45px;
-			        padding: .25rem;
+			        min-height: var(--min);
+			        padding: var(--pad);
 			    }
 
 			    button,
-			    span
+			    .button,
+			    input[type="reset"],
+			    input[type="submit"]
 			    {
-			        display: inline-block;
-			        margin: .5rem;
-			        vertical-align: middle;
-			        overflow: visible;
+			        margin: .25rem;
 			        overflow-wrap: anywhere;
 			    }
 
@@ -197,17 +198,32 @@
 			    	display: flex;
 			    	flex-direction: column;
 			    	gap: .5rem;
+			    	justify-content: center;
 			    	margin: 1rem 0;
 			    }
 
-			    div:has(input[type="checkbox"])
+			    div:has(input[type="checkbox"]),
+			    div:has(input[type="color"]),
+			    div:has(input[type="radio"])
 			    {
-			    	border: 1px solid orange;
-			    	width: min-content;
+			    	display: inline-flex;
+/*			    	width: max-content;*/
 			    }
 
-			    div > textarea
-			    { height: 100%; }
+			    div > *
+			    { margin: 0; }
+
+			    fieldset
+			    {
+			    	display: inline-flex;
+			    	flex-wrap: wrap;
+			    	gap: .5rem;
+			    	height: min-content;
+			    	padding: var(--pad);
+			    }
+
+			    fieldset > div
+			    { margin: 0; }
 
 			    figure
 			    { text-align: center; }
@@ -227,20 +243,41 @@
 			    	width: 100%;
 			    }
 
-			   /* input[type="color"]
-			    { padding: 5px; }*/
+			    input
+			    {
+			    	min-height: var(--min);
+			        padding: var(--pad);
+			    }
 
+			    input[type="color"]
+			    {
+			    	padding: 0;
+			    	width: var(--min);
+			    }
+
+			    input[type="checkbox"],
+			    input[type="radio"]
+			    {
+			    	appearance: none;
+			    	background: none;
+			    	border: none;
+			    	margin: 0 auto;
+			    	position: relative;
+			    	width: var(--min);
+			    }
 
 			    input[type="checkbox"]::before,
 			    input[type="radio"]::before
 			     {
+					bottom: 0;
 			        content: "";
-			        min-width: inhert;
-			        min-height: inherit;
-			        display: flex;
-			        align-items: center;
-			        justify-content: center;
-			        line-height: 0;
+			        height: inherit;
+			        left: 0;
+			        margin: 0;
+			        position: absolute;
+			        right: 0;
+			        text-align: center;
+			        top:0;
 			    }
 
 			    input[type="checkbox"]:checked::before,
@@ -250,6 +287,9 @@
 			    input[type="range"]
 			    { min-height: auto; }
 
+			    label
+			    { white-space: nowrap; }
+
 			    label.required:after
 			    {
 			        content: "Required";
@@ -258,89 +298,54 @@
 			    }
 
 			    option
-			    { font-size: 1.2rem; }
+			    { padding: var(--pad) }
 
-			    textarea
-			    { min-height: 5rem; }
-
-			    ul, ol
+			    select
 			    {
-			        margin: 1rem;
-			        padding: 1rem;
+			    	flex: 2;
+			    	min-height: var(--min);
+			    	min-width: 10rem;
+			        padding: var(--pad);
+			    	overflow: auto;
+			    	width: max-content;
 			    }
 
-			    :user-valid
-			    { border-color: var(--pass) }
+			    textarea
+			    {
+			    	flex: 2;
+			    	min-height: 10rem;
+			    	min-width: 10rem;
+			    	padding: var(--pad);
+			    }
 
-			    :user-invalid
-			    { border-color: var(--fail) }
+			    .error,
+			    .success
+			    { text-align: center; }
 
-			    /*********************/
-			    /******** Flex *******/
-			    /*********************/
+			    .column
+			    { flex-direction: column; }
 
-			        .flex
-			        { display: flex; }
+		        .row
+		        {
+		        	align-items: center;
+		            flex-direction: row;
+		            flex-wrap: wrap;
+		        }
 
-			        .between
-			        { justify-content: space-between; }
+		        .row > *
+		        {
+		        	flex: 1;
+			    	margin: 0;
+			    }
 
-			        .center
-			        {
-			            align-content: center;
-			            align-items: center;
-			            justify-content: center;
-			            justify-items: center;
-			        }
+		        .row > input:not([type="radio"]):not([type="checkbox"])
+		        { flex: 2 }
 
-			        .column
-			        { flex-direction: column }
+		        .row.reverse
+		        { flex-direction: row-reverse; }
 
-			        .column-reverse
-			        { flex-direction: column-reverse; }
-
-			        .row
-			        {
-			        	align-items: center;
-			            flex-direction: row;
-			            justify-content: space-evenly;
-			        }
-
-			        .row > input:not([type="radio"]):not([type="checkbox"])
-			        { flex: 2 }
-
-			        .row-reverse
-			        { flex-direction: row-reverse; }
-
-			        .bottom
-			        { align-items: flex-end; }
-
-			        .start.column,
-			        .start.row
-			        {
-			            align-items: center;
-			            justify-content: flex-start;
-			        }
-
-			        .start.column-reverse,
-			        .start.row-reverse
-			        {
-			            align-items: center;
-			            justify-content: flex-end;
-			        }
-
-			        .end.row,
-			        .end.row-reverse
-			        { align-items: center; }
-
-			        .end.column,
-			        .end.row
-			         { justify-content: flex-end; }
-
-			        .end.column-reverse,
-			        .end.row-reverse
-			        { justify-content: flex-start; }
-
+		        .column.reverse
+		        { flex-direction: column-reverse; }
 
 			} /**** wijit-form ****/
             </style>
@@ -349,41 +354,58 @@
 	<wijit-form custom-css="true">
 		<form action="/test-server.php">
 			<button>Submit Button</button>
+			<button class="secondary">Secondary</button>
+
 			<input type="submit" value="Submit">
-			<input type="reset" class="secondary">
+			<input type="reset">
+
 			<div class="row">
-				<label for="name">Name</label>
-				<input name="name" id="name">
+				<div>
+					<label for="givenname">Given Name</label>
+					<input name="name" id="givenname">
+				</div>
+				<div>
+					<label for="familyname">Family Name</label>
+					<input name="email" id="familyname">
+				</div>
+				<div>
+					<label for="nickname">Nickname</label>
+					<input name="email" id="nickname">
+				</div>
 			</div>
-			<div>
-				<label for="email">Email</label>
-				<input name="email" id="email">
-			</div>
+
 
 			<div>
 				<label for="range">Range</label>
 				<input type="range" id="range">
 			</div>
 
-			<div>
-				<label for="color">Color</label>
-				<input type="color" id="color">
+			<div class="row">
+					<div>
+						<label for="color">Color</label>
+						<input type="color" id="color">
+					</div>
+					<div>
+						<label for="checkbox">Checkbox</label>
+						<input type="checkbox" id="checkbox">
+					</div>
 			</div>
 
-			<div>
-				<label for="checkbox">Checkbox</label>
-				<input type="checkbox" id="checkbox">
-			</div>
+			<fieldset>
+				<legend>Radio Buttons</legend>
+				<div>
+					<div class="row reverse">
+						<label for="radio1">Radio 1</label>
+						<input type="radio" name="radio" id="radio1">
+					</div>
 
-			<div>
-				<label for="radio1">Radio 1</label>
-				<input type="radio" name="radio" id="radio1">
-			</div>
+					<div class="row reverse">
+						<label for="radio2">Radio 2</label>
+						<input type="radio" name="radio" id="radio2">
+					</div>
+				</div>
+			</fieldset>
 
-			<div>
-				<label for="radio2">Radio 2</label>
-				<input type="radio" name="radio" id="radio2">
-			</div>
 
 			<div>
 				<label for="select">Select</label>
@@ -412,7 +434,7 @@
 			<fieldset>
 				<legend>This is a Fieldset</legend>
 
-				<div class="row center">
+				<div class="row">
 					<label for="namefieldset">Name</label>
 					<input name="name" id="namefieldset">
 				</div>
@@ -421,39 +443,60 @@
 					<input name="email" id="emailfieldset">
 				</div>
 
-				<label for="checkboxfieldset">Checkbox</label>
-				<input type="checkbox" id="checkboxfieldset">
+				<div class="row">
+					<label for="checkboxfieldset">Checkbox</label>
+					<input type="checkbox" id="checkboxfieldset">
+				</div>
 
-				<label for="radio1fieldset">Radio 1</label>
-				<input type="radio" name="radio" id="radio1fieldset">
+				<fieldset class="column">
+					<legend>Radio Buttons</legend>
+					<div class="row reverse">
+						<label for="radio1fieldset">Radio 1</label>
+						<input type="radio" name="radio" id="radio1fieldset">
+					</div>
 
-				<label for="radio2fieldset">Radio 2</label>
-				<input type="radio" name="radio" id="radio2fieldset">
+					<div class="row reverse">
+						<label for="radio2fieldset">Radio 2</label>
+						<input type="radio" name="radio" id="radio2fieldset">
+					</div>
+				</fieldset>
 
-				<label for="rangefieldset">Range</label>
-				<input type="range" id="rangefieldset">
+				<div>
+					<label for="rangefieldset">Range</label>
+					<input type="range" id="rangefieldset">
+				</div>
 
-				<label for="colorfieldset">Color</label>
-				<input type="color" id="colorfieldset">
+				<div>
+					<label for="colorfieldset">Color</label>
+					<input type="color" id="colorfieldset">
+				</div>
 
-				<label for="selectfieldset">Select</label>
-				<select id="selectfieldset">
-					<option>One</option>
-					<option>Two</option>
-					<option>Three</option>
-				</select>
+				<div>
+					<label for="selectfieldset">Select</label>
+					<select id="selectfieldset">
+						<option>One</option>
+						<option>Two</option>
+						<option>Three</option>
+					</select>
+				</div>
 
-				<label for="selectmultiplefieldset">Select multiple</label>
-				<select multiple id="selectmultiplefieldset">
-					<option>One</option>
-					<option>Two</option>
-					<option>Three</option>
-					<option>Four</option>
-				</select>
+				<div>
+					<label for="selectmultiplefieldset">Select multiple</label>
+					<select multiple id="selectmultiplefieldset">
+						<option>One</option>
+						<option>Two</option>
+						<option>Three</option>
+						<option>Four</option>
+						<option>Fee Fie Fo Fum</option>
+					</select>
+				</div>
 
-				<label for="textareafieldset">Textarea</label>
-				<textarea id="textareafieldset"> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </textarea>
+				<div>
+					<label for="textareafieldset">Textarea</label>
+					<textarea id="textareafieldset"> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </textarea>
+				</div>
 			</fieldset>
+
 		</form>
 	</wijit-form>
 </body>
