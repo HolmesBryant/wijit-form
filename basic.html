@@ -6,8 +6,7 @@
 	<title></title>
 	<script type="module" src="/wijit-form.js"></script>
 	<style>
-/*		body { background-color: rgb(30,30,30) }*/
-		wijit-form * { box-sizing: border-box; }
+/*		wijit-form * { box-sizing: border-box; }*/
 
 		wijit-form {
 		    --bg1: rgb(250,250,250);
@@ -19,8 +18,7 @@
 		    --selected: lightgray ;
 		    --fail: hsl(6, 93%, 80%);
 		    --pass: hsl(112, 70%, 75%);
-		    --primary: dodgerblue;
-		    --secondary: aliceblue;
+		    --accent: lime;
 		    --min: 2.5rem;
 		    --pad: .5rem;
 
@@ -47,19 +45,24 @@
 			    fieldset
 			    { background-color: var(--bg2); }
 
+			    button,
 			    input,
 			    input[type="checkbox"]::before,
 			    input[type="radio"]::before,
+			    progress,
+			    progress::-webkit-progress-bar,
 			    select,
-			    textarea,
-			    .secondary
+			    textarea
 			    { background-color: var(--bg3); }
 
-			    button
-			    { background-color: var(--primary); }
-
-			    /*.secondary
-			    { background-color: var(--secondary) }*/
+			    /** Chromium stops processing ALL css rules
+			     * after progess:-moz-progress-bar{} (within a nesting context),
+			     * so I placed it at the very end of the styles
+			     */
+			    .primary,
+			    progress::-webkit-progress-value {
+					background-color: var(--accent);
+				}
 
 			    .error
 			    { background-color: var(--fail); }
@@ -76,6 +79,7 @@
 			    input,
 			    input[type="checkbox"]::before,
 			    input[type="radio"]::before,
+			    progress,
 			    select,
 			    textarea,
 			    .error,
@@ -88,11 +92,15 @@
 			    :user-invalid
 			    { border-color: var(--fail) }
 
+			    :user-valid
+			    { border-color: var(--pass) }
+
 			    button,
 			    fieldset,
 			    input,
 			    input[type="checkbox"]::before,
 			    option,
+			    progress,
 			    select,
 			    textarea,
 			    .error,
@@ -102,10 +110,23 @@
 			    input[type="radio"]::before
 			    { border-radius: 50%; }
 
-		    /*********************/
-		    /******* Text ********/
-		    /** Color/Font Size/Font Weight **/
-		    /*********************/
+			    *:focus
+			    {outline-color: var(--accent)}
+
+			    input:focus::before
+			    { outline: 2px solid }
+
+		    /******************************/
+		    /*********** Accent ***********/
+		    /******************************/
+			    input,
+			    progress
+			    { accent-color: var(--accent); }
+
+		    /******************************/
+		    /************ Text ************/
+		    /** Color/Size/Weight/Shadow **/
+		    /******************************/
 
 			    label.required:after
 			    { color: var(--fail) }
@@ -121,6 +142,12 @@
 			        color: var(--text);
 			        font-size: 1rem;
 			    }
+
+			    input:before
+			    { color: var(--accent) }
+
+			    .primary
+			    { color: var(--bg3) }
 
 			     option
 			    { font-size: 1.2rem; }
@@ -142,6 +169,9 @@
 			    .error,
 			    .success
 			    { font-weight:bold; }
+
+			    .primary
+			    { text-shadow: 1px 1px 1px var(--text) }
 
 		    /*********************/
 		    /****** Shadows ******/
@@ -205,10 +235,7 @@
 			    div:has(input[type="checkbox"]),
 			    div:has(input[type="color"]),
 			    div:has(input[type="radio"])
-			    {
-			    	display: inline-flex;
-/*			    	width: max-content;*/
-			    }
+			    { display: inline-flex; }
 
 			    div > *
 			    { margin: 0; }
@@ -287,6 +314,7 @@
 			    input[type="range"]
 			    { min-height: auto; }
 
+
 			    label
 			    { white-space: nowrap; }
 
@@ -300,9 +328,15 @@
 			    option
 			    { padding: var(--pad) }
 
+			    progress
+			    {
+			    	appearance: none;
+			    	height: 1rem;
+			    	overflow: clip;
+			    }
+
 			    select
 			    {
-			    	flex: 2;
 			    	min-height: var(--min);
 			    	min-width: 10rem;
 			        padding: var(--pad);
@@ -325,6 +359,9 @@
 			    .column
 			    { flex-direction: column; }
 
+		        .column.reverse
+		        { flex-direction: column-reverse; }
+
 		        .row
 		        {
 		        	align-items: center;
@@ -344,17 +381,20 @@
 		        .row.reverse
 		        { flex-direction: row-reverse; }
 
-		        .column.reverse
-		        { flex-direction: column-reverse; }
-
-			} /**** wijit-form ****/
+		        /** Chromium stops processing ALL css rules
+			     * after progess:-moz-progress-bar{} (within a nesting context),
+			     * so I placed it at the very end of the styles
+			     */
+		        wijit-form progress::-moz-progress-bar
+		        { background-color: var(--accent); }
+			} /* wijit-form */
             </style>
 </head>
 <body>
 	<wijit-form custom-css="true">
 		<form action="/test-server.php">
-			<button>Submit Button</button>
-			<button class="secondary">Secondary</button>
+			<button class="primary">Primary Button</button>
+			<button>Normal Button</button>
 
 			<input type="submit" value="Submit">
 			<input type="reset">
@@ -362,22 +402,37 @@
 			<div class="row">
 				<div>
 					<label for="givenname">Given Name</label>
-					<input name="name" id="givenname">
+					<input id="givenname" name="givenname">
 				</div>
 				<div>
 					<label for="familyname">Family Name</label>
-					<input name="email" id="familyname">
+					<input id="familyname" name="familyname">
 				</div>
 				<div>
 					<label for="nickname">Nickname</label>
-					<input name="email" id="nickname">
+					<input id="nickname" name="nickname">
 				</div>
 			</div>
 
+			<div class="row">
+				<div>
+					<label for="email">Email</label>
+					<input required type="email" id="email" name="email">
+				</div>
+				<div>
+					<label for="phone">Phone</label>
+					<input type="tel" id="phone" name="phone">
+				</div>
+			</div>
 
 			<div>
 				<label for="range">Range</label>
 				<input type="range" id="range">
+			</div>
+
+			<div>
+				<label for="progress">Progress</label>
+				<progress value="50" max="100" id="progress"></progress>
 			</div>
 
 			<div class="row">

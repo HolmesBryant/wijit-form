@@ -930,6 +930,18 @@ export default class WijitForm extends HTMLElement {
 		return document.createRange().createContextualFragment(style);
 	}
 
+	async getCountryCityList() {
+		const url = "https://countriesnow.space/api/v0.1/countries/";
+		const result = await fetch(url).then(response => response.json());
+		console.log(result);
+	}
+
+	async getCountryStateList() {
+		url = "https://countriesnow.space/api/v0.1/countries/states/";
+		const result = await fetch(url).then(response => response.json());
+		console.log(result);
+	}
+
 	/**
 	 * @returns {boolean}
 	 */
