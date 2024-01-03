@@ -106,8 +106,8 @@ export default class WijitForm extends HTMLElement {
 	 * @summary Default messages for success, error, and waiting states.
 	 */
 	default = {
-		success: "<h3>Submission Received</h3><p>Thank you!.</p>",
-		error: "<h3>Oopsie!</h3><p>There was an error. Please get help.</p>",
+		success: "<h3>Submission Received</h3><p>Thank you!</p>",
+		error: "<h3>Oopsie!</h3><p>There was an error. Your submission was not received.</p>",
 		waiting: "<h1>Please Wait...</h1>"
 	}
 
@@ -575,371 +575,405 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
-	 * @summary Returns a Style element with css rules.
+	 * @summary Returns a Style element containing css rules.
 	 * @returns {HTMLStyleElement}
 	 */
 	defaultCss() {
 		const style = `
 			<style>
-			wijit-form {
-			    --bg1: rgb(250,250,250);
-			    --bg2: rgb(245,245,245);
-			    --bg3: white;
-			    --text: rgb(60,60,60);
-			    --focused: paleturquoise;
-			    --border: silver;
-			    --selected: lightgray ;
-			    --fail: hsl(6, 93%, 80%);
-			    --pass: hsl(112, 70%, 75%);
-			    --primary: dodgerblue;
-			    --secondary: aliceblue ;
+				wijit-form {
+				    --bg1: rgb(250,250,250);
+				    --bg2: rgb(245,245,245);
+				    --bg3: white;
+				    --text: rgb(60,60,60);
+				    --border: silver;
+				    --fail: hsl(6, 93%, 80%);
+				    --pass: hsl(112, 70%, 75%);
+				    --accent: dodgerblue;
+				    --min: 2.5rem;
+				    --pad: .5rem;
 
-			    @media (prefers-color-scheme: dark) {
-			        --text: rgb(240,240,240);
-			        --bg1: rgb(20,20,20);
-			        --bg2: rgb(40,40,40);
-			        --bg3: rgb(60,60,60);
-			        --border: dimgray;
-			    }
+				    @media (prefers-color-scheme: dark) {
+				        --text: rgb(240,240,240);
+				        --bg1: rgb(35,35,35);
+				        --bg2: rgb(40,40,40);
+				        --bg3: rgb(60,60,60);
+				        --border: dimgray;
+				    }
 
-			    background-color: var(--bg1);
-			    border-radius: 10px;
-			    display: inline-block;
-			    padding: 1rem;
-			    width: max-content;
+				    background-color: var(--bg1);
+				    border-radius: 10px;
+				    display: inline-block;
+				    padding: 1rem;
+				    width: 100%;
 
 			    /*********************/
 			    /**** Backgrounds ****/
 			    /*********************/
 
-			    article,
-			    details > *,
-			    fieldset
-			    { background-color: var(--bg2); }
+				    details > *,
+				    fieldset
+				    { background-color: var(--bg2); }
 
-			    div { margin: 1rem 0; }
+				    button,
+				    input,
+				    input[type="checkbox"]::before,
+				    input[type="radio"]::before,
+				    progress,
+				    progress::-webkit-progress-bar,
+				    select,
+				    textarea
+				    { background-color: var(--bg3); }
 
-			    input,
-			    input[type="checkbox"]::before,
-			    input[type="radio"]::before,
-			    select,
-			    textarea
-			    { background-color: var(--bg3); }
+				    /** Chromium stops processing ALL css rules
+				     * after progess:-moz-progress-bar{} (within a nesting context),
+				     * so I placed it at the very end of the styles
+				     */
+				    .primary,
+				    progress::-webkit-progress-value {
+						background-color: var(--accent);
+					}
 
-			    button
-			    { background-color: var(--primary); }
+				    .error
+				    { background-color: var(--fail); }
 
-			    .secondary
-			    { background-color: var(--secondary) }
-
-			    .error
-			    { background-color: var(--fail); }
-
-			    .success
-			    { background-color: var(--pass); }
+				    .success
+				    { background-color: var(--pass); }
 
 			    /*********************/
 			    /****** Borders ******/
 			    /*********************/
 
-			    button,
-			    input,
-			    fieldset,
-			    select,
-			    textarea,
-			    .error,
-			    .success
-			    {
-			        border: 1px solid var(--border);
-			        border-radius: .5rem;
-			    }
+				    button,
+				    fieldset,
+				    input,
+				    input[type="checkbox"]::before,
+				    input[type="radio"]::before,
+				    progress,
+				    select,
+				    textarea,
+				    .error,
+				    .success
+				    { border: 1px solid var(--border); }
 
-			    input[type="checkbox"]::before
-			    {
-			        border: 1px solid var(--border);
-			        border-radius: 5px;
-			    }
+				    input:user-valid:not([type="submit"]):not([type="reset"])
+				    { border-color: var(--pass) }
 
-			    input[type="radio"]::before
-			    {
-			        border: 1px solid var(--border);
-			        border-radius: 50%;
-			    }
+				    :user-invalid
+				    { border-color: var(--fail) }
 
-			    article,
-			    section
-			    { border-radius: 1rem; }
+				    :user-valid
+				    { border-color: var(--pass) }
 
-			    :user-valid
-			    { border-color: var(--pass) }
+				    button,
+				    fieldset,
+				    input,
+				    input[type="checkbox"]::before,
+				    option,
+				    progress,
+				    select,
+				    textarea,
+				    .error,
+				    .success
+				    { border-radius: .5rem; }
 
-			    :user-invalid
-			    { border-color: var(--fail) }
+				    input[type="radio"]::before
+				    { border-radius: 50%; }
 
-			    /*********************/
-			    /******* Text ********/
-			    /*********************/
+				    *:focus
+				    {outline-color: var(--accent)}
 
-			    button,
-			    input,
-			    fieldset,
-			    label,
-			    legend,
-			    select,
-			    textarea
-			    {
-			        color: var(--text);
-			        font-size: 1rem;
-			    }
+				    input:focus::before
+				    { outline: 2px solid }
 
-			    label.required:after
-			    { color: var(--fail) }
+			    /******************************/
+			    /*********** Accent ***********/
+			    /******************************/
+				    input,
+				    progress
+				    { accent-color: var(--accent); }
 
-			    input[type="checkbox"]::before,
-			    input[type="radio"]::before
-			    { font-size: 28px; }
+			    /******************************/
+			    /************ Text ************/
+			    /** Color/Size/Weight/Shadow **/
+			    /******************************/
 
-			    label.required
-			    { font-size: small }
+				    label.required:after
+				    { color: var(--fail) }
 
-			    label,
-			    legend,
-			    .error,
-			    .success
-			    { font-weight:bold; }
+				    button,
+				    input,
+				    fieldset,
+				    label,
+				    legend,
+				    select,
+				    textarea
+				    {
+				        color: var(--text);
+				        font-size: 1rem;
+				    }
 
-			    .error,
-			    .success
-			    { text-align: center; }
+				    input:before
+				    { color: var(--accent) }
+
+				    .primary
+				    { color: var(--bg3) }
+
+				     option
+				    { font-size: 1.2rem; }
+
+
+				    input[type="checkbox"]::before,
+				    input[type="radio"]::before
+				    {
+				    	font-size: 2.5rem;
+				    	 line-height: 2.4rem;
+				    }
+
+				    label.required
+				    { font-size: small }
+
+				    button,
+				    .button,
+				    input[type="reset"],
+				    input[type="submit"],
+				    label,
+				    legend,
+				    .error,
+				    .success
+				    { font-weight:bold; }
+
+				    .primary
+				    { text-shadow: 1px 1px 1px var(--text) }
 
 			    /*********************/
 			    /****** Shadows ******/
 			    /*********************/
 
-			    button:hover,
-			    input[type="submit"]:hover,
-			    input[type="reset"]:hover
-			    { box-shadow: 2px 2px 5px black; }
+				    button:hover,
+				    input[type="submit"]:hover,
+				    input[type="reset"]:hover
+				    { box-shadow: 2px 2px 5px black; }
 
-			    button:active,
-			    input[type="submit"]:active,
-			    input[type="reset"]:active
-			    { box-shadow: none; }
+				    button:active,
+				    input[type="submit"]:active,
+				    input[type="reset"]:active
+				    { box-shadow: none; }
 
 			    /*********************/
 			    /******* Cursor ******/
 			    /*********************/
 
-			    input[type="color"],
-			    input[type="range"],
-			    label,
-			    button,
-			    select
-			    { cursor: pointer; }
+				    input[type="checkbox"],
+				    input[type="radio"],
+				    input[type="color"],
+				    input[type="range"],
+				    input[type="reset"],
+				    input[type="submit"],
+				    label,
+				    button,
+				    select
+				    { cursor: pointer; }
 
-			    [disabled]
-			    { cursor: not-allowed; }
+				    [disabled]
+				    { cursor: not-allowed; }
 
 			    /*********************/
 			    /***** Structure *****/
 			    /*********************/
 
-			    article
-			    { padding: 10px; }
+				    button
+				    {
+				        min-height: var(--min);
+				        padding: var(--pad);
+				    }
 
-			    article.flex > textarea
-			    { height: 100%; }
+				    button,
+				    .button,
+				    input[type="reset"],
+				    input[type="submit"]
+				    {
+				        margin: .25rem;
+				        overflow-wrap: anywhere;
+				    }
 
-			    button,
-			    input,
-			    option,
-			    select,
-			    textarea
-			    {
-			        min-height: 35px;
-			        min-width: 35px;
-			        padding: .5rem;
-			    }
+				    div {
+				    	display: flex;
+				    	flex-direction: column;
+				    	gap: .5rem;
+				    	justify-content: center;
+				    	margin: 1rem 0;
+				    }
 
-			    button,
-			    span
-			    {
-			        display: inline-block;
-			        margin: .5rem;
-			        vertical-align: middle;
-			        overflow: visible;
-			        overflow-wrap: anywhere;
-			    }
+				    div:has(input[type="checkbox"]),
+				    div:has(input[type="color"]),
+				    div:has(input[type="radio"])
+				    { display: inline-flex; }
 
-			    details
-			    { margin: 0 10px; }
+				    div > *
+				    { margin: 0; }
 
-			    details > *
-			    {
-			        margin: 1rem 0;
-			        padding: 1rem;
-			    }
+				    fieldset
+				    {
+				    	display: inline-flex;
+				    	flex-wrap: wrap;
+				    	gap: .5rem;
+				    	height: min-content;
+				    	justify-content: center;
+				    	padding: var(--pad);
+				    }
 
-			    figure
-			    { text-align: center; }
+				    fieldset > div
+				    { margin: 0; }
 
-			    figcaption
-			    {
-			        align-items: stretch;
-			        display: flex;
-			    }
+				    figure
+				    { text-align: center; }
 
-			    figcaption > *
-			    { flex: 1; }
+				    figcaption
+				    {
+				        align-items: stretch;
+				        display: flex;
+				    }
 
-			    form
-			    { width: 100%;}
+				    figcaption > *
+				    { flex: 1; }
 
-			    input[type="color"]
-			    { padding: 0; }
+				    form
+				    {
+				    	max-width: 94vw;
+				    	width: 100%;
+				    }
 
-			    input,
-			    select
-			    {
-			        min-height: 35px;
-			        min-width: 35px;
-			        vertical-align: middle;
-			    }
+				    input
+				    {
+				    	min-height: var(--min);
+				        padding: var(--pad);
+				    }
 
-			    input[type="checkbox"]::before,
-			    input[type="radio"]::before
-			     {
-			        content: "";
-			        min-width: inhert;
-			        min-height: inherit;
-			        display: flex;
-			        align-items: center;
-			        justify-content: center;
-			        line-height: 0;
-			    }
+				    input[type="color"]
+				    {
+				    	padding: 0;
+				    	width: var(--min);
+				    }
 
-			    input[type="checkbox"]:checked::before,
-			    input[type="radio"]:checked::before {
-			        content: "⬤";
-			    }
+				    input[type="checkbox"],
+				    input[type="radio"]
+				    {
+				    	appearance: none;
+				    	background: none;
+				    	border: none;
+				    	margin: 0 auto;
+				    	position: relative;
+				    	width: var(--min);
+				    }
 
-			    label.required:after
-			    {
-			        content: "Required";
-			        font-size: small;
-			        vertical-align: super;
-			    }
+				    input[type="checkbox"]::before,
+				    input[type="radio"]::before
+				     {
+						bottom: 0;
+				        content: "";
+				        height: inherit;
+				        left: 0;
+				        margin: 0;
+				        position: absolute;
+				        right: 0;
+				        text-align: center;
+				        top:0;
+				    }
 
-			    option
-			    { font-size: 1.2rem; }
+				    input[type="checkbox"]:checked::before,
+				    input[type="radio"]:checked::before
+				    { content: "⬤"; }
 
-			    section
-			    {
-			        display: flex;
-			        flex-wrap: wrap;
-			        gap: 1rem;
-			        margin-top: 10px;
-			    }
+				    input[type="range"]
+				    { min-height: auto; }
 
-			    section > *
-			    { flex: 1 0 200px}
 
-			    textarea
-			    { min-height: 5rem; }
+				    label
+				    { white-space: nowrap; }
 
-			    ul, ol
-			    {
-			        margin: 1rem;
-			        padding: 1rem;
-			    }
+				    label.required:after
+				    {
+				        content: "Required";
+				        font-size: small;
+				        vertical-align: super;
+				    }
 
-			    :user-valid
-			    { border-color: var(--pass) }
+				    option
+				    { padding: var(--pad) }
 
-			    :user-invalid
-			    { border-color: var(--fail) }
 
-			    /*********************/
-			    /******** Flex *******/
-			    /*********************/
+				    progress
+				    {
+				    	appearance: none;
+				    	height: 1rem;
+				    	overflow: clip;
+				    }
 
-			    @layer flex {
-			        .flex
-			        { display: flex; }
 
-			        .between
-			        { justify-content: space-between; }
+				    select
+				    {
+				    	min-height: var(--min);
+				    	min-width: 10rem;
+				        padding: var(--pad);
+				    	overflow: auto;
+				    	width: max-content;
+				    }
 
-			        .flex.center
-			        {
-			            align-content: center;
-			            align-items: center;
-			            justify-content: center;
-			            justify-items: center;
-			        }
+				    textarea
+				    {
+				    	flex: 2;
+				    	min-height: 10rem;
+				    	min-width: 10rem;
+				    	padding: var(--pad);
+				    }
 
-			        .column
-			        { flex-direction: column }
+				    .error,
+				    .success
+				    { text-align: center; }
 
-			        .column-reverse
+				    .column
+				    {
+				    	flex-direction: column;
+				    	margin: 0;
+				    }
+
+			        .column.reverse
 			        { flex-direction: column-reverse; }
 
 			        .row
 			        {
+			        	align-items: center;
 			            flex-direction: row;
-			            justify-content: space-evenly;
+			            flex-wrap: wrap;
 			        }
 
-			        .row-reverse
+			        .column > label,
+			        .row > label
+			        {
+			        	flex: 0 0 auto;
+			        	min-width: 1rem ;
+			        	min-height: 1rem;
+			        }
+
+			        .column > textarea,
+			        .row > input
+			        { flex: 1 1 auto; }
+
+			        .row.reverse
 			        { flex-direction: row-reverse; }
 
-			        .bottom
-			        { align-items: flex-end; }
-
-			        .start.column,
-			        .start.row
-			        {
-			            align-items: center;
-			            justify-content: flex-start;
-			        }
-
-			        .start.column-reverse,
-			        .start.row-reverse
-			        {
-			            align-items: center;
-			            justify-content: flex-end;
-			        }
-
-			        .end.row,
-			        .end.row-reverse
-			        { align-items: center; }
-
-			        .end.column,
-			        .end.row
-			         { justify-content: flex-end; }
-
-			        .end.column-reverse,
-			        .end.row-reverse
-			        { justify-content: flex-start; }
-
-			    } /* @flex */
-			} /**** wijit-form ****/
+			        /** Chromium stops processing ALL css rules
+				     * after progess:-moz-progress-bar{} (within a nesting context),
+				     * so I placed it at the very end of the styles
+				     */
+			        wijit-form progress::-moz-progress-bar
+			        { background-color: var(--accent); }
+				} /* wijit-form */
             </style>
 		`;
 
 		return document.createRange().createContextualFragment(style);
-	}
-
-	async getCountryCityList() {
-		const url = "https://countriesnow.space/api/v0.1/countries/";
-		const result = await fetch(url).then(response => response.json());
-		console.log(result);
-	}
-
-	async getCountryStateList() {
-		url = "https://countriesnow.space/api/v0.1/countries/states/";
-		const result = await fetch(url).then(response => response.json());
-		console.log(result);
 	}
 
 	/**

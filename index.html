@@ -4,9 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Wijit-Form Web Component</title>
-    <link rel="stylesheet" href="/styles.css">
+    <!-- <link rel="stylesheet" href="/styles.css"> -->
     <script type="module" src="wijit-form.js"></script>
     <script type="module" src="wijit-icon01.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
 
     <!-----------------------------------------
      You can change the colors of the form by changing the values of these css variables
@@ -19,140 +20,121 @@
 <body>
     <details>
         <summary><h1>Wijit Form Web Component</h1></summary>
-        <p>This component serves simply as a convenience to make styling forms and configuring waiting effects and confirmation/error messages less time consuming.</p>
 
-        <article>
-            <h2>Usage</h2>
+        <zero-md src="/README.md">
+            <template>
+                <style>
+                    @media (prefers-color-scheme: dark) {
+                        * {color: white; }
+                        pre { background-color: dimgray }
+                    }
 
-            <h3>Basic Usage</h3>
-            <p>
-                [script type="module" src="/wijit-form.js"][/script]
-                [wijit-form]
-                    [form action="some-server-script.php"]
-                        form elements ...
-                    [/form]
-                [/wijit-form]
-            </p>
+                    pre {
+                        background-color: gainsboro;
+                        border-radius: 10px;
+                        margin: 2rem;
+                        overflow: auto;
+                        padding: 1rem;
+                    }
 
 
-        </article>
-
-        <article>
-            <h2>Attributes</h2>
-            <p>All of these attributes are optional</p>
-            <ul>
-                <li><b>fetch-options (default: null)</b> Acceptable values: [Any valid fetch option from: <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/fetch#options">The MDN Docs</a>]. This should be formatted as valid JSON. For example, if you are submitting the form to the same server, you might want to add <code>{"mode":"same-origin"}</code>.</li>
-
-                <li>User Supplied Confirmation Messages. These attributes accept strings or basic html. You may include custom confirmation messages via slots as well as attributes. Usage of the slots will be described below.
-                    <ul>
-                        <li><b>waiting (default: null)</b> Acceptable values: [any string or basic html] This is the message displayed after the form is submitted, while the page is waiting for a response from the server.</li>
-
-                        <li><b>success (default: null)</b> Acceptable values: [any string or basic HTML] This is the message displayed upon a successful response from the server, meaning the server sent an http status code lower than 400</li>
-
-                        <li><b>error (default: null)</b> Acceptable values: [any string or basic HTML] This is the message displayed when the server reports an error, meaning it sent an http status code greater than 399.
-                        </li>
-                    </ul>
-                </li>
-
-                <li><b>response (default: "json")</b> Acceptable values: ["html", "json"] The Content Type expected from the server response.</li>
-
-                <li><b>modal (default: "false")</b> Acceptable values: ["true", "false"] Whether to open the confirmation dialog as a modal. A modal dialog/overlay covers the entire screen. When this value is false, the confirmation dialog/overlay only covers the form which was submitted.</li>
-
-                <li><b>reset (default: "true")</b> Acceptable value: ["true", "false"] Whether to reset the form after it is submitted.</li>
-            </ul>
-        </article>
+                </style>
+            </template>
+        </zero-md>
     </details>
 
     <section>
-        <article>
-            <h2>Demo Form</h2>
-            <wijit-form id="demoform" reset="false">
-                <form action="/test-server.php">
-                    <section id="settings">
-                        <article class="flex column">
-                            <label>fetch-options</label>
-                            <textarea
-                                name="fetch-options"
-                                oninput="change(event, 'fetch-options')"
-                                placeholder="Example: {headers:{Accept:'text/html'}}"></textarea>
-                        </article>
+        <h2>Demo Form</h2>
+        <wijit-form id="demoform" reset="false">
+            <form action="/test-server.php">
 
-                        <fieldset class="column">
+                <div class="row">
+
+                    <div>
+                        <label>fetch-options</label>
+                        <textarea
+                            name="fetch-options"
+                            oninput="change(event, 'fetch-options')"
+                            placeholder="Example: {headers:{Accept:'text/html'}}"></textarea>
+                    </div>
+
+                    <fieldset>
                         <legend>Custom Messages</legend>
-                            <p class="flex column end">
-                                <label for="demo-waiting">waiting</label>
-                                <textarea name="waiting" id="demo-waiting" placeholder="Example: <h1>Waiting</h1>" oninput="change(event, 'waiting')"></textarea>
-                            </p>
-                            <p class="flex column">
-                                <label for="demo-success">success</label>
-                                <textarea name="success" id="demo-success" placeholder="Example: <p>Thanks!</p>" oninput="change(event, 'success')"></textarea>
-                            </p>
-                            <p class="flex column">
-                                <label for="demo-error">error</label>
-                                <textarea name="error" id="demo-error" placeholder="Example: <p>Nope!</p>" oninput="change(event, 'error')"></textarea>
-                            </p>
+                        <div>
+                            <label for="demo-waiting">waiting</label>
+                            <textarea name="waiting" id="demo-waiting" placeholder="Example: <h1>Waiting</h1>" oninput="change(event, 'waiting')"></textarea>
+                        </div>
+                        <div>
+                            <label for="demo-success">success</label>
+                            <textarea name="success" id="demo-success" placeholder="Example: <p>Thanks!</p>" oninput="change(event, 'success')"></textarea>
+                        </div>
+                        <div>
+                            <label for="demo-error">error</label>
+                            <textarea name="error" id="demo-error" placeholder="Example: <p>Nope!</p>" oninput="change(event, 'error')"></textarea>
+                        </div>
+                    </fieldset>
+
+                    <div>
+                        <fieldset>
+                            <legend>response</legend>
+                            <div>
+                                <div class="row reverse">
+                                    <label for="demo-response-html">html</label>
+                                    <input type="radio" name="response" value="html" id="demo-response-html" onchange="change(event, 'response')">
+                                </div>
+                                <div class="row reverse">
+                                    <label for="demo-response-json">json</label>
+                                    <input checked type="radio" name="response" value="json" id="demo-response-json" onchange="change(event, 'response')">
+                                </div>
+                            </div>
+                            <hr>
+                            <div>
+                                <label for="demo-force-error">Force Error</label>
+                                <input type="checkbox" name="fail" value="true" id="demo-force-error">
+                            </div>
                         </fieldset>
 
-                        <article class="flex column between">
-                            <fieldset>
-                            <legend>response</legend>
-                                <div>
-                                    <input type="radio" name="response" value="html" id="demo-response-html" onchange="change(event, 'response')">
-                                    <label for="demo-response-html">html</label>
-                                </div>
-                                <div>
-                                    <input checked type="radio" name="response" value="json" id="demo-response-json" onchange="change(event, 'response')">
-                                    <label for="demo-response-json">json</label>
-                                </div>
-                                <hr>
-                                <div>
-                                    <input type="checkbox" name="fail" value="true" id="demo-force-error">
-                                    <label for="demo-force-error">Force Error</label>
-                                </div>
-                            </fieldset>
-
-                            <fieldset>
+                        <fieldset>
                             <legend>modal</legend>
-                                <div>
-                                    <input type="radio" id="demo-modal-true" name="modal" value="true" onchange="change(event, 'modal')">
-                                    <label for="demo-modal-true">true</label>
-                                </div>
-                                <div>
-                                    <input checked type="radio" id="demo-modal-false" name="modal" value="false" onchange="change(event, 'modal')">
-                                    <label for="demo-modal-false">false</label>
-                                </div>
-                            </fieldset>
+                            <div>
+                                <label for="demo-modal-true">true</label>
+                                <input type="radio" id="demo-modal-true" name="modal" value="true" onchange="change(event, 'modal')">
+                            </div>
+                            <div>
+                                <label for="demo-modal-false">false</label>
+                                <input checked type="radio" id="demo-modal-false" name="modal" value="false" onchange="change(event, 'modal')">
+                            </div>
+                        </fieldset>
 
-                            <fieldset>
+                        <fieldset>
                             <legend>reset</legend>
-                                <div>
-                                    <input type="radio" id="demo-reset-true" name="reset" value="true" onchange="change(event, 'reset')">
-                                    <label for="demo-reset-true">true</label>
-                                </div>
-                                <div>
-                                    <input checked type="radio" id="demo-reset-false" name="reset" value="false" onchange="change(event, 'reset')">
-                                    <label for="demo-reset-false">false</label>
-                                </div>
-                            </fieldset>
-                        </article>
-                    </section>
+                            <div>
+                                <label for="demo-reset-true">true</label>
+                                <input type="radio" id="demo-reset-true" name="reset" value="true" onchange="change(event, 'reset')">
+                            </div>
+                            <div>
+                                <label for="demo-reset-false">false</label>
+                                <input checked type="radio" id="demo-reset-false" name="reset" value="false" onchange="change(event, 'reset')">
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
 
-                    <section>
-                        <span>
-                            <label for="demo-name1">First</label>
-                            <input name="first" id="demo-name1" value="Foo" autocomplete="given-name">
-                        </span>
-                        <span>
-                            <label for="demo-name2">Last</label>
-                            <input name="last" id="demo-name2" value="Bar" autocomplete="family-name">
-                        </span>
+                <div class="row">
+                    <div class="row">
+                        <label for="demo-name1">First</label>
+                        <input name="first" id="demo-name1" value="Foo" autocomplete="given-name">
+                    </div>
+                    <div class="row">
+                        <label for="demo-name2">Last</label>
+                        <input name="last" id="demo-name2" value="Bar" autocomplete="family-name">
+                    </div>
 
-                        <button>Submit</button>
-                    </section>
+                    <button class="primary">Submit</button>
+                </div>
 
-                </form>
-            </wijit-form>
-        <article>
+            </form>
+        </wijit-form>
     </section>
 
     <section>
@@ -160,14 +142,14 @@
             <h3>Basic Example</h3>
             <wijit-form>
                 <form action="/test-server.php">
-                    <p>
+                    <div class="row">
                         <label for="ex1-name">Name</label>
                         <input id="ex1-name" name="name" autocomplete="name">
-                    </p>
-                    <p>
+                    </div>
+                    <div class="row">
                         <label for="ex1-email">Email</label>
                         <input type="email" id="ex1-email" name="email" autocomplete="email">
-                    </p>
+                    </div>
                     <p>
                         <button>Spam Me!</button>
                     </p>
@@ -179,21 +161,20 @@
             <h3>User Supplied Messages</h3>
             <wijit-form>
                 <form action="/test-server.php">
-                    <p>
+                    <div class="row">
                         <label for="ex2-name">Name</label>
                         <input id="ex2-name" name="name" value="Foo" autocomplete="name">
-                    </p>
-                    <p>
+                    </div>
+                    <div class="row">
                         <label for="ex2-email">Email</label>
                         <input type="email" id="ex2-email" name="email" autocomplete="email">
-                    </p>
+                    </div>
                     <p>
                         <button>Spam Me!</button>
                     </p>
                 </form>
 
                 <p>This example provides slots for "waiting", "success" and "error".</p>
-                <p>The contents of these slots are shown while awaiting a response and upon receiving a response from the server.</p>
 
                 <wijit-icon01 animate color="lime" slot="waiting">Please Wait</wijit-icon01>
 

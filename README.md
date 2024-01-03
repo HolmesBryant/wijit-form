@@ -1,15 +1,15 @@
 # Wijit Form Web Component #
 
-This component serves simply as a convenience to make styling forms and configuring waiting effects and confirmation/error messages less time consuming.</p>
+This component serves simply as a convenience to make styling forms and configuring waiting effects and confirmation/error messages less time consuming.
 
 ## Features ##
 
 - Set custom "waiting", "success" and "error" messages.
 - Custom messages can be set by either attributes or slots.
 - Receive and display messages from the server sent in HTML or JSON format.
-- Set whether the messages appear as a modal.
+- Choose whether the messages appear as a modal.
 - Set custom http headers and other fetch options, such as CORS etc.
-- Set whether to reset the form when it is submitted.
+- Choose whether to reset the form when it is submitted.
 - Use the component's default css to style to form, or use your own styles.
 
 ## Usage ##
@@ -27,11 +27,16 @@ Add the tag around your form:
 
 ### Custom Messages ###
 
-Instead of displaying whatever message the server sends, you may wish to display your own "waiting", "success" and/or "error" messages. You may set these messages by either attributes or slots. 
+Instead of displaying whatever message the server sends, you may wish to display your own ***waiting***, ***success*** and/or ***error*** messages. You may set these messages by either attributes or slots. 
 
-If you don't set a "waiting", "success" and/or "error" message, the message that is displayed depends on the "response" attribute. If it is set to "json" (default), the component's default message will display. If "response" is set to "html", the response from the server is displayed.
+If you don't define a ***waiting*** message, the default message will display.
 
-**If the server returns an HTML response and you simply wish to display whatever the server sends, you must set  the "response" attribute to "html".**
+If you don't define a ***success*** and/or ***error*** message, the displayed message depends on the ***response*** attribute:
+
+- If ***response*** is set to "json" (default), the component's default message will display.
+- If ***response*** is set to "html", the response from the server is displayed.
+
+If the server typically returns an HTML response and you simply wish to display whatever the server sends, you must set  the ***response*** attribute to "html".
 
 		<wijit-form response="html">...</wijit-form>
 
@@ -39,7 +44,12 @@ If you don't set a "waiting", "success" and/or "error" message, the message that
 
 To set custom messages with attributes:
 
-	<wijit-form waiting="<h1>Waiting Message</h1>" success="<h2>Success</h2><p>message</p>" error="error message">...</wijit-form>
+	<wijit-form 
+	waiting="<h1>Waiting Message</h1>" 
+	success="<h2>Success</h2><p>message</p>" 
+	error="error message">
+	...
+	</wijit-form>
 
 #### Custom Message via Slots ####
 
@@ -111,7 +121,7 @@ If you have many custom fetch options, you may want to add them with javascript.
 		component.setAttribute('fetch-options', options);
 	</script>
 				
-### Do Not Reset Form on Submission
+### Form Reset ###
 
 By default, the form will reset on submission, if you do not want the form to reset, add the "reset" attribute with a value of "false".
 
@@ -122,15 +132,15 @@ By default, the form will reset on submission, if you do not want the form to re
 
 All of these attributes are optional
 
-- **fetch-options (default: null)** Acceptable values: [Any valid fetch option from: <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/fetch#options">The MDN Docs</a>]. This should be formatted as valid JSON.
+- **fetch-options (default: null)** Acceptable values: [Any valid fetch option from: <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/fetch#options">The MDN Docs</a>]. This should be formatted as a valid JSON string.
 
 - User Supplied Confirmation Messages. These attributes accept strings. The string may contain HTML.
 
-      - **waiting (default: null)** Acceptable values: [any string] This is the message displayed after the form is submitted, while the page is waiting for a response from the server.
+  - **waiting (default: "`<h1>Please Wait...</h1>`")** Acceptable values: [any string] This is the message displayed after the form is submitted, while the page is waiting for a response from the server.
 
-      - **success (default: null)** Acceptable values: [any string] This is the message displayed upon a successful response from the server, meaning the server sent an http status code lower than 400.
+   - **success (default: "`<h3>Submission Received</h3><p>Thank you!</p>`")** Acceptable values: [any string] This is the message displayed upon a successful response from the server, meaning the server sent an http status code lower than 400.
 
-      - **error (default: null)** Acceptable values: [any string] This is the message displayed when the server reports an error, meaning it sent an http status code greater than 399.
+   - **error (default: "`<h3>Oopsie!</h3><p>There was an error. Your submission was not received.</p>`")** Acceptable values: [any string] This is the message displayed when the server reports an error, meaning it sent an http status code greater than 399.
 
  
 - **response (default: "json")** Acceptable values: ["html", "json"] The Content Type expected from the server.
