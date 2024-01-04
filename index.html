@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Wijit-Form Web Component</title>
-    <!-- <link rel="stylesheet" href="/styles.css"> -->
+    <link rel="stylesheet" href="/styles.css">
     <script type="module" src="wijit-form.js"></script>
     <script type="module" src="wijit-icon01.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
@@ -24,10 +24,6 @@
         <zero-md src="/README.md">
             <template>
                 <style>
-                    @media (prefers-color-scheme: dark) {
-                        * {color: white; }
-                        pre { background-color: dimgray }
-                    }
 
                     pre {
                         background-color: gainsboro;
@@ -37,6 +33,11 @@
                         padding: 1rem;
                     }
 
+                    @media (prefers-color-scheme: dark) {
+                        * {color: white; }
+                        pre { background-color: dimgray }
+                    }
+
 
                 </style>
             </template>
@@ -44,12 +45,12 @@
     </details>
 
     <section>
-        <h2>Demo Form</h2>
-        <wijit-form id="demoform" reset="false">
-            <form action="/test-server.php">
+        <header><h2>Demo</h2></header>
 
-                <div class="row">
+        <wijit-form>
+            <form action="/tests/test-server.php">
 
+                <section class="row">
                     <div>
                         <label>fetch-options</label>
                         <textarea
@@ -59,7 +60,7 @@
                     </div>
 
                     <fieldset>
-                        <legend>Custom Messages</legend>
+                    <legend>Custom Messages</legend>
                         <div>
                             <label for="demo-waiting">waiting</label>
                             <textarea name="waiting" id="demo-waiting" placeholder="Example: <h1>Waiting</h1>" oninput="change(event, 'waiting')"></textarea>
@@ -74,9 +75,9 @@
                         </div>
                     </fieldset>
 
-                    <div>
-                        <fieldset>
-                            <legend>response</legend>
+                    <section>
+                        <fieldset class="row">
+                        <legend>response</legend>
                             <div>
                                 <div class="row reverse">
                                     <label for="demo-response-html">html</label>
@@ -94,8 +95,8 @@
                             </div>
                         </fieldset>
 
-                        <fieldset>
-                            <legend>modal</legend>
+                        <fieldset class="row">
+                        <legend>modal</legend>
                             <div>
                                 <label for="demo-modal-true">true</label>
                                 <input type="radio" id="demo-modal-true" name="modal" value="true" onchange="change(event, 'modal')">
@@ -106,8 +107,8 @@
                             </div>
                         </fieldset>
 
-                        <fieldset>
-                            <legend>reset</legend>
+                        <fieldset class="row">
+                        <legend>reset</legend>
                             <div>
                                 <label for="demo-reset-true">true</label>
                                 <input type="radio" id="demo-reset-true" name="reset" value="true" onchange="change(event, 'reset')">
@@ -117,10 +118,10 @@
                                 <input checked type="radio" id="demo-reset-false" name="reset" value="false" onchange="change(event, 'reset')">
                             </div>
                         </fieldset>
-                    </div>
-                </div>
+                    </section>
+                </section>
 
-                <div class="row">
+                <section class="row">
                     <div class="row">
                         <label for="demo-name1">First</label>
                         <input name="first" id="demo-name1" value="Foo" autocomplete="given-name">
@@ -131,190 +132,12 @@
                     </div>
 
                     <button class="primary">Submit</button>
-                </div>
+                </section>
 
             </form>
         </wijit-form>
+
     </section>
-
-    <section>
-        <article>
-            <h3>Basic Example</h3>
-            <wijit-form>
-                <form action="/test-server.php">
-                    <div class="row">
-                        <label for="ex1-name">Name</label>
-                        <input id="ex1-name" name="name" autocomplete="name">
-                    </div>
-                    <div class="row">
-                        <label for="ex1-email">Email</label>
-                        <input type="email" id="ex1-email" name="email" autocomplete="email">
-                    </div>
-                    <p>
-                        <button>Spam Me!</button>
-                    </p>
-                </form>
-            </wijit-form>
-        </article>
-
-        <article>
-            <h3>User Supplied Messages</h3>
-            <wijit-form>
-                <form action="/test-server.php">
-                    <div class="row">
-                        <label for="ex2-name">Name</label>
-                        <input id="ex2-name" name="name" value="Foo" autocomplete="name">
-                    </div>
-                    <div class="row">
-                        <label for="ex2-email">Email</label>
-                        <input type="email" id="ex2-email" name="email" autocomplete="email">
-                    </div>
-                    <p>
-                        <button>Spam Me!</button>
-                    </p>
-                </form>
-
-                <p>This example provides slots for "waiting", "success" and "error".</p>
-
-                <wijit-icon01 animate color="lime" slot="waiting">Please Wait</wijit-icon01>
-
-                <div slot="success">
-                    <div>Name: {{data.name}}</div>
-                    <p>I'm using data.name from the json data sent from the server.</p>
-                </div>
-
-                <div slot="error">
-                    <h2>Something went wrong.</h2>
-                    <p>Your submission was not processed.</p>
-                </div>
-            </wijit-form>
-        </article>
-
-        <article>
-            <h3>HTML response from server</h3>
-            <wijit-form response="html">
-                <form action="/test-server.php">
-                    <p>
-                        <label for="ex3-name">Name</label>
-                        <input id="ex3-name" name="name" autocomplete="name">
-                    </p>
-                    <p>
-                        <label for="ex3-email">Email</label>
-                        <input type="email" id="ex3-email" name="email" autocomplete="email">
-                    </p>
-                    <p>
-                        <button>Spammie!</button>
-                    </p>
-                </form>
-            </wijit-form>
-            <p>This example assumes an HTML response from the server.</p>
-        </article>
-
-        <article>
-            <h3>Modal Dialog</h3>
-            <wijit-form modal>
-                <form action="/test-server.php">
-                    <p>
-                        <label for="ex4-name">Name</label>
-                        <input id="ex4-name" name="name" autocomplete="name">
-                    </p>
-                    <p>
-                        <label for="ex4-email">Email</label>
-                        <input type="email" id="ex4-email" name="enail" autocomplete="email">
-                    </p>
-                    <p>
-                        <button>Spammie!</button>
-                    </p>
-                </form>
-            </wijit-form>
-            <p>This example opens the waiting and confirmation dialogs as modals</p>
-        </article>
-    </section>
-
-    <!-- <section>
-        <article>
-            <wijit-form waiting_attr="active" waiting_delay="500" options="{headers:{Accept:'text/html'}}">
-                <form id="test-form" method="post" action="/test-server.php">
-
-                    <div class="flex column">
-                        <label for="name">Name</label>
-                        <input required type="text" id="name" name="Name" autocomplete="_name" value="Foo Barr">
-                    </div>
-
-                    <div class="flex column">
-                        <label class="required" for="email">Email</label>
-                        <input required type="email" id="email" name="Email" autocomplete="_email" value="foo@barr.com">
-                    </div>
-
-                    <div class="flex row-reverse start">
-                        <label for="checkbox">Checkbox</label>
-                        <input type="checkbox" name="Checkbox" id="checkbox" value="Yes" aria-role="checkbox" tabindex="0">
-                    </div>
-
-                    <fieldset>
-                        <legend>Choose One</legend>
-
-                        <div class="flex row-reverse start">
-                            <label for="ochoice1">One</label>
-                            <input checked type="radio" name="Other Choice" id="ochoice1" value="One" aria-role="radio" tabindex="0">
-                        </div>
-                        <div class="flex row-reverse start">
-                            <label for="ochoice2">Two</label>
-                            <input type="radio" name="Other Choice" id="ochoice2" value="Two" aria-role="radio" tabindex="0">
-                        </div>
-                    </fieldset>
-
-                    <div class="flex column">
-                        <label for="select-one">Select</label>
-                        <select id="select-one">
-                            <option disabled selected></option>
-                            <option>one</option>
-                            <option>two</option>
-                            <option>three</option>
-                        </select>
-                    </div>
-
-                    <div class="flex column">
-                        <label for="favorite-color">Fav Color</label>
-                        <input name="Favorite Color" id="favorite-color" list="fav-colors" placeholder="Favorite Color">
-                        <datalist id="fav-colors">
-                            <option>red</option>
-                            <option>blue</option>
-                            <option>green</option>
-                            <option>yellow</option>
-                        </datalist>
-                    </div>
-
-                    <div class="flex column">
-                        <label for="multi-choices">Multiple Choice</label>
-                        <select multiple name="Multi Choices" id="multi-choices">
-                            <option>One</option>
-                            <option selected>Two</option>
-                            <option>Three</option>
-                        </select>
-                    </div>
-
-                    <div class="flex center">
-                        <button type="submit" class="primary">Submit</button>
-                        <button type="reset" class="secondary">Reset</button>
-                    </div>
-                </form>
-
-                <sliding-doors slot="waiting" theme="auto" style="height:100%">
-                    <wijit-icon01 animate color="lime" slot="effect">
-                        <b>Check out this eye candy<br>while you wait</b>
-                    </wijit-icon01>
-                </sliding-doors>
-
-                <div slot="success"><h1>Hi {{Name}}</h1><p>Thanks for sharing! Here is what you submitted:</p><pre>{{data}}</pre></div>
-
-                <div slot="error">
-                    <h1>Oopsie!</h1>
-                    <p>There was an error. Please get help from someone who has a clue.</p>
-                </div>
-            </wijit-form>
-        </article>
-    </section> -->
 
     <script>
         function change (event, attr) {

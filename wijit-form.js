@@ -581,395 +581,339 @@ export default class WijitForm extends HTMLElement {
 	defaultCss() {
 		const style = `
 			<style>
-				wijit-form {
-				    --bg1: rgb(250,250,250);
-				    --bg2: rgb(245,245,245);
-				    --bg3: white;
-				    --text: rgb(60,60,60);
-				    --border: silver;
-				    --fail: hsl(6, 93%, 80%);
-				    --pass: hsl(112, 70%, 75%);
-				    --accent: dodgerblue;
-				    --min: 2.5rem;
-				    --pad: .5rem;
+				html, body * { box-sizing: border-box; }
 
-				    @media (prefers-color-scheme: dark) {
-				        --text: rgb(240,240,240);
-				        --bg1: rgb(35,35,35);
-				        --bg2: rgb(40,40,40);
-				        --bg3: rgb(60,60,60);
-				        --border: dimgray;
-				    }
+				@layer wijit-form {
+					wijit-form {
+					    --bg1: rgb(250,250,250);
+					    --bg2: rgb(245,245,245);
+					    --bg3: white;
+					    --text: rgb(60,60,60);
+					    --border: silver;
+					    --fail: hsl(6, 93%, 80%);
+					    --pass: hsl(112, 70%, 75%);
+					    --accent: lime;
+					    --min: 2.5rem;
+					    --pad: .25rem;
 
-				    background-color: var(--bg1);
-				    border-radius: 10px;
-				    display: inline-block;
-				    padding: 1rem;
-				    width: 100%;
+					    @media (prefers-color-scheme: dark) {
+					        --text: rgb(240,240,240);
+					        --bg1: rgb(35,35,35);
+					        --bg2: rgb(40,40,40);
+					        --bg3: rgb(60,60,60);
+					        --border: dimgray;
+					    }
 
-			    /*********************/
-			    /**** Backgrounds ****/
-			    /*********************/
 
-				    details > *,
-				    fieldset
-				    { background-color: var(--bg2); }
-
-				    button,
-				    input,
-				    input[type="checkbox"]::before,
-				    input[type="radio"]::before,
-				    progress,
-				    progress::-webkit-progress-bar,
-				    select,
-				    textarea
-				    { background-color: var(--bg3); }
-
-				    /** Chromium stops processing ALL css rules
-				     * after progess:-moz-progress-bar{} (within a nesting context),
-				     * so I placed it at the very end of the styles
-				     */
-				    .primary,
-				    progress::-webkit-progress-value {
-						background-color: var(--accent);
+					    background-color: var(--bg1);
+					    border-radius: 10px;
+					    display: inline-block;
+					    padding: 1rem;
+					    width: 100%;
 					}
 
-				    .error
-				    { background-color: var(--fail); }
+				    /*********************/
+				    /**** Backgrounds ****/
+				    /*********************/
 
-				    .success
-				    { background-color: var(--pass); }
+					    details > *,
+					    fieldset,
+					    section
+					    { background-color: var(--bg2); }
 
-			    /*********************/
-			    /****** Borders ******/
-			    /*********************/
+					    button,
+					    hr,
+					    input,
+					    progress,
+					    select,
+					    textarea
+					    { background-color: var(--bg3); }
 
-				    button,
-				    fieldset,
-				    input,
-				    input[type="checkbox"]::before,
-				    input[type="radio"]::before,
-				    progress,
-				    select,
-				    textarea,
-				    .error,
-				    .success
-				    { border: 1px solid var(--border); }
+					    .primary,
+					    progress::-webkit-progress-value
+					    { background-color: var(--accent); }
 
-				    input:user-valid:not([type="submit"]):not([type="reset"])
-				    { border-color: var(--pass) }
+						progress::-moz-progress-bar
+						{ background-color: var(--accent); }
 
-				    :user-invalid
-				    { border-color: var(--fail) }
+					    .error
+					    { background-color: var(--fail); }
 
-				    :user-valid
-				    { border-color: var(--pass) }
+					    .success
+					    { background-color: var(--pass); }
 
-				    button,
-				    fieldset,
-				    input,
-				    input[type="checkbox"]::before,
-				    option,
-				    progress,
-				    select,
-				    textarea,
-				    .error,
-				    .success
-				    { border-radius: .5rem; }
+				    /********************************/
+				    /****** Borders / Outlines ******/
+				    /********************************/
 
-				    input[type="radio"]::before
-				    { border-radius: 50%; }
+					    button,
+					    fieldset,
+					    input,
+					    input[type="checkbox"]::before,
+					    input[type="radio"]::before,
+					    progress,
+					    select,
+					    textarea,
+					    .error,
+					    .success
+					    { border: 1px solid var(--border); }
 
-				    *:focus
-				    {outline-color: var(--accent)}
+					    hr
+					    { border: none; }
 
-				    input:focus::before
-				    { outline: 2px solid }
+					    input:user-valid:not([type="submit"]):not([type="reset"])
+					    { border-color: var(--pass) }
 
-			    /******************************/
-			    /*********** Accent ***********/
-			    /******************************/
-				    input,
-				    progress
-				    { accent-color: var(--accent); }
+					    :user-invalid
+					    { border-color: var(--fail) }
 
-			    /******************************/
-			    /************ Text ************/
-			    /** Color/Size/Weight/Shadow **/
-			    /******************************/
+					    :user-valid
+					    { border-color: var(--pass) }
 
-				    label.required:after
-				    { color: var(--fail) }
+					    button,
+					    fieldset,
+					    hr,
+					    input,
+					    input[type="checkbox"]::before,
+					    option,
+					    progress,
+					    progress::-webkit-progress-value,
+					    progress::-webkit-progress-bar,
+					    section,
+					    select,
+					    textarea,
+					    .error,
+					    .success
+					    { border-radius: .5rem; }
 
-				    button,
-				    input,
-				    fieldset,
-				    label,
-				    legend,
-				    select,
-				    textarea
-				    {
-				        color: var(--text);
-				        font-size: 1rem;
-				    }
+					    :focus-visible
+					    {
+					    	border-color: transparent;
+					    	outline: 1px solid var(--accent);
+					    }
 
-				    input:before
-				    { color: var(--accent) }
+				    /******************************/
+				    /*********** Accent ***********/
+				    /******************************/
+					    input
+					    { accent-color: var(--accent); }
 
-				    .primary
-				    { color: var(--bg3) }
+				    /******************************/
+				    /************ Text ************/
+				    /******************************/
 
-				     option
-				    { font-size: 1.2rem; }
+					    label.required:after
+					    { color: var(--fail) }
 
+					    button,
+					    input,
+					    fieldset,
+					    label,
+					    legend,
+					    select,
+					    textarea
+					    {
+					        color: var(--text);
+					        font-size: 1rem;
+					    }
 
-				    input[type="checkbox"]::before,
-				    input[type="radio"]::before
-				    {
-				    	font-size: 2.5rem;
-				    	 line-height: 2.4rem;
-				    }
+					    .primary
+					    { color: var(--bg3) }
 
-				    label.required
-				    { font-size: small }
+					     option
+					    { font-size: 1.2rem; }
 
-				    button,
-				    .button,
-				    input[type="reset"],
-				    input[type="submit"],
-				    label,
-				    legend,
-				    .error,
-				    .success
-				    { font-weight:bold; }
+					    input[type="checkbox"]::before,
+					    input[type="radio"]::before
+					    {
+					    	font-size: 2.5rem;
+					    	 line-height: 2.4rem;
+					    }
 
-				    .primary
-				    { text-shadow: 1px 1px 1px var(--text) }
+					    label.required
+					    { font-size: small }
 
-			    /*********************/
-			    /****** Shadows ******/
-			    /*********************/
+					    button,
+					    .button,
+					    input[type="reset"],
+					    input[type="submit"],
+					    label,
+					    legend,
+					    .error,
+					    .success
+					    { font-weight:bold; }
 
-				    button:hover,
-				    input[type="submit"]:hover,
-				    input[type="reset"]:hover
-				    { box-shadow: 2px 2px 5px black; }
+					    .primary
+					    { text-shadow: 1px 1px 1px var(--text) }
 
-				    button:active,
-				    input[type="submit"]:active,
-				    input[type="reset"]:active
-				    { box-shadow: none; }
+					    .error,
+					    .success
+					    { text-align: center; }
 
-			    /*********************/
-			    /******* Cursor ******/
-			    /*********************/
+				    /*********************/
+				    /****** Shadows ******/
+				    /*********************/
 
-				    input[type="checkbox"],
-				    input[type="radio"],
-				    input[type="color"],
-				    input[type="range"],
-				    input[type="reset"],
-				    input[type="submit"],
-				    label,
-				    button,
-				    select
-				    { cursor: pointer; }
+					    button:hover,
+					    input[type="submit"]:hover,
+					    input[type="reset"]:hover
+					    { box-shadow: 2px 2px 5px black; }
 
-				    [disabled]
-				    { cursor: not-allowed; }
+					    button:active,
+					    input[type="submit"]:active,
+					    input[type="reset"]:active
+					    { box-shadow: none; }
 
-			    /*********************/
-			    /***** Structure *****/
-			    /*********************/
+				    /*********************/
+				    /******* Cursor ******/
+				    /*********************/
 
-				    button
-				    {
-				        min-height: var(--min);
-				        padding: var(--pad);
-				    }
+					    input[type="checkbox"],
+					    input[type="radio"],
+					    input[type="color"],
+					    input[type="range"],
+					    input[type="reset"],
+					    input[type="submit"],
+					    label,
+					    button,
+					    select
+					    { cursor: pointer; }
 
-				    button,
-				    .button,
-				    input[type="reset"],
-				    input[type="submit"]
-				    {
-				        margin: .25rem;
-				        overflow-wrap: anywhere;
-				    }
+					    [disabled]
+					    { cursor: not-allowed; }
 
-				    div {
-				    	display: flex;
-				    	flex-direction: column;
-				    	gap: .5rem;
-				    	justify-content: center;
-				    	margin: 1rem 0;
-				    }
+				    /*********************/
+				    /***** Structure *****/
+				    /*********************/
 
-				    div:has(input[type="checkbox"]),
-				    div:has(input[type="color"]),
-				    div:has(input[type="radio"])
-				    { display: inline-flex; }
+					    div,
+						fieldset,
+						section {
+							display: flex;
+							flex-direction: column;
+							flex-wrap: wrap;
+							gap: 0.5rem;
+						}
 
-				    div > *
-				    { margin: 0; }
+						div {
+							align-items: stretch;
+						}
 
-				    fieldset
-				    {
-				    	display: inline-flex;
-				    	flex-wrap: wrap;
-				    	gap: .5rem;
-				    	height: min-content;
-				    	justify-content: center;
-				    	padding: var(--pad);
-				    }
+						div.row {
+							align-items: center;
+						}
 
-				    fieldset > div
-				    { margin: 0; }
+						div > *,
+						fieldset > *,
+						section > * {
+							flex: 1;
+						}
 
-				    figure
-				    { text-align: center; }
+						button,
+						input,
+						select,
+						textarea {
+					    	min-height: var(--min);
+					    	min-width: var(--min);
+					        padding: var(--pad);
+					    }
 
-				    figcaption
-				    {
-				        align-items: stretch;
-				        display: flex;
-				    }
+					    hr {
+							min-width: 100%;
+							max-height: 5px;
+						}
 
-				    figcaption > *
-				    { flex: 1; }
+						.row > hr {
+							min-width: 5px;
+							margin: 0;
+							max-width: 5px;
+							max-height: 100%;
+						}
 
-				    form
-				    {
-				    	max-width: 94vw;
-				    	width: 100%;
-				    }
+					    input[type="color"],
+					    input[type="checkbox"],
+					    input[type="radio"] {
+					    	flex: 0;
+					    	flex-basis: var(--min);
+					    	padding: 0;
+					    	width: var(--min);
+					    }
 
-				    input
-				    {
-				    	min-height: var(--min);
-				        padding: var(--pad);
-				    }
+						label {
+							flex: 0;
+							white-space: nowrap;
+						}
 
-				    input[type="color"]
-				    {
-				    	padding: 0;
-				    	width: var(--min);
-				    }
+						progress {
+							-webkit-appearance: none;
+							-moz-appearance: none;
+							appearance: none;
+							inline-size: 100%;
+							min-height: 1rem;
+						}
 
-				    input[type="checkbox"],
-				    input[type="radio"]
-				    {
-				    	appearance: none;
-				    	background: none;
-				    	border: none;
-				    	margin: 0 auto;
-				    	position: relative;
-				    	width: var(--min);
-				    }
+						progress::-webkit-progress-value {
+							min-height: 1rem;
+						}
 
-				    input[type="checkbox"]::before,
-				    input[type="radio"]::before
-				     {
-						bottom: 0;
-				        content: "";
-				        height: inherit;
-				        left: 0;
-				        margin: 0;
-				        position: absolute;
-				        right: 0;
-				        text-align: center;
-				        top:0;
-				    }
+						section + section {
+							margin: 1rem 0;
+						}
 
-				    input[type="checkbox"]:checked::before,
-				    input[type="radio"]:checked::before
-				    { content: "⬤"; }
+						select
+					    {
+					    	min-width: 10rem;
+					        padding: var(--pad);
+					    	overflow: auto;
+					    	width: max-content;
+					    }
 
-				    input[type="range"]
-				    { min-height: auto; }
+					    textarea
+					    {
+					    	flex: 1;
+					    	min-height: 5rem;
+					    	min-width: 10rem;
+					    	padding: var(--pad);
+					    }
 
+						.reverse {
+							flex-direction: column-reverse;
+						}
 
-				    label
-				    { white-space: nowrap; }
+						.row {
+							flex-direction: row;
+						}
 
-				    label.required:after
-				    {
-				        content: "Required";
-				        font-size: small;
-				        vertical-align: super;
-				    }
+						.row.reverse {
+							flex-direction: row-reverse;
+						}
 
-				    option
-				    { padding: var(--pad) }
+						.start {
+							align-content: flex-start;
+						}
 
+						.start > * {
+							flex: 0;
+						}
 
-				    progress
-				    {
-				    	appearance: none;
-				    	height: 1rem;
-				    	overflow: clip;
-				    }
+						.end {
+							align-content: flex-end;
+							justify-content: flex-end;
+						}
 
+						.end > * {
+							flex: 0;
+						}
 
-				    select
-				    {
-				    	min-height: var(--min);
-				    	min-width: 10rem;
-				        padding: var(--pad);
-				    	overflow: auto;
-				    	width: max-content;
-				    }
+						.center {
+							justify-content: center;
+							align-content: center;
+						}
 
-				    textarea
-				    {
-				    	flex: 2;
-				    	min-height: 10rem;
-				    	min-width: 10rem;
-				    	padding: var(--pad);
-				    }
-
-				    .error,
-				    .success
-				    { text-align: center; }
-
-				    .column
-				    {
-				    	flex-direction: column;
-				    	margin: 0;
-				    }
-
-			        .column.reverse
-			        { flex-direction: column-reverse; }
-
-			        .row
-			        {
-			        	align-items: center;
-			            flex-direction: row;
-			            flex-wrap: wrap;
-			        }
-
-			        .column > label,
-			        .row > label
-			        {
-			        	flex: 0 0 auto;
-			        	min-width: 1rem ;
-			        	min-height: 1rem;
-			        }
-
-			        .column > textarea,
-			        .row > input
-			        { flex: 1 1 auto; }
-
-			        .row.reverse
-			        { flex-direction: row-reverse; }
-
-			        /** Chromium stops processing ALL css rules
-				     * after progess:-moz-progress-bar{} (within a nesting context),
-				     * so I placed it at the very end of the styles
-				     */
-			        wijit-form progress::-moz-progress-bar
-			        { background-color: var(--accent); }
-				} /* wijit-form */
+						.center > * {
+							flex: 0;
+						}
+				} /* @layer */
             </style>
 		`;
 
