@@ -52,7 +52,7 @@ export default class WijitForm extends HTMLElement {
 	 * @default true
 	 * @summary Determines whether to reset the form after submission.
 	 */
-	#reset = true;
+	#resetForm = true;
 
 	/**
 	 * @private
@@ -128,12 +128,109 @@ export default class WijitForm extends HTMLElement {
 	 * @type {string[]}
 	 * @summary A list of attributes that should be observed for changes.
 	 */
-	static observedAttributes = ['modal','fetch-options', 'response', 'reset', 'dialog-message-id', 'force-error', 'custom-css'];
+	static observedAttributes = [
+		'custom-css',
+		'dialog-message-id',
+		'error',
+		'fetch-options',
+		'force-error',
+		'modal',
+		'reset-form',
+		'response',
+		'success',
+		'waiting'
+		];
 
 	constructor () {
 		super();
 		this.attachShadow({mode:'open'});
 		this.shadowRoot.innerHTML = `
+			<style>
+				button {
+					border-color: var(--border);
+					border-radius: 5px;
+					cursor: pointer;
+					font-size: large;
+					font-weight: bold;
+					outline-color: var(--accent);
+					padding: .5rem;
+				}
+
+				button:hover,
+				button:focus {
+					box-shadow: 2px 2px 5px black;
+				}
+
+				button:active {
+					box-shadow: inset 2px 2px 5px black;
+				}
+
+				dialog {
+					background: transparent;
+					border: none;
+					box-sizing: border-box;
+					color: var(--text);
+					outline: none;
+					text-align: center;
+				}
+
+				dialog::backdrop {
+					background-color: white;
+					color: black;
+					opacity: 0.75;
+				}
+
+				dialog.modeless {
+					accent-color: transparent;
+					backdrop-filter: blur(.3rem);
+					height: 100%;
+					outline: none;
+					padding: 0;
+					top: 0;
+					width: 100%;
+				}
+
+				dialog.modeless[open] {
+					display: table;
+				}
+
+				.hidden
+				{ display: none; }
+
+				#dialog-message {
+					background-color: var(--bg3);
+					border: 1px solid var(--border);
+					border-radius: 10px;
+					display: table-cell;
+					padding: 1rem;
+					vertical-align: middle;
+				}
+
+				dialog.modeless #dialog-message {
+					transition: all 1s;
+
+				}
+
+				#dialog-message.waiting {
+					background-color: transparent;
+					border: none;
+					margin: auto;
+					padding: 0;
+					width: auto;
+				}
+
+				#wrapper {
+					position: relative;
+					overflow: hidden;
+				}
+
+				@media (prefers-color-scheme: dark) {
+					dialog::backdrop {
+						background-color: black;
+						color: white;
+					}
+				}
+			</style>
 			<div id="wrapper">
 				<slot></slot>
 				<slot name="dialog">
@@ -179,12 +276,13 @@ export default class WijitForm extends HTMLElement {
 		this.errorElems = this.querySelectorAll('[slot=error]');
 		this.successElems = this.querySelectorAll('[slot=success]');
 		this.waitingElems = this.querySelectorAll('[slot=waiting]');
-		if (!this.customCss) document.head.append(this.defaultCss());
 
+		if (!this.customCss) this.addDefaultCss();
 		this.form.addEventListener('submit', (event) => this.submitData(event), {signal: this.mainAbortController.signal});
 		this.dialog.addEventListener('close', (event) => {
 			if (this.reset) this.resetForm(this.form);
 		}, {signal: this.mainAbortController.signal});
+		this.addFocusListeners();
 	}
 
 	/**
@@ -205,6 +303,7 @@ export default class WijitForm extends HTMLElement {
 			attr = attr.replace(attr.charAt(0), attr.charAt(0).toLowerCase());
 		}
 
+console.log(attr, newval)
 		this[attr] = newval;
 	}
 
@@ -469,16 +568,28 @@ export default class WijitForm extends HTMLElement {
 		return nodeList;
 	}
 
+	addFocusListeners() {
+		for (const input of this.form.elements) {
+			if (input.localName === 'textarea') continue;
+			input.addEventListener('focus', () => {
+				if (typeof input.select === 'function') input.select();
+			}, {signal: this.mainAbortController.signal});
+		}
+	}
+
 	/**
 	 * Resets form inputs to default values
 	 * @param  {HTMLElement} form The html form
 	 * @returns {Void}
 	 */
 	resetForm(form) {
-		// for some reason this.form.reset() is not a function ???
 		const inputs = form.querySelectorAll('input, select, textarea');
-		for (const input of inputs) {
-			input.value = input.defaultValue || '';
+		try {
+			this.form.reset();
+			inputs[0].focus();
+		} catch (error) {
+			console.debug(typeof this.form.reset, this.form);
+			console.error(this);
 		}
 	}
 
@@ -574,13 +685,18 @@ export default class WijitForm extends HTMLElement {
 		}
 	}
 
+	addDefaultCss() {
+		const style = document.head.querySelector('#wijit-form-css');
+		if (!style) document.head.append (this.defaultCss());
+	}
+
 	/**
 	 * @summary Returns a Style element containing css rules.
 	 * @returns {HTMLStyleElement}
 	 */
 	defaultCss() {
 		const style = `
-			<style>
+			<style id="wijit-form-css">
 				html, body * { box-sizing: border-box; }
 
 				@layer wijit-form {
@@ -592,7 +708,7 @@ export default class WijitForm extends HTMLElement {
 					    --border: silver;
 					    --fail: hsl(6, 93%, 80%);
 					    --pass: hsl(112, 70%, 75%);
-					    --accent: lime;
+					    --accent: lightskyblue;
 					    --min: 2.5rem;
 					    --pad: .25rem;
 
@@ -601,9 +717,9 @@ export default class WijitForm extends HTMLElement {
 					        --bg1: rgb(35,35,35);
 					        --bg2: rgb(40,40,40);
 					        --bg3: rgb(60,60,60);
+						    --accent: dodgerblue;
 					        --border: dimgray;
 					    }
-
 
 					    background-color: var(--bg1);
 					    border-radius: 10px;
@@ -616,235 +732,273 @@ export default class WijitForm extends HTMLElement {
 				    /**** Backgrounds ****/
 				    /*********************/
 
-					    details > *,
-					    fieldset,
-					    section
+					    wijit-form details > *,
+					    wijit-form fieldset,
+					    wijit-form section
 					    { background-color: var(--bg2); }
 
-					    button,
-					    hr,
-					    input,
-					    progress,
-					    select,
-					    textarea
+					    wijit-form button,
+					    wijit-form input,
+					    wijit-form progress,
+					    wijit-form select,
+					    wijit-form textarea
 					    { background-color: var(--bg3); }
 
-					    .primary,
-					    progress::-webkit-progress-value
+					    wijit-form hr
+					    { background-color: silver; }
+
+					    wijit-form .primary,
+					    wijit-form option:checked
 					    { background-color: var(--accent); }
 
-						progress::-moz-progress-bar
+					    wijit-form progress::-webkit-progress-value
+					    { background-color: var(--accent); }
+
+						wijit-form progress::-moz-progress-bar
 						{ background-color: var(--accent); }
 
-					    .error
+					    wijit-form .error
 					    { background-color: var(--fail); }
 
-					    .success
+					    wijit-form .success
 					    { background-color: var(--pass); }
 
 				    /********************************/
 				    /****** Borders / Outlines ******/
 				    /********************************/
 
-					    button,
-					    fieldset,
-					    input,
-					    input[type="checkbox"]::before,
-					    input[type="radio"]::before,
-					    progress,
-					    select,
-					    textarea,
-					    .error,
-					    .success
+					    wijit-form button,
+					    wijit-form fieldset,
+					    wijit-form input,
+					    wijit-form input[type="checkbox"]::before,
+					    wijit-form input[type="radio"]::before,
+					    wijit-form progress,
+					    wijit-form select,
+					    wijit-form textarea,
+					    wijit-form .error,
+					    wijit-form .success
 					    { border: 1px solid var(--border); }
 
-					    hr
+					    wijit-form option
+					    { border-bottom: 1px solid var(--border); }
+
+					    wijit-form hr,
+					    wijit-form option:last-child
 					    { border: none; }
 
-					    input:user-valid:not([type="submit"]):not([type="reset"])
+					    wijit-form input:user-valid:not([type="submit"]):not([type="reset"])
 					    { border-color: var(--pass) }
 
-					    :user-invalid
+					    wijit-form :user-invalid
 					    { border-color: var(--fail) }
 
-					    :user-valid
-					    { border-color: var(--pass) }
+						wijit-form button,
+						wijit-form fieldset,
+						wijit-form hr,
+						wijit-form input,
+						wijit-form input[type="checkbox"]::before,
+						wijit-form option,
+						wijit-form progress,
+						wijit-form progress::-webkit-progress-value,
+						wijit-form progress::-webkit-progress-bar,
+						wijit-form section,
+						wijit-form select,
+						wijit-form textarea,
+						wijit-form .error,
+						wijit-form .success
+						{ border-radius: .5rem; }
 
-					    button,
-					    fieldset,
-					    hr,
-					    input,
-					    input[type="checkbox"]::before,
-					    option,
-					    progress,
-					    progress::-webkit-progress-value,
-					    progress::-webkit-progress-bar,
-					    section,
-					    select,
-					    textarea,
-					    .error,
-					    .success
-					    { border-radius: .5rem; }
+						wijit-form option
+						{ border-radius: 0; }
 
-					    :focus-visible
+						wijit-form option:first-child
+						{ border-radius: .5rem .5rem 0 0; }
+
+						wijit-form option:last-child
+						{ border-radius: 0 0 .5rem .5rem; }
+
+					    wijit-form :focus-visible
 					    {
 					    	border-color: transparent;
 					    	outline: 1px solid var(--accent);
 					    }
 
+					    .success
+					    { border-color: var(--pass); }
+
+					    .error
+					    { border-color: var(--fail);
+					}
+
 				    /******************************/
 				    /*********** Accent ***********/
 				    /******************************/
-					    input
+					    wijit-form input
 					    { accent-color: var(--accent); }
 
 				    /******************************/
 				    /************ Text ************/
 				    /******************************/
 
-					    label.required:after
+					    wijit-form label.required:after
 					    { color: var(--fail) }
 
-					    button,
-					    input,
-					    fieldset,
-					    label,
-					    legend,
-					    select,
-					    textarea
+					    wijit-form button,
+					    wijit-form input,
+					    wijit-form fieldset,
+					    wijit-form label,
+					    wijit-form legend,
+					    wijit-form option,
+					    wijit-form select,
+					    wijit-form textarea
+					    { color: var(--text); }
+
+					    wijit-form option,
+					    wijit-form button,
+					    wijit-form input,
+					    wijit-form fieldset,
+					    wijit-form label,
+					    wijit-form legend,
+					    wijit-form option,
+					    wijit-form select,
+					    wijit-form textarea
 					    {
-					        color: var(--text);
 					        font-size: 1rem;
+					        letter-spacing: .1rem;
 					    }
 
-					    .primary
-					    { color: var(--bg3) }
-
-					     option
-					    { font-size: 1.2rem; }
-
-					    input[type="checkbox"]::before,
-					    input[type="radio"]::before
+					    wijit-form input[type="checkbox"]::before,
+					    wijit-form input[type="radio"]::before
 					    {
 					    	font-size: 2.5rem;
-					    	 line-height: 2.4rem;
+					    	line-height: 2.4rem;
 					    }
 
-					    label.required
+					    wijit-form label.required
 					    { font-size: small }
 
-					    button,
-					    .button,
-					    input[type="reset"],
-					    input[type="submit"],
-					    label,
-					    legend,
-					    .error,
-					    .success
+					    wijit-form button,
+					    wijit-form input[type="reset"],
+					    wijit-form input[type="submit"],
+					    wijit-form label,
+					    wijit-form legend,
+					    wijit-form option,
+					    wijit-form .error,
+					    wijit-form .success
 					    { font-weight:bold; }
 
-					    .primary
-					    { text-shadow: 1px 1px 1px var(--text) }
-
-					    .error,
-					    .success
+					    wijit-form .error,
+					    wijit-form .success
 					    { text-align: center; }
 
 				    /*********************/
 				    /****** Shadows ******/
 				    /*********************/
 
-					    button:hover,
-					    input[type="submit"]:hover,
-					    input[type="reset"]:hover
+					    wijit-form  button:hover,
+					    wijit-form input[type="submit"]:hover,
+					    wijit-form input[type="reset"]:hover,
+					    wijit-form option:hover
 					    { box-shadow: 2px 2px 5px black; }
 
-					    button:active,
-					    input[type="submit"]:active,
-					    input[type="reset"]:active
-					    { box-shadow: none; }
+					    wijit-form button:active,
+					    wijit-form input[type="submit"]:active,
+					    wijit-form input[type="reset"]:active,
+					    wijit-form option:active,
+					    wijit-form option:checked
+					    { box-shadow: inset 2px 2px 5px black; }
 
 				    /*********************/
 				    /******* Cursor ******/
 				    /*********************/
 
-					    input[type="checkbox"],
-					    input[type="radio"],
-					    input[type="color"],
-					    input[type="range"],
-					    input[type="reset"],
-					    input[type="submit"],
-					    label,
-					    button,
-					    select
+					    wijit-form input[type="checkbox"],
+					    wijit-form input[type="radio"],
+					    wijit-form input[type="color"],
+					    wijit-form input[type="range"],
+					    wijit-form input[type="reset"],
+					    wijit-form input[type="submit"],
+					    wijit-form label,
+					    wijit-form button,
+					    wijit-form select
 					    { cursor: pointer; }
 
-					    [disabled]
+					    wijit-form [disabled]
 					    { cursor: not-allowed; }
 
 				    /*********************/
 				    /***** Structure *****/
 				    /*********************/
 
-					    div,
-						fieldset,
-						section {
+					    wijit-form button,
+					    wijit-form input[type=submit],
+					    wijit-form input[type=reset] {
+					    	margin: 1rem;
+					    }
+
+					    wijit-form div,
+						wijit-form fieldset,
+						wijit-form section {
 							display: flex;
 							flex-direction: column;
 							flex-wrap: wrap;
 							gap: 0.5rem;
 						}
 
-						div {
-							align-items: stretch;
-						}
+						wijit-form div
+						{ align-items: stretch; }
 
-						div.row {
-							align-items: center;
-						}
+						wijit-form div.row
+						{ align-items: center; }
 
-						div > *,
-						fieldset > *,
-						section > * {
-							flex: 1;
-						}
+						wijit-form div:has(input:not([type="radio"]):not([type="checkbox"]))
+						{ padding: 1rem; }
 
-						button,
-						input,
-						select,
-						textarea {
+						wijit-form div > *,
+						wijit-form fieldset > *,
+						wijit-form section > *
+						{ flex: 1; }
+
+						wijit-form button,
+						wijit-form input,
+						wijit-form select,
+						wijit-form textarea {
 					    	min-height: var(--min);
 					    	min-width: var(--min);
 					        padding: var(--pad);
 					    }
 
-					    hr {
+					    wijit-form hr {
 							min-width: 100%;
 							max-height: 5px;
 						}
 
-						.row > hr {
+						wijit-form .row > hr {
 							min-width: 5px;
 							margin: 0;
 							max-width: 5px;
 							max-height: 100%;
 						}
 
-					    input[type="color"],
-					    input[type="checkbox"],
-					    input[type="radio"] {
+					    wijit-form input[type="color"],
+					    wijit-form input[type="checkbox"],
+					    wijit-form input[type="radio"] {
 					    	flex: 0;
 					    	flex-basis: var(--min);
 					    	padding: 0;
 					    	width: var(--min);
 					    }
 
-						label {
+						wijit-form label {
 							flex: 0;
 							white-space: nowrap;
 						}
 
-						progress {
+						wijit-form option {
+							padding: 1rem;
+						}
+
+						wijit-form progress {
 							-webkit-appearance: none;
 							-moz-appearance: none;
 							appearance: none;
@@ -852,15 +1006,13 @@ export default class WijitForm extends HTMLElement {
 							min-height: 1rem;
 						}
 
-						progress::-webkit-progress-value {
-							min-height: 1rem;
-						}
+						wijit-form progress::-webkit-progress-value
+						{ min-height: 1rem; }
 
-						section + section {
-							margin: 1rem 0;
-						}
+						wijit-form section + section
+						{ margin: 1rem 0; }
 
-						select
+						wijit-form select
 					    {
 					    	min-width: 10rem;
 					        padding: var(--pad);
@@ -868,7 +1020,7 @@ export default class WijitForm extends HTMLElement {
 					    	width: max-content;
 					    }
 
-					    textarea
+					    wijit-form textarea
 					    {
 					    	flex: 1;
 					    	min-height: 5rem;
@@ -876,43 +1028,44 @@ export default class WijitForm extends HTMLElement {
 					    	padding: var(--pad);
 					    }
 
-						.reverse {
-							flex-direction: column-reverse;
-						}
+					    wijit-form .required:after {
+					    	content: "*";
+					    	font-size: x-large;
+					    	vertical-align: super;
+					    }
 
-						.row {
-							flex-direction: row;
-						}
+					    /* Classes */
 
-						.row.reverse {
-							flex-direction: row-reverse;
-						}
+						wijit-form .reverse
+						{ flex-direction: column-reverse; }
 
-						.start {
-							align-content: flex-start;
-						}
+						wijit-form .row
+						{ flex-direction: row; }
 
-						.start > * {
-							flex: 0;
-						}
+						wijit-form .row.reverse
+						{ flex-direction: row-reverse; }
 
-						.end {
+						wijit-form .start
+						{ align-content: flex-start; }
+
+						wijit-form .start > *
+						{ flex: 0; }
+
+						wijit-form .end {
 							align-content: flex-end;
 							justify-content: flex-end;
 						}
 
-						.end > * {
-							flex: 0;
-						}
+						wijit-form .end > *
+						{ flex: 0; }
 
-						.center {
+						wijit-form .center {
 							justify-content: center;
 							align-content: center;
 						}
 
-						.center > * {
-							flex: 0;
-						}
+						wijit-form .center > *
+						{ flex: 0; }
 				} /* @layer */
             </style>
 		`;
@@ -930,12 +1083,11 @@ export default class WijitForm extends HTMLElement {
 		case '':
 		case 'true':
 			value = true;
-			this.shadowRoot.prepend(this.defaultCss());
+			this.addDefaultCss();
 			break;
 		default:
 			value = false;
-			const style = this.shadowRoot.querySelector('style');
-			if (style) style.remove();
+			if (document.head.querySelector('style#wijit-form-css')) style.remove();
 		}
 
 		this.#customCss = value;
@@ -1015,8 +1167,8 @@ export default class WijitForm extends HTMLElement {
 	/**
 	 * @returns {boolean}
 	 */
-	get reset () { return this.#reset; }
-	set reset (value) {
+	get resetForm () { return this.#resetForm; }
+	set resetForm (value) {
 		switch (value) {
 		case '':
 		case 'true':
@@ -1026,7 +1178,7 @@ export default class WijitForm extends HTMLElement {
 			value = false;
 		}
 
-		this.#reset = value;
+		this.#resetForm = value;
 	}
 
 	/**
@@ -1060,6 +1212,7 @@ export default class WijitForm extends HTMLElement {
 	 */
 	get waiting () { return this.#waiting; }
 	set waiting (value) {
+		// console.log(value)
 		value = this.cleanHTML(value);
 		this.#waiting = value;
 	}

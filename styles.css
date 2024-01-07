@@ -13,14 +13,23 @@ body {
     }
 }
 
+@layer doc {
+
 /**** Backgrounds ****/
 
-    article,
-    details > *
+    article
     {
     	background-color: rgb(240,240,240);
     	@media (prefers-color-scheme: dark) {
     		background-color: rgb(40,40,40);
+    	}
+    }
+
+    summary
+    {
+    	background-color: whitesmoke;
+    	@media (prefers-color-scheme: dark) {
+    		background-color: rgb(60,60,60);
     	}
     }
 
@@ -34,11 +43,20 @@ body {
     	}
     }
 
+    summary
+    {
+    	border: 1px solid silver;
+    	@media (prefers-color-scheme: dark) {
+    		border: 1px solid dimgray;
+    	}
+    }
+
     article,
     details > *,
     section,
     hr
     { border-radius: .5rem; }
+
 
 /**** Text ****/
 	a
@@ -63,10 +81,9 @@ body {
 	{ box-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
 
 	summary:active
-	{ box-shadow: none; }
+	{ box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5); }
 
 /**** Structure ****/
-	@layer page {
 
 	article
 	{
@@ -79,14 +96,23 @@ body {
     details
 	{ margin: 0 10px; }
 
+	details[open] {
+		height: 75svh;
+		overflow: auto;
+	}
+
 	details > *
 	{
 		margin: 1rem 0;
 		padding: 1rem;
 	}
 
-	details > section
-	{ display: block; }
+	details summary
+	{
+		position: sticky;
+		top: 0;
+		z-index: 1;
+	}
 
 	h1
 	{
@@ -95,8 +121,8 @@ body {
 		vertical-align: middle;
 	}
 
-	h2, h3
-	{ margin: 0 0 1.5rem 0; }
+	header
+	{ flex-basis: 100%; }
 
 	li
 	{ margin-bottom: 1rem; }
@@ -107,4 +133,11 @@ body {
 		margin: 1rem;
 		padding: 1rem;
 	}
-}
+
+	section
+	{
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+	}
+} /*#layer*/

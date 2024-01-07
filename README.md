@@ -121,11 +121,17 @@ If you have many custom fetch options, you may want to add them with javascript.
 		component.setAttribute('fetch-options', options);
 	</script>
 				
-### Form Reset ###
+### Reset Form ###
 
-By default, the form will reset on submission, if you do not want the form to reset, add the "reset" attribute with a value of "false".
+By default, the form will reset on submission, if you do not want the form to reset, add the "reset-form" attribute with a value of "false".
 
-	<wijit-form reset="false">...</wijit-form>
+	<wijit-form reset-form="false">...</wijit-form>
+
+### Custom CSS ###
+
+By default, the component styles the form and fields with it's own default css styles. If you wish to use your own styles, add this attribute. You may give the attribute a value of "true", or you may omit the value.
+
+	<wijit-form custom-css>...</wijit-form>
 
 
 ## Attributes ##
@@ -147,4 +153,6 @@ All of these attributes are optional
 
 - **modal (default: "false")** Acceptable values: ["true", "false"] Whether to open the confirmation dialog as a modal. A modal dialog/overlay covers the entire screen. When this value is false, the confirmation dialog/overlay only covers the form which was submitted.
 
-- **reset (default: "true")** Acceptable value: ["true", "false"] Whether to reset the form after it is submitted.
+- **reset-form (default: "true")** Acceptable values: ["true", "false"] Whether to reset the form after it is submitted.
+
+- **custom-css (default: "false")** Acceptable values: ["true", "false"] Whether to use your own custom css styles on the form instead of the default styles.

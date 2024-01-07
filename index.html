@@ -20,41 +20,37 @@
 <body>
     <details>
         <summary><h1>Wijit Form Web Component</h1></summary>
+            <article>
+            <zero-md src="/README.md">
+                <template>
+                    <style>
+                        pre {
+                            background-color: gainsboro;
+                            border-radius: 10px;
+                            margin: 2rem;
+                            overflow: auto;
+                            padding: 1rem;
+                        }
 
-        <zero-md src="/README.md">
-            <template>
-                <style>
-
-                    pre {
-                        background-color: gainsboro;
-                        border-radius: 10px;
-                        margin: 2rem;
-                        overflow: auto;
-                        padding: 1rem;
-                    }
-
-                    @media (prefers-color-scheme: dark) {
-                        * {color: white; }
-                        pre { background-color: dimgray }
-                    }
-
-
-                </style>
-            </template>
-        </zero-md>
+                        @media (prefers-color-scheme: dark) {
+                            * {color: white; }
+                            pre { background-color: dimgray }
+                        }
+                    </style>
+                </template>
+            </zero-md>
+        </article>
     </details>
 
     <section>
         <header><h2>Demo</h2></header>
-
-        <wijit-form>
+        <wijit-form id="demo-form">
             <form action="/tests/test-server.php">
-
                 <section class="row">
                     <div>
-                        <label>fetch-options</label>
+                        <label for="demo-fetchoptions">fetch-options</label>
                         <textarea
-                            name="fetch-options"
+                            id="demo-fetchoptions"
                             oninput="change(event, 'fetch-options')"
                             placeholder="Example: {headers:{Accept:'text/html'}}"></textarea>
                     </div>
@@ -63,7 +59,7 @@
                     <legend>Custom Messages</legend>
                         <div>
                             <label for="demo-waiting">waiting</label>
-                            <textarea name="waiting" id="demo-waiting" placeholder="Example: <h1>Waiting</h1>" oninput="change(event, 'waiting')"></textarea>
+                            <textarea id="demo-waiting" placeholder="Example: <h1>Waiting</h1>" oninput="change(event, 'waiting')"></textarea>
                         </div>
                         <div>
                             <label for="demo-success">success</label>
@@ -71,7 +67,7 @@
                         </div>
                         <div>
                             <label for="demo-error">error</label>
-                            <textarea name="error" id="demo-error" placeholder="Example: <p>Nope!</p>" oninput="change(event, 'error')"></textarea>
+                            <textarea id="demo-error" placeholder="Example: <p>Nope!</p>" oninput="change(event, 'error')"></textarea>
                         </div>
                     </fieldset>
 
@@ -91,7 +87,7 @@
                             <hr>
                             <div>
                                 <label for="demo-force-error">Force Error</label>
-                                <input type="checkbox" name="fail" value="true" id="demo-force-error">
+                                <input type="checkbox" value="true" id="demo-force-error" onchange="change(event,'force-error')">
                             </div>
                         </fieldset>
 
@@ -109,51 +105,119 @@
 
                         <fieldset class="row">
                         <legend>reset</legend>
-                            <div>
-                                <label for="demo-reset-true">true</label>
-                                <input type="radio" id="demo-reset-true" name="reset" value="true" onchange="change(event, 'reset')">
-                            </div>
-                            <div>
-                                <label for="demo-reset-false">false</label>
-                                <input checked type="radio" id="demo-reset-false" name="reset" value="false" onchange="change(event, 'reset')">
-                            </div>
+                            <select size="2" onchange="change(event, 'reset-form')">
+                                <option>True</option>
+                                <option selected>False</option>
+                            </select>
                         </fieldset>
                     </section>
                 </section>
 
-                <section class="row">
+                <section class="row center">
                     <div class="row">
                         <label for="demo-name1">First</label>
-                        <input name="first" id="demo-name1" value="Foo" autocomplete="given-name">
+                        <input name="first" id="demo-name1" autocomplete="given-name">
                     </div>
                     <div class="row">
                         <label for="demo-name2">Last</label>
-                        <input name="last" id="demo-name2" value="Bar" autocomplete="family-name">
+                        <input name="last" id="demo-name2" autocomplete="family-name">
                     </div>
 
-                    <button class="primary">Submit</button>
+                    <div class="end">
+                        <button class="primary">Submit</button>
+                    </div>
                 </section>
 
             </form>
         </wijit-form>
-
     </section>
+
+    <section>
+        <header><h2>Examples</h2></header>
+        <article>
+            <header><h3>Basic Example</h3></header>
+            <wijit-form id="ex1">
+                <form action="/tests/test-server.php">
+                    <div>
+                        <label for="ex1-name">Name</label>
+                        <input name="name" id="ex1-name" autocomplete="name" value="Foo">
+                    </div>
+                    <div>
+                        <label for="ex1-email">Email</label>
+                        <input type="email" name="email" id="ex1-email" autocomplete="email">
+                    </div>
+                    <button>Spam Me!</button>
+                </form>
+            </wijit-form>
+        </article>
+
+        <article>
+            <header><h3>HTML Response</h3></header>
+            <wijit-form response="html" id="ex2">
+                <form action="/tests/test-server.php">
+                    <div>
+                        <label for="ex2-name">Name</label>
+                        <input name="name" id="ex2-name" autocomplete="name">
+                    </div>
+                    <div>
+                        <label for="ex2-email">Email</label>
+                        <input type="email" name="email" id="ex2-email" autocomplete="email">
+                    </div>
+                    <button>Spam Me!</button>
+                </form>
+            </wijit-form>
+        </article>
+
+        <article>
+            <header><h3>Custom Messages</h3></header>
+            <wijit-form id="ex3">
+                <form action="/tests/test-server.php">
+                    <div>
+                        <label for="ex3-name" class="required">Name</label>
+                        <input required name="name" id="ex3-name" value="Foo" autocomplete="name">
+                    </div>
+                    <div>
+                        <label for="ex3-email">Email</label>
+                        <input type="email" name="email" id="ex3-email" autocomplete="email">
+                    </div>
+                    <button>Spame Me!</button>
+                </form>
+
+                <wijit-icon01 slot="waiting" animate color="lime" style="width:85%; margin:auto">Please Wait</wijit-icon01>
+                <div slot="success">
+                    <h1>Success!</h1>
+                    <p>Thank you {{data.name}}</p>
+                </div>
+                <div slot="error">
+                    <h1>{{status}}</h1>
+                    <p>Please seek help.</p>
+                </div>
+            </wijit-form>
+        </article>
+
+        <article>
+            <header><h3>Modal</h3></header>
+            <wijit-form modal id="ex4">
+                <form action="/tests/test-server.php">
+                    <div>
+                        <label for="ex4-name">Name</label>
+                        <input name="name" id="ex4-name" autocomplete="name">
+                    </div>
+                    <div>
+                        <label for="ex4-email">Email</label>
+                        <input type="email" name="email" id="ex4-email" autocomplete="email">
+                    </div>
+                    <button>Spammie!</button>
+                </form>
+            </wijit-form>
+        </article>
+    </section>
+
 
     <script>
         function change (event, attr) {
-            const elem = document.querySelector('#demoform');
-            let div = event.target.querySelector(`[slot=${attr}]`);
-
-            switch (attr) {
-            case 'waiting':
-            case 'success':
-            case 'error':
-                elem[attr] = event.target.value;
-                break;
-            default:
-                elem.setAttribute(attr, event.target.value);
-                break;
-            }
+            const elem = document.querySelector('#demo-form');
+            elem.setAttribute(attr, event.target.value);
         }
     </script>
 </body>
