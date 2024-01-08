@@ -28,6 +28,7 @@
 			background: lightsalmon;
 		}
 	</style>
+
 </head>
 <body>
 	<h1>Testing all attribute combinations and submitting to test server</h1>
@@ -43,8 +44,9 @@
 	<div id="container"></div>
 
 	<script type="module">
+		console.log('foo');
 		import WijitForm from "/wijit-form.js";
-		import Tester from "/tests/tester.js";
+		import Tester from "/tester.js";
 
 		let tester, instance, combos;
 		let endTest = false;
@@ -88,7 +90,7 @@
 			combos = tester.getAllCombinations (options);
 			progress.setAttribute ('max', combos.length);
 			totalElem.innerText = combos.length;
-			form.action = 'test-server.php';
+			form.action = '/test-server.php';
 			input.name = 'name';
 			input.value = inputValue;
 			form.append (input);
@@ -126,7 +128,7 @@
 
 		function addResult (result, expected, currentIdx) {
 			const div = document.querySelector('#container');
-			const item = document.createElement('div');
+			const item = document.querySelector('div');
 			expected = `<div><b>Expected:</b> ${expected}</div>`;
 			result = `<div><b>Result:</b> ${result}</div>`;
 
@@ -154,14 +156,14 @@
 				// delete(combo.waiting);
 				// delete(combo.modal);
 				// delete(combo.reset);
-				const expected = testResult (combo);
+				const expected = testResult (result, combo);
 				addResult(result, expected, i);
 				updateProgress(i);
 				i++;
 			}
 		}
 
-		function testResult (combo) {
+		function testResult (result, combo) {
 			let expected;
 
 			if (combo["force-error"] === "false") {
@@ -173,7 +175,7 @@
 			return expected;
 		}
 
-		function testSucccess (combo) {
+		function testSucccess (result, combo) {
 			let expected;
 			if (combo.response === "html") {
 				if (combo.success === null) {
@@ -196,9 +198,8 @@
 			return expected;
 		}
 
-		function testError (combo) {
+		function testError (result, combo) {
 			let expected;
-
 			if (combo.response === "html") {
 				if (combo.error === null) {
 					expected = server.error.html;

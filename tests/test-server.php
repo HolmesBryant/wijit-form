@@ -7,7 +7,7 @@ $headers = getallheaders();
 $accept = $headers['Accept'] ?? 'application/json';
 
 $status = ($fail) ? 'error' : 'success';
-$message = ($fail) ? "Error message from server" : 'Success message from server.';
+$message = ($fail) ? "Error message from server" : 'Success message from server';
 
 $data = (object) [
 	'status' => $status,

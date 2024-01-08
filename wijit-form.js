@@ -303,8 +303,8 @@ export default class WijitForm extends HTMLElement {
 			attr = attr.replace(attr.charAt(0), attr.charAt(0).toLowerCase());
 		}
 
-console.log(attr, newval)
 		this[attr] = newval;
+		// console.log(attr, newval)
 	}
 
 	disconnectedCallback () {
@@ -327,6 +327,7 @@ console.log(attr, newval)
 	 */
 	async submitData(event) {
 		event.preventDefault();
+
 		let url = event.target.action;
 		const data = new FormData (event.target);
 		const accept = (this.response === 'html') ? "text/html" : "application/json, application/xml";
@@ -1107,9 +1108,10 @@ console.log(attr, newval)
 	 */
 	get fetchOptions () { return this.#fetchOptions; }
 	set fetchOptions (value) {
-		let result;
 		value = this.validateJson(value);
-		if (typeof value === 'object') {
+		if (value === null) {
+			this.#fetchOptions = {};
+		} else {
 			this.#fetchOptions = value;
 		}
 	}
