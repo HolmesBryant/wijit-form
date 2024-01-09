@@ -27,6 +27,27 @@
 			border: 2px solid darkred;
 			background: lightsalmon;
 		}
+
+		.hidden { display: none; }
+
+		.row {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-items: flex-start;
+			align-content: flex-start;
+			justify-content: flex-start;
+		}
+
+		b { flex: 0 0 5rem; }
+
+		textarea {
+			flex: 2;
+			width: 100%;
+			overflow-y: hidden;
+			overflow-x: auto;
+			border: 1px solid gray;
+		}
 	</style>
 </head>
 <body>
@@ -36,9 +57,10 @@
 		<progress id="progress" min="0"></progress>
 	</p>
 	<p>
-		<button onclick="start()">Start</button>
-		<button onclick="stop()">Stop</button>
-		<button id="pause-button" onclick="pause()">Pause</button>
+		<button id="start" onclick="start()">Start</button>
+		<button id="stop" onclick="stop()">Stop</button>
+		<button id="pause" class="hidden" onclick="pause()">Pause</button>
+		<button id="reload" class="hidden" onclick="reload()">Reload</button>
 	</p>
 	<div id="container"></div>
 
@@ -49,11 +71,15 @@
 		let tester, instance, combos;
 		let endTest = false;
 		let paused = false;
+		const stopOnError = true;
 		const abortController = new AbortController();
-		const pauseBtn = document.querySelector('#pause-button')
+		const startBtn = document.querySelector('#start');
+		const stopBtn = document.querySelector('#stop');
+		const pauseBtn = document.querySelector('#pause');
+		const reloadBtn = document.querySelector('#reload');
 		const progress = document.querySelector('#progress');
 		const totalElem = document.querySelector('#total');
-		const inputValue = 'Some Name';
+		const inputValue = 'UserName';
 
 		// responses from server
 		const server = {
@@ -78,35 +104,60 @@
 		};
 
 		function start () {
+			const tag = document.querySelector('wijit-form');
+			if (tag) tag.remove();
+
 			const component = new WijitForm ();
-			const event = new CustomEvent ('testEvent', {bubbles:true, cancelable:true, composed:true});
-			const form = document.createElement ('form');
-			const input = document.createElement ('input');
+			const form = addForm();
+			const customEvent = new CustomEvent ('testEvent', {bubbles:true, cancelable:true, composed:true});
 
 			tester = new Tester(component);
 			instance = tester.instance;
 			combos = tester.getAllCombinations (options);
 			progress.setAttribute ('max', combos.length);
 			totalElem.innerText = combos.length;
-			form.action = 'test-server.php';
-			input.name = 'name';
-			input.value = inputValue;
-			form.append (input);
+
 			instance.append (form);
 			instance.testing = true;
 			document.body.append (instance);
-			form.dispatchEvent (event)
-			form.addEventListener ('testEvent', testFormSubmission(event), {signal: abortController.signal});
+			form.dispatchEvent (customEvent)
+			form.addEventListener ('testEvent', testFormSubmission(customEvent), {signal: abortController.signal});
+			startBtn.classList.add('hidden');
+			pauseBtn.classList.remove('hidden');
 		}
 
 		function stop () {
 			abortController.abort();
 			endTest = true;
+			pauseBtn.classList.add('hidden');
+			stopBtn.classList.add('hidden');
+			reloadBtn.classList.remove('hidden');
 		}
 
 		function pause () {
 			paused = !paused;
 			pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+
+		}
+
+		function reload() {
+			location.reload();
+		}
+
+		function addForm() {
+			const form = document.createElement ('form');
+			const input = document.createElement ('input');
+			const checkbox = document.createElement ('input');
+			form.action = 'test-server.php';
+			checkbox.type = 'checkbox';
+			input.name = 'name';
+			checkbox.name = 'test';
+			input.value = inputValue;
+			checkbox.value = 'true';
+			checkbox.checked = true;
+			form.append (input);
+			form.append (checkbox);
+			return form;
 		}
 
 		async function pauseIfNeeded () {
@@ -124,11 +175,13 @@
 			label.innerText = count;
 		}
 
-		function addResult (result, expected, currentIdx) {
+		function addResult (result, expected, combo, currentIdx) {
 			const div = document.querySelector('#container');
 			const item = document.createElement('div');
-			expected = `<div><b>Expected:</b> ${expected}</div>`;
-			result = `<div><b>Result:</b> ${result}</div>`;
+			const options = JSON.stringify(combo);
+			const current = `<div><b>${currentIdx}:</b> ${options}</div>`
+			const expectedMsg = `<div class="row"><b>Expected:</b> <textarea>${expected}</textarea></div>`;
+			const resultMsg = `<div class="row"><b>Result:</b> <textarea>${result}</textarea></div>`;
 
 			if (result === expected) {
 				item.classList.add('pass');
@@ -136,11 +189,12 @@
 				item.classList.add('fail');
 			}
 
-			item.innerHTML = `<h4>${currentIdx}</h4>` + expected + result;
-			// item.insertAdjacentHTML('afterbegin', expected);
-			// item.insertAdjacentHTML('afterbegin', result);
-			// item.insertAdjacentHTML('afterbegin', `<h4>${currentIdx}</h4>`);
-			div.append(item);
+			item.innerHTML = current + expectedMsg + resultMsg;
+			div.prepend(item);
+
+			if (result !== expected && stopOnError) {
+				stop();
+			}
 		}
 
 		async function testFormSubmission (event) {
@@ -150,12 +204,12 @@
 				await pauseIfNeeded();
 				tester.setAttributes(combo);
 				const result = await instance.submitData(event);
-				// delete(combo.fetchOptionss);
-				// delete(combo.waiting);
-				// delete(combo.modal);
-				// delete(combo.reset);
+				delete(combo.fetchOptionss);
+				delete(combo.waiting);
+				delete(combo.modal);
+				delete(combo.reset);
 				const expected = testResult (combo);
-				addResult(result, expected, i);
+				addResult(result, expected, combo, i);
 				updateProgress(i);
 				i++;
 			}
@@ -173,21 +227,21 @@
 			return expected;
 		}
 
-		function testSucccess (combo) {
+		function testSuccess (combo) {
 			let expected;
 			if (combo.response === "html") {
 				if (combo.success === null) {
+					// server message
 					expected = server.success.html;
-				} else if (combo.success.indexOf ('{{') > -1) {
-					expected = inputValue;
 				} else {
+					// custom message
 					expected = combo.success;
 				}
 			} else if (combo.response === "json") {
 				if (combo.success === null) {
 					expected = instance.default.success;
 				} else if (combo.success.indexOf ('{{') > -1) {
-					expected = inputValue;
+					expected = expected = `success ${inputValue}`;
 				} else {
 					expected = combo.success;
 				}
@@ -201,18 +255,21 @@
 
 			if (combo.response === "html") {
 				if (combo.error === null) {
+					// server message
 					expected = server.error.html;
-				} else if (combo.error.indexOf ('{{') > -1) {
-					expected = inputValue;
 				} else {
+					// custom msg
 					expected = combo.error;
 				}
 			} else if (combo.response === "json") {
 				if (combo.error === null) {
+					// default message
 					expected = instance.default.error;
 				} else if (combo.error.indexOf ('{{') > -1) {
-					expected = inputValue;
+					// custom message with placeholders
+					expected = `error ${inputValue}`;
 				} else {
+					// custom message without placeholders
 					expected = combo.error;
 				}
 			}
@@ -223,6 +280,7 @@
 		window.start = start;
 		window.stop = stop;
 		window.pause = pause;
+		window.reload = reload;
 	</script>
 </body>
 </html>

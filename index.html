@@ -20,10 +20,10 @@
 <body>
     <details>
         <summary><h1>Wijit Form Web Component</h1></summary>
-            <!-- <article>
+            <article>
                 <p><a href="/tests/test-attributes.html" target="_blank">Test Attribute Combinations</a></p>
                 <p><a href="/tests/test-unit.html" target="_blank">Unit Tests</a></p>
-            </article> -->
+            </article>
             <article>
             <zero-md src="/README.md">
                 <template>
@@ -67,11 +67,11 @@
                         </div>
                         <div>
                             <label for="demo-success">success</label>
-                            <textarea name="success" id="demo-success" placeholder="Example: <p>Thanks!</p>" oninput="change(event, 'success')"></textarea>
+                            <textarea name="success" id="demo-success" placeholder="Example: <p>Thanks {{data.first}}</p> (Placeholders only work when response is 'json')" oninput="change(event, 'success')"></textarea>
                         </div>
                         <div>
                             <label for="demo-error">error</label>
-                            <textarea id="demo-error" placeholder="Example: <p>Nope!</p>" oninput="change(event, 'error')"></textarea>
+                            <textarea id="demo-error" placeholder="Example: <h1>Nope!</h1><p>There was an error</p>" oninput="change(event, 'error')"></textarea>
                         </div>
                     </fieldset>
 
@@ -120,7 +120,7 @@
                 <section class="row center">
                     <div class="row">
                         <label for="demo-name1">First</label>
-                        <input name="first" id="demo-name1" autocomplete="given-name">
+                        <input name="first" id="demo-name1" autocomplete="given-name" value="Foo">
                     </div>
                     <div class="row">
                         <label for="demo-name2">Last</label>
@@ -221,7 +221,8 @@
     <script>
         function change (event, attr) {
             const elem = document.querySelector('#demo-form');
-            elem.setAttribute(attr, event.target.value);
+            const value = (attr === 'force-error') ? event.target.checked : event.target.value;
+            elem.setAttribute(attr, value);
         }
     </script>
 </body>

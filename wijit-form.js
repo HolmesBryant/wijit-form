@@ -146,6 +146,11 @@ export default class WijitForm extends HTMLElement {
 		this.attachShadow({mode:'open'});
 		this.shadowRoot.innerHTML = `
 			<style>
+				:host {
+					--error: darksalmon;
+					--success: limegreen;
+				}
+
 				button {
 					border-color: var(--border);
 					border-radius: 5px;
@@ -217,6 +222,14 @@ export default class WijitForm extends HTMLElement {
 					margin: auto;
 					padding: 0;
 					width: auto;
+				}
+
+				#dialog-message.error {
+					border-color: var(--error);
+				}
+
+				#dialog-message.success {
+					border-color: var(--success);
 				}
 
 				#wrapper {
@@ -389,7 +402,7 @@ export default class WijitForm extends HTMLElement {
 	 * @see {@link fetchData}
 	 */
 	setFetchOptions(event, accept) {
-		const options = JSON.parse (JSON.stringify (this.fetchOptions));
+		const options = (this.fetchOptions) ? JSON.parse (JSON.stringify (this.fetchOptions)) : {};
 		const method = event.target.getAttribute('method') || 'POST';
 		options.method = method.toUpperCase();
 		options.headers = options.headers || {};
@@ -413,7 +426,7 @@ export default class WijitForm extends HTMLElement {
 	 * @remarks This method is invoked after data has been fetched from a server.
 	 * @see {@link setMessage}
 	 */
-	showDialog(dataFromServer = '', statusCode) {
+	showDialog(dataFromServer, statusCode) {
 		const { container, dialog, modal } = this;
 		const message = this.setMessage(dataFromServer, statusCode);
 		const closeDialogForm = this.dialog.querySelector('form[method=dialog]');
@@ -460,7 +473,8 @@ export default class WijitForm extends HTMLElement {
 	 * @remarks This method is invoked to prepare a message before displaying a dialog.
 	 * @see {@link showDialog}
 	 */
-	setMessage(dataFromServer, statusCode) {
+	setMessage(messageFromServer, statusCode) {
+
 		const { waitingElems, errorElems, successElems, container } = this;
 		this.clearMessage();
 		let type, nodeList, message;
@@ -481,23 +495,35 @@ export default class WijitForm extends HTMLElement {
 			container.classList.remove('waiting');
 		}
 
-		if (this[type]) {
-			// Handle user-supplied custom message via attributes
-			message = this.response === 'json'
-			? this.replacePlaceholders(this[type], dataFromServer)
-			: this[type];
-		} else if (nodeList.length > 0) {
-			// Handle user-supplied custom message via slots
+		if (this[type] !== null && this[type] !== undefined) {
+			// type != "waiting" AND user-supplied custom message via attributes
 			if (this.response === 'json') {
-				this.replaceNodeContents(nodeList, dataFromServer);
+				// replace user placeholders with data from server
+				message = this.replacePlaceholders(this[type], messageFromServer);
+			} else {
+				// Use whatever user has given
+				message = this[type];
 			}
+
+		} else if (nodeList.length > 0) {
+			// type could be "waiting" and user-supplied custom message via slots
+			if (this.response === 'json') {
+				this.replaceNodeContents(nodeList, messageFromServer);
+			}
+
 			nodeList.forEach(node => node.setAttribute('slot', 'message'));
+
 		} else if (this.response === 'html') {
-			message = statusCode === null
-			? this.default[type] // Waiting message
-			: dataFromServer; // Server-sent message
+			if (statusCode === null) {
+				// type === "waiting". Set default "Waiting" message
+				message = this.default[type];
+			} else {
+				// type !== "waiting". Use whatever the server sends
+				message = messageFromServer;
+			}
 		} else {
-			message = this.default[type]; // Default message
+			// Default message
+			message = this.default[type];
 		}
 
 		return message;
@@ -534,7 +560,7 @@ export default class WijitForm extends HTMLElement {
 			text = text.replace(match[0], result === undefined ? match[0] : JSON.stringify(result));
 		}
 
-		return text;
+		return text.replaceAll('"', '');
 	}
 
 	/**
@@ -1132,6 +1158,7 @@ export default class WijitForm extends HTMLElement {
 		switch (value) {
 		case '':
 		case 'true':
+		case true:
 			value = true;
 			if (!input) {
 				input = document.createElement('input');
@@ -1145,7 +1172,6 @@ export default class WijitForm extends HTMLElement {
 			value = false;
 			if (input) input.remove();
 		}
-
 		this.#forceError = value;
 	}
 
@@ -1197,6 +1223,11 @@ export default class WijitForm extends HTMLElement {
 	get error () { return this.#error; }
 	set error (value) {
 		value = this.cleanHTML(value);
+		switch (value) {
+			case 'null':
+				value = null;
+				break;
+		}
 		this.#error = value;
 	}
 
@@ -1206,6 +1237,11 @@ export default class WijitForm extends HTMLElement {
 	get success () { return this.#success; }
 	set success (value) {
 		value = this.cleanHTML(value);
+		switch (value) {
+			case 'null':
+				value = null;
+				break;
+		}
 		this.#success = value;
 	}
 
@@ -1216,6 +1252,11 @@ export default class WijitForm extends HTMLElement {
 	set waiting (value) {
 		// console.log(value)
 		value = this.cleanHTML(value);
+		switch (value) {
+			case 'null':
+				value = null;
+				break;
+		}
 		this.#waiting = value;
 	}
 }

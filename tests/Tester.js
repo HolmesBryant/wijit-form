@@ -48,7 +48,7 @@ export default class Tester {
         }
     }
 
-    isBool (actual=Bool, message) {
+    isBool (actual, message) {
         const msg = `${actual} is not Boolean`;
         if (typeof actual !== "boolean") {
             throw new Error(`Failed: ${message || msg}`);
@@ -82,7 +82,6 @@ export default class Tester {
         }
     }
 
-
     getAllCombinations(options) {
         return Object.entries(options).reduce(
             (acc, [key, values]) =>
@@ -104,12 +103,24 @@ export default class Tester {
         }
     }
 
+    printResults(useConsole = true) {
+        let message = '';
+        if (useConsole) console.log ("Test Results:");
+        this.testResults.forEach (result => {
+            if (useConsole) {
+                message = `- ${result.description}: ${result.passed ? "PASSED" : "FAILED"}`;
+                console.log(message);
+                if (!result.passed) console.error(result.error);
+            } else {
+                message += `<p>${result.description}: ${result.passed ? "PASSED" : "FAILED"}`;
+                if (!result.passed) {
+                    message += ' <b>See more details in the console</b>';
+                }
 
-    printResults() {
-        console.log("Test Results:");
-        this.testResults.forEach(result => {
-            console.log(`- ${result.description}: ${result.passed ? "PASSED" : "FAILED"}`);
-            if (!result.passed) console.error(result.error);
+                message += '</p>';
+            }
         });
+
+                return message;
     }
 }

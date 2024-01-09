@@ -4,9 +4,15 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Unit Tests</title>
+</head>
+<body>
+	<h1>Unit Tests</h1>
+	<div id="container"></div>
+
+
 	<script type="module">
 		import WijitForm from "/wijit-form.js";
-		import Tester from "/tester.js";
+		import Tester from "/tests/tester.js";
 		const component = new WijitForm();
 		const tester = await new Tester(component);
 		const instance = tester.instance;
@@ -32,8 +38,8 @@
 			tester.isBool(instance.modal);
 		});
 
-		tester.test('reset should be Boolean', () => {
-			tester.isBool(instance.reset);
+		tester.test('resetForm should be Boolean', () => {
+			tester.isBool(instance.resetForm);
 		});
 
 		tester.test('response should be one of [json, html]', () => {
@@ -68,14 +74,9 @@
 			tester.is(instance.dialog, HTMLElement)
 		});
 
-
-
-
+		const results = tester.printResults(false);
+		const elem = document.querySelector('#container');
+		elem.innerHTML = results;
 	</script>
-</head>
-<body>
-
-
-
 </body>
 </html>
