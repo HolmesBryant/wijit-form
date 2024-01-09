@@ -140,4 +140,8 @@ body {
 		flex-wrap: wrap;
 		gap: 1rem;
 	}
+
+	.center {
+		justify-content: space-evenly;
+	}
 } /*#layer*/
