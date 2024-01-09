@@ -375,15 +375,17 @@ export default class WijitForm extends HTMLElement {
 	 * @returns {object}			{data: string, status: number}
 	 */
 	async fetchData(url, options) {
+		let data;
+
 		try {
 			const response = await fetch (url, options);
 			const status = response.status;
-			const contentType = response.headers.get('Content-Type') || this.response;
+			const contentType = response.headers.get('Content-Type');
 			const data = contentType.includes('json') ? await response.json() : await response.text();
 			return {data:data, status:status};
 		} catch (error) {
-			console.error (error);
-			return {data: '<h3>Service Unavailable</h3><p>This server does not allow server side processing</p>', status: status}
+			// console.error (error);
+			return {data: '<h3>Service Unavailable</h3>', status: status}
 		}
 	}
 

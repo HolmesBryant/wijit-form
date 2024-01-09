@@ -227,33 +227,30 @@
                     <section>
                         <fieldset class="row">
                         <legend>response</legend>
-                            <div>
-                                <div class="row reverse">
+                            <div class="row center">
+                                <div>
                                     <label for="demo-response-html">html</label>
                                     <input type="radio" name="response" value="html" id="demo-response-html" onchange="change(event, 'response')">
                                 </div>
-                                <div class="row reverse">
+                                <div>
                                     <label for="demo-response-json">json</label>
                                     <input checked type="radio" name="response" value="json" id="demo-response-json" onchange="change(event, 'response')">
                                 </div>
                             </div>
-                            <hr>
+                            <!-- <hr>
                             <div>
                                 <label for="demo-force-error">Force Error</label>
                                 <input type="checkbox" value="true" id="demo-force-error" onchange="change(event,'force-error')">
-                            </div>
+                            </div> -->
                         </fieldset>
 
                         <fieldset class="row">
                         <legend>modal</legend>
-                            <div>
-                                <label for="demo-modal-true">true</label>
-                                <input type="radio" id="demo-modal-true" name="modal" value="true" onchange="change(event, 'modal')">
-                            </div>
-                            <div>
-                                <label for="demo-modal-false">false</label>
-                                <input checked type="radio" id="demo-modal-false" name="modal" value="false" onchange="change(event, 'modal')">
-                            </div>
+                            <select size="2" onchange="change(event, 'modal')">
+                                <option>True</option>
+                                <option selected>False</option>
+                            </select>
+
                         </fieldset>
 
                         <fieldset class="row">
