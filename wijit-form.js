@@ -343,7 +343,7 @@ export default class WijitForm extends HTMLElement {
 
 		let url = event.target.action;
 		const data = new FormData (event.target);
-		const accept = (this.response === 'html') ? "text/html" : "application/json, application/xml";
+		const accept = (this.response === 'html') ? "text/html" : "application/json";
 		const options = this.setFetchOptions(event, accept);
 
 		if (!this.testing) this.showDialog(this.waiting, null);

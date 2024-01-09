@@ -10,7 +10,7 @@ This component serves simply as a convenience to make styling forms and configur
 - Choose whether the messages appear as a modal.
 - Set custom http headers and other fetch options, such as CORS etc.
 - Choose whether to reset the form when it is submitted.
-- Use the component's default css to style to form, or use your own styles.
+- Use the component's default css to style the form, or use your own styles.
 
 ## Usage ##
 Add the script to your page:
@@ -27,9 +27,9 @@ Add the tag around your form:
 
 ### Custom Messages ###
 
-Instead of displaying whatever message the server sends, you may wish to display your own ***waiting***, ***success*** and/or ***error*** messages. You may set these messages by either attributes or slots. 
+Instead of displaying the component's default messages, you can display whatever (HTML) message the server sends or you can display your own ***waiting***, ***success*** and/or ***error*** messages. You may set these messages by either attributes or slots.
 
-If you don't define a ***waiting*** message, the default message will display.
+If you don't define a ***waiting*** message, the component's default message will display.
 
 If you don't define a ***success*** and/or ***error*** message, the displayed message depends on the ***response*** attribute:
 
