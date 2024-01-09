@@ -147,8 +147,8 @@ export default class WijitForm extends HTMLElement {
 		this.shadowRoot.innerHTML = `
 			<style>
 				:host {
-					--error: darksalmon;
-					--success: limegreen;
+					--fail: darksalmon;
+					--pass: limegreen;
 				}
 
 				button {
@@ -225,11 +225,11 @@ export default class WijitForm extends HTMLElement {
 				}
 
 				#dialog-message.error {
-					border-color: var(--error);
+					border-color: var(--fail);
 				}
 
 				#dialog-message.success {
-					border-color: var(--success);
+					border-color: var(--pass);
 				}
 
 				#wrapper {
