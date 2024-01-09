@@ -383,6 +383,7 @@ export default class WijitForm extends HTMLElement {
 			return {data:data, status:status};
 		} catch (error) {
 			console.error (error);
+			return {data: '<h3>Service Unavailable</h3><p>This server does not allow server side processing</p>', status: status}
 		}
 	}
 
