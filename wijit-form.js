@@ -444,7 +444,8 @@ export default class WijitForm extends HTMLElement {
 			closeDialogForm.classList.remove('hidden');
 			btn.focus();
 		} else {
-			closeDialogForm.classList.add('hidden');
+			closeDialogForm.classList.remove('hidden');
+			// closeDialogForm.classList.add('hidden');
 		}
 
 		if (modal) {
