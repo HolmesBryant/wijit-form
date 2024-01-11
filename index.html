@@ -37,168 +37,225 @@
 <body>
     <details>
         <summary><h1>Wijit Form Web Component</h1></summary>
-        <article>
+            <article>
             <p><a href="/tests/test-attributes.html" target="_blank">Test Attribute Combinations</a></p>
             <p><a href="/tests/test-unit.html" target="_blank">Unit Tests</a></p>
-        </article>
+            <p><a href="css-guide.html" target="_blank">Guide to styling Wijit Forms</a>
+            </article>
         <article>
-            <p>This component serves simply as a convenience to make styling forms and configuring waiting effects and confirmation/error messages less time consuming.</p>
-            <h2>Features</h2>
-            <ul>
-            <li>Set custom &quot;waiting&quot;, &quot;success&quot; and &quot;error&quot; messages.</li>
-            <li>Custom messages can be set by either attributes or slots.</li>
-            <li>Receive and display messages from the server sent in HTML or JSON format.</li>
-            <li>Choose whether the messages appear as a modal.</li>
-            <li>Set custom http headers and other fetch options, such as CORS etc.</li>
-            <li>Choose whether to reset the form when it is submitted.</li>
-            <li>Use the component's default css to style the form, or use your own styles.</li>
-            </ul>
-            <h2>Usage</h2>
-            <p>Add the script to your page:</p>
-            <pre><code>&lt;script type=&quot;module&quot; src=&quot;/wijit-form.js&quot;&gt;&lt;/script&gt;
-            </code></pre>
+        <p>This component serves as a convenience to make styling forms and configuring waiting effects and confirmation/error messages less time consuming.</p>
 
-            <p>Add the tag around your form:</p>
-            <pre><code>&lt;wijit-form&gt;
-                &lt;form action=&quot;/some/url/&quot;&gt;...&lt;/form&gt;
-            &lt;/wijit-form&gt;
-            </code></pre>
+        <h2>Features</h2>
+        <ul>
+        <li>Set custom "waiting", "success" and "error" messages.</li>
+        <li>Custom messages can be set by either attributes or slots.</li>
+        <li>Receive and display messages from the server sent in HTML or JSON format.</li>
+        <li>Choose whether the messages appear as a modal.</li>
+        <li>Set custom http headers and other fetch options, such as CORS etc.</li>
+        <li>Choose whether to reset the form when it is submitted.</li>
+        <li>Use the component's default css to style the form, or use your own styles.</li>
+        </ul>
 
-            <h2>Description of Features</h2>
-            <h3>Custom Messages</h3>
-            <p>Instead of displaying the component's default messages, you can display whatever (HTML) message the server sends or you can display your own <strong><em>waiting</em></strong>, <strong><em>success</em></strong> and/or <strong><em>error</em></strong> messages. You may set these messages by either attributes or slots.</p>
-            <p>If you don't define a <strong><em>waiting</em></strong> message, the component's default message will display.</p>
-            <p>If you don't define a <strong><em>success</em></strong> and/or <strong><em>error</em></strong> message, the displayed message depends on the <strong><em>response</em></strong> attribute:</p>
-            <ul>
-            <li>If <strong><em>response</em></strong> is set to &quot;json&quot; (default), the component's default message will display.</li>
-            <li>If <strong><em>response</em></strong> is set to &quot;html&quot;, the response from the server is displayed.</li>
-            </ul>
-            <p>If the server typically returns an HTML response and you simply wish to display whatever the server sends, you must set  the <strong><em>response</em></strong> attribute to &quot;html&quot;.</p>
-            <pre><code>    &lt;wijit-form response=&quot;html&quot;&gt;...&lt;/wijit-form&gt;
-            </code></pre>
+        <h2>Usage</h2>
 
-            <h4>Custom Message via Attributes</h4>
-            <p>To set custom messages with attributes:</p>
-            <pre><code>&lt;wijit-form
-            waiting=&quot;&lt;h1&gt;Waiting Message&lt;/h1&gt;&quot;
-            success=&quot;&lt;h2&gt;Success&lt;/h2&gt;&lt;p&gt;message&lt;/p&gt;&quot;
-            error=&quot;error message&quot;&gt;
-            ...
-            &lt;/wijit-form&gt;
-            </code></pre>
+        <p>Add the script to your page:</p>
+        <pre><code>&lt;script type="module" src="/wijit-form.js"&gt;&lt;/script&gt;
+        </code></pre>
 
-            <h4>Custom Message via Slots</h4>
-            <p>To set custom messages with slots:</p>
-            <pre><code>&lt;wijit-form&gt;
-                &lt;form&gt;...&lt;/form&gt;
-                &lt;div slot=&quot;waiting&quot; class=&quot;animated-icon&quot;&gt;&lt;/div&gt;
-                &lt;div slot=&quot;success&quot;&gt;&lt;h1&gt;Success!&lt;/h1&gt;&lt;p&gt;Thank You&lt;/p&gt;&lt;/div&gt;
-                &lt;p slot=&quot;error&quot;&gt;An error occured :(&lt;/p&gt;
-            &lt;/wijit-form&gt;
-            </code></pre>
+        <p>Add the tag around your form:</p>
+        <pre><code>
+        &lt;wijit-form&gt;
+            &lt;form action="/some/url/"&gt;...&lt;/form&gt;
+        &lt;/wijit-form&gt;
+        </code></pre>
 
-            <p>If the server/script to which you submit the form returns responses in JSON format, you have the option to include placeholders in your custom &quot;success&quot; or &quot;error&quot; messages&quot; which map to specific bits of data in the response.</p>
-            <p>For example, if the server sends back JSON data in the form of:</p>
-            <pre><code>{
-                &quot;status&quot;:&quot;success&quot;,
-                &quot;message&quot;:&quot;Thank You&quot;,
-                &quot;data&quot;: {
-                    &quot;name&quot;: &quot;Foo&quot;
-                }
+        <h2>Description of Features</h2>
+        <h3>Custom Messages</h3>
+
+        <p>Instead of displaying the component's default messages, you can display whatever (HTML) message the server sends or you can display your own <strong><em>waiting</em></strong>, <strong><em>success</em></strong> and/or <strong><em>error</em></strong> messages. You may set these messages by either attributes or slots.</p>
+
+        <p>If you don't define a <strong><em>waiting</em></strong> message, the component's default message will display.</p>
+        <p>If you don't define a <strong><em>success</em></strong> and/or <strong><em>error</em></strong> message, the displayed message depends on the <strong><em>response</em></strong> attribute:</p>
+
+        <ul>
+        <li>If <strong><em>response</em></strong> is set to "json" (default), the component's default message will display.</li>
+        <li>If <strong><em>response</em></strong> is set to "html", the response from the server is displayed.</li>
+        </ul>
+
+        <p>If the server typically returns an HTML response and you simply wish to display whatever the server sends, you must set  the <strong><em>response</em></strong> attribute to "html".</p>
+
+        <pre><code>&lt;wijit-form response="html"&gt;...&lt;/wijit-form&gt;
+        </code></pre>
+
+        <h4>Custom Message via Attributes</h4>
+
+        <p>To set custom messages with attributes:</p>
+
+        <pre><code>
+        &lt;wijit-form
+        waiting="&lt;h1&gt;Waiting Message&lt;/h1&gt;"
+        success="&lt;h2&gt;Success&lt;/h2&gt;&lt;p&gt;message&lt;/p&gt;"
+        error="error message"&gt;
+        ...
+        &lt;/wijit-form&gt;
+        </code></pre>
+
+        <h4>Custom Message via Slots</h4>
+
+        <p>To set custom messages with slots:</p>
+        <pre><code>
+        &lt;wijit-form&gt;
+            &lt;form&gt;...&lt;/form&gt;
+            &lt;div slot="waiting" class="animated-icon"&gt;&lt;/div&gt;
+            &lt;div slot="success"&gt;&lt;h1&gt;Success!&lt;/h1&gt;&lt;p&gt;Thank You&lt;/p&gt;&lt;/div&gt;
+            &lt;p slot="error"&gt;An error occured&lt;/p&gt;
+        &lt;/wijit-form&gt;
+        </code></pre>
+
+        <h4>Placeholders</h4>
+
+        <p>If the server/script to which you submit the form returns responses in JSON format, you have the option to include placeholders in your custom "success" or "error" messages" which map to specific bits of data in the response.</p>
+        <p>For example, if the server sends back JSON data in the form of:</p>
+        <pre><code>
+        {
+            "status":"success",
+            "message":"Thank You",
+            "data": {
+                "name": "Foo"
             }
-            </code></pre>
+        }
+        </code></pre>
 
-            <p>You can write your custom success message as:</p>
-            <pre><code>&lt;wijit-form success=&quot;{{message}} {{data.name}}&quot;&gt;...&lt;/wijit-form&gt;
-            </code></pre>
+        <p>You can write your custom success message as:</p>
+        <pre><code>
+        &lt;wijit-form success="{{message}} {{data.name}}"&gt;...&lt;/wijit-form&gt;
+        </code></pre>
 
-            <p>Or </p>
-            <pre><code>&lt;wijit-form&gt;
-                &lt;form&gt;...&lt;/form&gt;
-                &lt;div slot=&quot;success&quot;&gt;&lt;h1&gt;{{status}}&lt;/h1&gt;&lt;p&gt;Thanks {{data.name}}&lt;/p&gt;&lt;/div&gt;
-            &lt;/wijit-form&gt;
-            </code></pre>
+        <p>Or </p>
+        <pre><code>
+        &lt;wijit-form&gt;
+            &lt;form&gt;...&lt;/form&gt;
+            &lt;div slot="success"&gt;&lt;h1&gt;{{status}}&lt;/h1&gt;&lt;p&gt;Thanks {{data.name}}&lt;/p&gt;&lt;/div&gt;
+        &lt;/wijit-form&gt;
+        </code></pre>
 
-            <p>Since &quot;json&quot; is the default value of the &quot;response&quot; property, you don't need to add a &quot;response&quot; attribute manually.</p>
-            <h3>Modal vs Non-modal</h3>
-            <p>You may also set whether the messages appear as a modal. If you add the &quot;modal&quot; attribute, an overlay will appear over the entire screen and the waiting/success/error message will appear centered in the screen. If the modal attribute is absent, or if it is set to &quot;false&quot;, the waiting/success/error messages will only appear over the form which was submitted.</p>
-            <p>To enable a modal dialog:</p>
-            <pre><code>&lt;wijit-form modal&gt;...&lt;/wijit-form&gt;
-            </code></pre>
+        <p>Since "json" is the default value of the "response" property, you don't need to add a "response" attribute manually.</p>
 
-            <h3>Custom Fetch Options</h3>
-            <p>This web component intercepts the form submission and sends the request to the server via fetch(). You may need to set custom http headers or other fetch options such as CORS directives. These options should be written in valid JSON syntax.</p>
-            <p>You do not need to set an &quot;Accept&quot; header. This is done automatically with the &quot;response&quot; attribute. If the value of &quot;response&quot; is &quot;html&quot; the &quot;Accept&quot; header is set to &quot;text/html&quot;. If the value of the &quot;response&quot; attribute is &quot;json&quot; (default), the Accept header is set to &quot;application/json&quot;.</p>
-            <p>To set a custom http header:</p>
-            <pre><code>&lt;wijit-form
-                fetch-options=&quot;{headers:{&quot;X-Requested-With&quot;:&quot;XMLHttpRequest&quot;}}&quot;&gt;
-                ...
-            &lt;/wijit-form&gt;
-            </code></pre>
+        <h3>Modal vs Non-modal</h3>
 
-            <p>If you have many custom fetch options, you may want to add them with javascript.</p>
-            <pre><code>&lt;script&gt;
-                const component = document.querySelector(&quot;wijit-form&quot;);
-                // options should be a String!
-                const options = `{
-                    headers: {...},
-                    mode: &quot;cors&quot;,
-                    cache: &quot;default&quot;
-                }`;
-                component.setAttribute('fetch-options', options);
-            &lt;/script&gt;
-            </code></pre>
+        <p>You may also set whether the messages appear as a modal. If you add the "modal" attribute, an overlay will appear over the entire screen and the waiting/success/error message will appear centered in the screen. If the modal attribute is absent, or if it is set to "false", the waiting/success/error messages will only appear over the form which was submitted.</p>
 
-            <h3>Reset Form</h3>
-            <p>By default, the form will reset on submission, if you do not want the form to reset, add the &quot;reset-form&quot; attribute with a value of &quot;false&quot;.</p>
-            <pre><code>&lt;wijit-form reset-form=&quot;false&quot;&gt;...&lt;/wijit-form&gt;
-            </code></pre>
+        <p>To enable a modal dialog:</p>
 
-            <h3>Custom CSS</h3>
-            <p>By default, the component styles the form and fields with it's own default css styles. If you wish to use your own styles, add this attribute. You may give the attribute a value of &quot;true&quot;, or you may omit the value.</p>
-            <pre><code>&lt;wijit-form custom-css&gt;...&lt;/wijit-form&gt;
-            </code></pre>
+        <pre><code>
+        &lt;wijit-form modal&gt;...&lt;/wijit-form&gt;
+        </code></pre>
 
-            <h2>Attributes</h2>
-            <p>All of these attributes are optional</p>
-            <ul>
-            <li>
-            <p><strong>fetch-options (default: null)</strong> Acceptable values: [Any valid fetch option from: <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/fetch#options">The MDN Docs</a>]. This should be formatted as a valid JSON string.</p>
+        <h3>Custom Fetch Options</h3>
+
+        <p>This web component intercepts the form submission and sends the request to the server via fetch(). You may need to set custom http headers or other fetch options such as CORS directives. These options should be written in valid JSON syntax.</p>
+
+        <p>You do not need to set an "Accept" header. This is done automatically with the "response" attribute. If the value of "response" is "html" the "Accept" header is set to "text/html". If the value of the "response" attribute is "json" (default), the Accept header is set to "application/json".</p>
+
+        <p>To set a custom http header:</p>
+
+        <pre><code>
+        &lt;wijit-form
+        fetch-options="{headers:{"X-Requested-With":"XMLHttpRequest"}}"&gt;
+            ...
+        &lt;/wijit-form&gt;
+        </code></pre>
+
+        <p>If you have many custom fetch options, you may want to add them with javascript.</p>
+
+        <pre><code>
+        &lt;script&gt;
+            const component = document.querySelector("wijit-form");
+            // options should be a String!
+            const options = `{
+                headers: {...},
+                mode: "cors",
+                cache: "default"
+            }`;
+            component.setAttribute('fetch-options', options);
+        &lt;/script&gt;
+        </code></pre>
+
+        <h3>Reset Form</h3>
+
+        <p>By default, the form will reset on submission, if you do not want the form to reset, add the "reset-form" attribute with a value of "false".</p>
+
+        <pre><code>
+        &lt;wijit-form reset-form="false"&gt;...&lt;/wijit-form&gt;
+        </code></pre>
+
+        <h3>Custom CSS</h3>
+
+        <p>By default, the component styles the form and fields with it's own default css styles. If you wish to use your own styles, add this attribute. You may give the attribute a value of "true", or you may omit the value.</p>
+
+        <pre><code>
+        &lt;wijit-form custom-css&gt;...&lt;/wijit-form&gt;
+        </code></pre>
+
+        <h2>Attributes</h2>
+
+        <p>All of these attributes are optional</p>
+
+        <ul>
+            <li><strong>fetch-options (default: null)</strong> Acceptable values: [Any valid fetch option from: <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/fetch#options">The MDN Docs</a>]. This should be formatted as a valid JSON string. </li>
+
+            <li>User Supplied Confirmation Messages. These attributes accept strings. The string may contain HTML.
+                <ul>
+                    <li><strong>waiting (default: "<code>&lt;h1&gt;Please Wait...&lt;/h1&gt;</code>")</strong> Acceptable values: [any string] This is the message displayed after the form is submitted, while the page is waiting for a response from the server. </li>
+
+                    <li><strong>success (default: "<code>&lt;h3&gt;Submission Received&lt;/h3&gt;&lt;p&gt;Thank you!&lt;/p&gt;</code>")</strong> Acceptable values: [any string] This is the message displayed upon a successful response from the server, meaning the server sent an http status code lower than 400.</li>
+
+                    <li><strong>error (default: "<code>&lt;h3&gt;Oopsie!&lt;/h3&gt;&lt;p&gt;There was an error. Your submission was not received.&lt;/p&gt;</code>")</strong> Acceptable values: [any string] This is the message displayed when the server reports an error, meaning it sent an http status code greater than 399.</li>
+                </ul>
             </li>
-            <li>
-            <p>User Supplied Confirmation Messages. These attributes accept strings. The string may contain HTML.</p>
-            <ul>
-            <li>
-            <p><strong>waiting (default: &quot;<code>&lt;h1&gt;Please Wait...&lt;/h1&gt;</code>&quot;)</strong> Acceptable values: [any string] This is the message displayed after the form is submitted, while the page is waiting for a response from the server.</p>
+
+            <li><strong>response (default: "json")</strong> Acceptable values: ["html", "json"] The Content Type expected from the server. </li>
+
+            <li><strong>modal (default: "false")</strong> Acceptable values: ["true", "false"] Whether to open the confirmation dialog as a modal. A modal dialog/overlay covers the entire screen. When this value is false, the confirmation dialog/overlay only covers the form which was submitted. </li>
+
+            <li><strong>reset-form (default: "true")</strong> Acceptable values: ["true", "false"] Whether to reset the form after it is submitted. </li>
+
+            <li><strong>custom-css (default: "false")</strong> Acceptable values: ["true", "false"] Whether to use your own custom css styles on the form instead of the default styles. </li>
+        </ul>
+
+        <h2>Using the Default Styles</h2>
+
+        <p>It is necessary to follow some conventions in order to use the default styles successfully.</p>
+
+        <ul>
+            <li>Place everything in one of the following elements:
+                <ul>
+                    <li>div</li>
+                    <li>fieldset</li>
+                    <li>section</li>
+                </ul>
             </li>
-            <li>
-            <p><strong>success (default: &quot;<code>&lt;h3&gt;Submission Received&lt;/h3&gt;&lt;p&gt;Thank you!&lt;/p&gt;</code>&quot;)</strong> Acceptable values: [any string] This is the message displayed upon a successful response from the server, meaning the server sent an http status code lower than 400.</p>
+            <li>Place each label/input combination in a div.
+                <ul>
+                    <li>example: <code><div><label for="foo">Foo</label><input id="foo" name="foo"></div></code></li>
+                </ul>
             </li>
-            <li>
-            <p><strong>error (default: &quot;<code>&lt;h3&gt;Oopsie!&lt;/h3&gt;&lt;p&gt;There was an error. Your submission was not received.&lt;/p&gt;</code>&quot;)</strong> Acceptable values: [any string] This is the message displayed when the server reports an error, meaning it sent an http status code greater than 399.</p>
-            </li>
-            </ul>
-            </li>
-            <li>
-            <p><strong>response (default: &quot;json&quot;)</strong> Acceptable values: [&quot;html&quot;, &quot;json&quot;] The Content Type expected from the server.</p>
-            </li>
-            <li>
-            <p><strong>modal (default: &quot;false&quot;)</strong> Acceptable values: [&quot;true&quot;, &quot;false&quot;] Whether to open the confirmation dialog as a modal. A modal dialog/overlay covers the entire screen. When this value is false, the confirmation dialog/overlay only covers the form which was submitted.</p>
-            </li>
-            <li>
-            <p><strong>reset-form (default: &quot;true&quot;)</strong> Acceptable values: [&quot;true&quot;, &quot;false&quot;] Whether to reset the form after it is submitted.</p>
-            </li>
-            <li>
-            <p><strong>custom-css (default: &quot;false&quot;)</strong> Acceptable values: [&quot;true&quot;, &quot;false&quot;] Whether to use your own custom css styles on the form instead of the default styles.</p>
-            </li>
-            </ul>
+            <li>Always place the label before the input.</li>
+            <li>By default, the label will appear above the input.</li>
+            <li>If you want the label to appear under the input, add <code>class="reverse"</code> to the containing div.</li>
+            <li>If you want the label to appear beside the input, add <code>class="row"</code> to the containing <code>div</code>.
+            <li>If you want the label to appear beside the input, but after it, add <code>class="row reverse"</code> to the containing <code>div</code>.</li>
+            <li><code>section</code> and <code>fieldset</code> are meant to hold a group of controls.</li>
+            <li>By default, all controls inside <code>section</code> and <code>fieldset</code> are stacked vertically.</li>
+            <li>If you wish these items to appear side-by-side, add <code>class="row"</code> to the containing <code>section</code> or <code>fieldset</code></li>
+        </ul>
         </article>
     </details>
 
     <section>
         <header><h2>Demo</h2></header>
         <wijit-form id="demo-form">
-            <form action="tests/test-server.php">
+            <form action="false">
                 <section class="row">
                     <div>
                         <label for="demo-fetchoptions">fetch-options</label>
@@ -237,11 +294,11 @@
                                     <input checked type="radio" name="response" value="json" id="demo-response-json" onchange="change(event, 'response')">
                                 </div>
                             </div>
-                            <!-- <hr>
+                            <hr>
                             <div>
                                 <label for="demo-force-error">Force Error</label>
                                 <input type="checkbox" value="true" id="demo-force-error" onchange="change(event,'force-error')">
-                            </div> -->
+                            </div>
                         </fieldset>
 
                         <fieldset class="row">
@@ -287,7 +344,7 @@
         <article>
             <header><h3>Basic Example</h3></header>
             <wijit-form id="ex1">
-                <form action="tests/test-server.php">
+                <form action="false">
                     <div>
                         <label for="ex1-name">Name</label>
                         <input name="name" id="ex1-name" autocomplete="name" value="Foo">
@@ -304,7 +361,7 @@
         <article>
             <header><h3>HTML Response</h3></header>
             <wijit-form response="html" id="ex2">
-                <form action="tests/test-server.php">
+                <form action="false">
                     <div>
                         <label for="ex2-name">Name</label>
                         <input name="name" id="ex2-name" autocomplete="name">
@@ -321,7 +378,7 @@
         <article>
             <header><h3>Custom Messages</h3></header>
             <wijit-form id="ex3">
-                <form action="tests/test-server.php">
+                <form action="false">
                     <div>
                         <label for="ex3-name" class="required">Name</label>
                         <input required name="name" id="ex3-name" value="Foo" autocomplete="name">
@@ -348,7 +405,7 @@
         <article>
             <header><h3>Modal</h3></header>
             <wijit-form modal id="ex4">
-                <form action="tests/test-server.php">
+                <form action="false">
                     <div>
                         <label for="ex4-name">Name</label>
                         <input name="name" id="ex4-name" autocomplete="name">

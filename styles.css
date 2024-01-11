@@ -43,6 +43,7 @@ body {
     	}
     }
 
+    details,
     summary
     {
     	border: 1px solid silver;
@@ -51,12 +52,12 @@ body {
     	}
     }
 
+
+    details,
     article,
-    details > *,
     section,
     hr
     { border-radius: .5rem; }
-
 
 /**** Text ****/
 	a
@@ -93,17 +94,15 @@ body {
 		padding: 10px;
 	}
 
-    details
-	{ margin: 0 10px; }
-
 	details[open] {
 		height: 75svh;
-		overflow: auto;
+		overflow-x: hidden;
+		overflow-y: auto;
 	}
 
 	details > *
 	{
-		margin: 1rem 0;
+
 		padding: 1rem;
 	}
 

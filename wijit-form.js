@@ -54,6 +54,8 @@ export default class WijitForm extends HTMLElement {
 	 */
 	#resetForm = true;
 
+	#server = true;
+
 	/**
 	 * @private
 	 * @type {string}
@@ -340,13 +342,19 @@ export default class WijitForm extends HTMLElement {
 	 */
 	async submitData(event) {
 		event.preventDefault();
-
-		let url = event.target.action;
+		let url, result;
 		const data = new FormData (event.target);
 		const accept = (this.response === 'html') ? "text/html" : "application/json";
 		const options = this.setFetchOptions(event, accept);
 
 		if (!this.testing) this.showDialog(this.waiting, null);
+
+		if (event.target.action.indexOf('false') === -1) {
+			url = event.target.action;
+			this.#server = true;
+		} else {
+			this.#server = false;
+		}
 
 		if (options.method === 'GET' || options.method === 'HEAD') {
 			let i = 0;
@@ -360,11 +368,18 @@ export default class WijitForm extends HTMLElement {
 			options.body = data;
 		}
 
-		const result = await this.fetchData(url, options);
-		if (this.testing) {
-			return this.setMessage(result.data, result.status);
+		if (this.#server) {
+			result = await this.fetchData(url, options);
+			if (this.testing) {
+				return this.setMessage(result.data, result.status);
+			} else {
+				this.showDialog(result.data, result.status);
+			}
 		} else {
-			this.showDialog(result.data, result.status);
+			result = this.simulateServer(options);
+			setTimeout (() => {
+				this.showDialog(result.data, result.status);
+			}, 1000);
 		}
 	}
 
@@ -385,8 +400,44 @@ export default class WijitForm extends HTMLElement {
 			return {data:data, status:status};
 		} catch (error) {
 			// console.error (error);
-			return {data: '<h3>Service Unavailable</h3>', status: status}
+			return {data: '<h1>Server Error</h1>', status: status}
 		}
+	}
+
+	/**
+	 * @summary Simulate server response for testing without a server side script.
+	 * @param {object} 	data 	An object containing simulated request data.
+	 * @returns {object} 		An object with the following properties:
+	 *                        	- data: The simulated response data.
+	 *                         	- status: The HTTP status code of the simulated response.
+	 */
+	simulateServer(data) {
+		let msg, status;
+		const formdata = data.body;
+		const caveat = '<p>This result is a simulation. No server side form processing was performed.';
+
+		data.data =  Object.fromEntries(formdata.entries());
+		delete (data.body);
+
+		if (this.forceError) {
+			status = 500;
+			if (this.response === 'html') {
+				msg = '<h1>Error</h1><p>HTML response</p>';
+				msg += caveat;
+			} else {
+				msg = data;
+			}
+		} else {
+			status = 200;
+			if (this.response === 'html') {
+				msg = '<h1>Success</h1><p>HTML response</p>';
+				msg += caveat;
+			} else {
+				msg = data;
+			}
+		}
+
+		return {data:msg, status:status};
 	}
 
 	/**
@@ -444,8 +495,7 @@ export default class WijitForm extends HTMLElement {
 			closeDialogForm.classList.remove('hidden');
 			btn.focus();
 		} else {
-			closeDialogForm.classList.remove('hidden');
-			// closeDialogForm.classList.add('hidden');
+			closeDialogForm.classList.add('hidden');
 		}
 
 		if (modal) {
@@ -1159,7 +1209,7 @@ export default class WijitForm extends HTMLElement {
 	set forceError(value) {
 		let input = this.form.querySelector('input[name=fail]');
 
-		switch (value) {
+		switch (value.toLowerCase()) {
 		case '':
 		case 'true':
 		case true:
@@ -1184,7 +1234,7 @@ export default class WijitForm extends HTMLElement {
 	 */
 	get modal () { return this.#modal; }
 	set modal (value) {
-		switch (value) {
+		switch (value.toLowerCase()) {
 		case '':
 		case 'true':
 			value = true;
@@ -1201,7 +1251,7 @@ export default class WijitForm extends HTMLElement {
 	 */
 	get resetForm () { return this.#resetForm; }
 	set resetForm (value) {
-		switch (value) {
+		switch (value.toLowerCase()) {
 		case '':
 		case 'true':
 			value = true;

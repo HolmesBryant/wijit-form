@@ -1,5 +1,11 @@
 <?php
 
+// Testing form submissions with 503 responses.
+////////////////////////////////////////////
+// http_response_code(503);
+// die();
+////////////////////////////////////////////
+
 $fail = $_REQUEST['fail'] ?? false;
 $test = $_REQUEST['test'] ?? false;
 
@@ -21,7 +27,7 @@ $data = (object) [
 ];
 
 if ($fail && $fail === 'true') {
-	http_response_code(503);
+	http_response_code(500);
 } else {
 	http_response_code(200);
 }
