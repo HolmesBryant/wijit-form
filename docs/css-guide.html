@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Wijit-Form Style Guide</title>
+	<script type="module" src="../src/wijit-form.js"></script>
+	<script type="module" src="../extra/wijit-code.js"></script>
+	<link rel="stylesheet" href="../styles.css">
+	<style>
+		wijit-code {
+			background: dimgray;
+			border-radius: .5rem;
+			padding: 1rem;
+		}
+	</style>
+</head>
+<body>
+	<article>
+	<section>
+		<h1>Using the Default Styles to style your form</h1>
+
+	    <p>It is necessary to follow some conventions in order to use the default styles successfully.</p>
+	</section>
+
+    <ul>
+        <li>Place everything in one of the following elements:
+            <ul>
+                <li>div</li>
+                <li>fieldset</li>
+                <li>section</li>
+            </ul>
+        </li>
+        <li>Place each label/input combination in a div.</li>
+        <li>Always place the label before the input.
+        	<ul>
+		        <li>By default, the label will appear above the input.</li>
+        	</ul>
+        </li>
+        <li>If you want the label to appear under the input, add <code>class="reverse"</code> to the containing div.</li>
+        <li>If you want the label to appear beside the input, add <code>class="row"</code> to the containing <code>div</code>.</li>
+        <li>If you want the label to appear beside the input, but after it, add <code>class="row reverse"</code> to the containing <code>div</code>.</li>
+        <li><code>section</code> and <code>fieldset</code> are meant to hold a group of controls.</li>
+        <li>By default, all controls inside <code>section</code> and <code>fieldset</code> are stacked vertically.</li>
+        <li>If you wish these items to appear side-by-side, add <code>class="row"</code> to the containing <code>section</code> or <code>fieldset</code></li>
+        <li>You can nest <code>section</code> elements and also place them inside <code>fieldset</code> elements.</li>
+    </ul>
+	<section>
+			<wijit-form>
+				<fieldset class="row nowrap center">
+					<legend>Simple Form Field</legend>
+					<div>
+						<strong id="ex1-code">Code</strong>
+						<wijit-code aria-labelledby="ex1-code">
+							<div>
+								<label for="ex1-field">Label</label>
+								<input id="ex1-field" name="some_field">
+							</div>
+						</wijit-code>
+					</div>
+
+					<div>
+						<label for="ex1-field">Label</label>
+						<input id="ex1-field" name="some_field">
+					</div>
+				</fieldset>
+			</wijit-form>
+	</section>
+</article>
+</body>
+</html>

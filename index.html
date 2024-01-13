@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Wijit-Form Web Component</title>
     <link rel="stylesheet" href="styles.css">
-    <script type="module" src="wijit-form.js"></script>
-    <script type="module" src="wijit-icon01.js"></script>
+    <script type="module" src="src/wijit-form.js"></script>
+    <script type="module" src="extra/wijit-icon01.js"></script>
 
     <!-----------------------------------------
      You can change the colors of the form by changing the values of these css variables
@@ -40,7 +40,7 @@
             <article>
             <p><a href="/tests/test-attributes.html" target="_blank">Test Attribute Combinations</a></p>
             <p><a href="/tests/test-unit.html" target="_blank">Unit Tests</a></p>
-            <p><a href="css-guide.html" target="_blank">Guide to styling Wijit Forms</a>
+            <p><a href="/docs/css-guide.html" target="_blank">Guide to styling Wijit Forms</a>
             </article>
         <article>
         <p>This component serves as a convenience to make styling forms and configuring waiting effects and confirmation/error messages less time consuming.</p>
@@ -220,34 +220,10 @@
 
             <li><strong>reset-form (default: "true")</strong> Acceptable values: ["true", "false"] Whether to reset the form after it is submitted. </li>
 
-            <li><strong>custom-css (default: "false")</strong> Acceptable values: ["true", "false"] Whether to use your own custom css styles on the form instead of the default styles. </li>
-        </ul>
-
-        <h2>Using the Default Styles</h2>
-
-        <p>It is necessary to follow some conventions in order to use the default styles successfully.</p>
-
-        <ul>
-            <li>Place everything in one of the following elements:
+            <li><strong>custom-css (default: "false")</strong> Acceptable values: ["true", "false"] Whether to use your own custom css styles on the form instead of the default styles.
                 <ul>
-                    <li>div</li>
-                    <li>fieldset</li>
-                    <li>section</li>
-                </ul>
+                    <li><a href="../docs/css-guide.html" target="_blank">Guide to using the default styles in your form</a></li>
             </li>
-            <li>Place each label/input combination in a div.
-                <ul>
-                    <li>example: <code><div><label for="foo">Foo</label><input id="foo" name="foo"></div></code></li>
-                </ul>
-            </li>
-            <li>Always place the label before the input.</li>
-            <li>By default, the label will appear above the input.</li>
-            <li>If you want the label to appear under the input, add <code>class="reverse"</code> to the containing div.</li>
-            <li>If you want the label to appear beside the input, add <code>class="row"</code> to the containing <code>div</code>.
-            <li>If you want the label to appear beside the input, but after it, add <code>class="row reverse"</code> to the containing <code>div</code>.</li>
-            <li><code>section</code> and <code>fieldset</code> are meant to hold a group of controls.</li>
-            <li>By default, all controls inside <code>section</code> and <code>fieldset</code> are stacked vertically.</li>
-            <li>If you wish these items to appear side-by-side, add <code>class="row"</code> to the containing <code>section</code> or <code>fieldset</code></li>
         </ul>
         </article>
     </details>

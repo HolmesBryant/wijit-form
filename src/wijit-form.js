@@ -293,7 +293,7 @@ export default class WijitForm extends HTMLElement {
 		this.waitingElems = this.querySelectorAll('[slot=waiting]');
 
 		if (!this.customCss) this.addDefaultCss();
-		this.form.addEventListener('submit', (event) => this.submitData(event), {signal: this.mainAbortController.signal});
+		if (this.form) this.form.addEventListener('submit', (event) => this.submitData(event), {signal: this.mainAbortController.signal});
 		this.dialog.addEventListener('close', (event) => {
 			if (this.reset) this.resetForm(this.form);
 		}, {signal: this.mainAbortController.signal});
@@ -650,6 +650,7 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	addFocusListeners() {
+		if (!this.form) return;
 		for (const input of this.form.elements) {
 			if (input.localName === 'textarea') continue;
 			input.addEventListener('focus', () => {
@@ -1049,6 +1050,10 @@ export default class WijitForm extends HTMLElement {
 					        padding: var(--pad);
 					    }
 
+					    wijit-form button,
+						wijit-form input
+						{ max-height: var(--min); }
+
 					    wijit-form hr {
 							min-width: 100%;
 							max-height: 5px;
@@ -1117,6 +1122,25 @@ export default class WijitForm extends HTMLElement {
 
 					    /* Classes */
 
+						wijit-form .center {
+							justify-content: center;
+							align-content: center;
+						}
+
+						wijit-form .center > *
+						{ flex: 0; }
+
+						wijit-form .end {
+							align-content: flex-end;
+							justify-content: flex-end;
+						}
+
+						wijit-form .end > *
+						{ flex: 0; }
+
+						wijit-form .nowrap
+						{ flex-wrap: nowrap}
+
 						wijit-form .reverse
 						{ flex-direction: column-reverse; }
 
@@ -1132,21 +1156,7 @@ export default class WijitForm extends HTMLElement {
 						wijit-form .start > *
 						{ flex: 0; }
 
-						wijit-form .end {
-							align-content: flex-end;
-							justify-content: flex-end;
-						}
 
-						wijit-form .end > *
-						{ flex: 0; }
-
-						wijit-form .center {
-							justify-content: center;
-							align-content: center;
-						}
-
-						wijit-form .center > *
-						{ flex: 0; }
 				} /* @layer */
             </style>
 		`;
