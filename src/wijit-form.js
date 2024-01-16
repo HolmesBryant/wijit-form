@@ -1028,13 +1028,16 @@ export default class WijitForm extends HTMLElement {
 						}
 
 						wijit-form div
-						{ align-items: stretch; }
+						{
+							align-items: stretch;
+							justify-content: center;
+						}
 
 						wijit-form div.row
 						{ align-items: center; }
 
-						wijit-form div:has(input:not([type="radio"]):not([type="checkbox"]))
-						{ padding: 1rem; }
+						/*wijit-form div:has(input:not([type="radio"]):not([type="checkbox"]))
+						{ padding: 1rem; }*/
 
 						wijit-form div > *,
 						wijit-form fieldset > *,
