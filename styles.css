@@ -121,7 +121,7 @@ body {
 	}
 
 	header
-	{ flex-basis: 100%; }
+	{ width: 100%; }
 
 	li
 	{ margin-bottom: 1rem; }

@@ -141,7 +141,7 @@ export default class WijitForm extends HTMLElement {
 		'response',
 		'success',
 		'waiting'
-		];
+	];
 
 	constructor () {
 		super();
@@ -295,7 +295,7 @@ export default class WijitForm extends HTMLElement {
 		if (!this.customCss) this.addDefaultCss();
 		if (this.form) this.form.addEventListener('submit', (event) => this.submitData(event), {signal: this.mainAbortController.signal});
 		this.dialog.addEventListener('close', (event) => {
-			if (this.reset) this.resetForm(this.form);
+			if (this.reset) this.resetFormElements(this.form);
 		}, {signal: this.mainAbortController.signal});
 		this.addFocusListeners();
 	}
@@ -481,6 +481,7 @@ export default class WijitForm extends HTMLElement {
 	 * @see {@link setMessage}
 	 */
 	showDialog(dataFromServer, statusCode) {
+
 		const { container, dialog, modal } = this;
 		const message = this.setMessage(dataFromServer, statusCode);
 		const closeDialogForm = this.dialog.querySelector('form[method=dialog]');
@@ -664,7 +665,7 @@ export default class WijitForm extends HTMLElement {
 	 * @param  {HTMLElement} form The html form
 	 * @returns {Void}
 	 */
-	resetForm(form) {
+	resetFormElements(form) {
 		const inputs = form.querySelectorAll('input, select, textarea');
 		try {
 			this.form.reset();
@@ -780,8 +781,8 @@ export default class WijitForm extends HTMLElement {
 		const style = `
 			<style id="wijit-form-css">
 				html, body * { box-sizing: border-box; }
-
 				@layer wijit-form {
+
 					wijit-form {
 					    --bg1: rgb(250,250,250);
 					    --bg2: rgb(245,245,245);
@@ -805,9 +806,11 @@ export default class WijitForm extends HTMLElement {
 
 					    background-color: var(--bg1);
 					    border-radius: 10px;
+					    color: var(--text);
 					    display: inline-block;
 					    padding: 1rem;
 					    width: 100%;
+					    overflow: auto;
 					}
 
 				    /*********************/
@@ -890,6 +893,9 @@ export default class WijitForm extends HTMLElement {
 						wijit-form .success
 						{ border-radius: .5rem; }
 
+						wijit-form input[type="radio"]
+						{ border-radius: 50%; }
+
 						wijit-form option
 						{ border-radius: 0; }
 
@@ -927,9 +933,6 @@ export default class WijitForm extends HTMLElement {
 
 					    wijit-form button,
 					    wijit-form input,
-					    wijit-form fieldset,
-					    wijit-form label,
-					    wijit-form legend,
 					    wijit-form option,
 					    wijit-form select,
 					    wijit-form textarea
@@ -1018,36 +1021,9 @@ export default class WijitForm extends HTMLElement {
 					    	margin: 1rem;
 					    }
 
-					    wijit-form div,
-						wijit-form fieldset,
-						wijit-form section {
-							display: flex;
-							flex-direction: column;
-							flex-wrap: wrap;
-							gap: 0.5rem;
-						}
-
-						wijit-form div
-						{
-							align-items: stretch;
-							justify-content: center;
-						}
-
-						wijit-form div.row
-						{ align-items: center; }
-
-						/*wijit-form div:has(input:not([type="radio"]):not([type="checkbox"]))
-						{ padding: 1rem; }*/
-
-						wijit-form div > *,
-						wijit-form fieldset > *,
-						wijit-form section > *
-						{ flex: 1; }
-
 						wijit-form button,
 						wijit-form input,
-						wijit-form select,
-						wijit-form textarea {
+						wijit-form select {
 					    	min-height: var(--min);
 					    	min-width: var(--min);
 					        padding: var(--pad);
@@ -1056,6 +1032,36 @@ export default class WijitForm extends HTMLElement {
 					    wijit-form button,
 						wijit-form input
 						{ max-height: var(--min); }
+
+						wijit-form div {
+							align-items: stretch;
+							display: flex;
+							flex-direction: column;
+							flex-wrap: wrap;
+							gap: 0.5rem;
+							justify-content: center;
+						}
+
+						wijit-form div.row
+						{ align-items: center; }
+
+						wijit-form div > *,
+						wijit-form fieldset > *,
+						wijit-form section > *
+						{ flex: 1; }
+
+						wijit-form fieldset:has(pre) {
+							overflow: auto;
+						}
+
+						wijit-form fieldset,
+						wijit-form section {
+							display: flex;
+							flex-direction: column;
+							flex-wrap: wrap;
+							gap: 0.5rem;
+						    min-inline-size: 200px;
+						}
 
 					    wijit-form hr {
 							min-width: 100%;
@@ -1068,6 +1074,28 @@ export default class WijitForm extends HTMLElement {
 							max-width: 5px;
 							max-height: 100%;
 						}
+
+					    wijit-form input[type="checkbox"],
+					    wijit-form input[type="radio"] {
+					    	appearance: none;
+					    }
+
+					    wijit-form input[type="checkbox"]:checked:after,
+					    wijit-form input[type="radio"]:checked:after {
+					    	align-items: center;
+					    	display: flex;
+					    	font-size: var(--min);
+					    	font-weight: bold;
+					    	height: 100%;
+					    	line-height: 1rem;
+					    	justify-content: center;
+					    }
+
+					    wijit-form input[type="checkbox"]:checked:after
+					    { content: "✔"; }
+
+					    wijit-form input[type="radio"]:checked:after
+					    { content: "⬤"; }
 
 					    wijit-form input[type="color"],
 					    wijit-form input[type="checkbox"],
@@ -1158,9 +1186,7 @@ export default class WijitForm extends HTMLElement {
 
 						wijit-form .start > *
 						{ flex: 0; }
-
-
-				} /* @layer */
+					} /* @layer */
             </style>
 		`;
 
@@ -1317,7 +1343,6 @@ export default class WijitForm extends HTMLElement {
 	 */
 	get waiting () { return this.#waiting; }
 	set waiting (value) {
-		// console.log(value)
 		value = this.cleanHTML(value);
 		switch (value) {
 			case 'null':
