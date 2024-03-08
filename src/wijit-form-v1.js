@@ -147,459 +147,19 @@ export default class WijitForm extends HTMLElement {
 		super();
 		this.attachShadow({mode:'open'});
 		this.shadowRoot.innerHTML = `
-			<style id="wijit-form-css">
-				@layer wijit-form {
-					html, body * { box-sizing: border-box; }
-
-					wijit-form {
-						    --bg1-color: rgb(250,250,250);
-						    --bg2-color: rgb(245,245,245);
-						    --bg3-color: white;
-						    --text-color: rgb(60,60,60);
-						    --border-color: silver;
-						    --fail-color: hsl(6, 93%, 80%);
-						    --pass-color: hsl(112, 70%, 75%);
-						    --accent-color: lightskyblue;
-						    --min: 2.5rem;
-						    --pad: .25rem;
-
-						    background-color: var(--bg1-color);
-						    border-radius: 10px;
-						    color: var(--text-color);
-						    display: inline-block;
-						    padding: 1rem;
-						    width: 100%;
-						    overflow: auto;
-						    scrollbar-gutter: stable both-edges;
-								scrollbar-color: var(--bg2-color) var(--bg3-color);
-
-					}
-
-					@media (prefers-color-scheme: dark) {
-						 		wijit-form {
-					        --text-color: rgb(240,240,240);
-					        --bg1-color: rgb(35,35,35);
-					        --bg2-color: rgb(40,40,40);
-					        --bg3-color: rgb(60,60,60);
-							    --accent-color: dodgerblue;
-					        --border-color: dimgray;
-						 		}
-				    }
-				} /* layer */
-
-		    /*********************/
-		    /**** Backgrounds ****/
-		    /*********************/
-
-			    wijit-form details > *,
-			    wijit-form fieldset,
-			    wijit-form section
-			    { background-color: var(--bg2-color); }
-
-			    wijit-form button,
-			    wijit-form input,
-			    wijit-form progress,
-			    wijit-form select,
-			    wijit-form textarea
-			    { background-color: var(--bg3-color); }
-
-			    wijit-form hr
-			    { background-color: silver; }
-
-			    wijit-form .primary,
-			    wijit-form option:checked
-			    { background-color: var(--accent-color); }
-
-			    wijit-form progress::-webkit-progress-value
-			    { background-color: var(--accent-color); }
-
-					wijit-form progress::-moz-progress-bar
-					{ background-color: var(--accent-color); }
-
-			    wijit-form .error
-			    { background-color: var(--fail-color); }
-
-			    wijit-form .success
-			    { background-color: var(--pass-color); }
-
-		    /********************************/
-		    /****** Borders / Outlines ******/
-		    /********************************/
-
-			    wijit-form button,
-			    wijit-form fieldset,
-			    wijit-form input,
-			    wijit-form input[type="checkbox"]::before,
-			    wijit-form input[type="radio"]::before,
-			    wijit-form progress,
-			    wijit-form select,
-			    wijit-form textarea,
-			    wijit-form .error,
-			    wijit-form .success
-			    { border: 1px solid var(--border-color); }
-
-			    wijit-form option
-			    { border-bottom: 1px solid var(--border-color); }
-
-			    wijit-form hr,
-			    wijit-form option:last-child
-			    { border: none; }
-
-			    wijit-form input:user-valid:not([type="submit"]):not([type="reset"])
-			    { border-color: var(--pass-color) }
-
-			    wijit-form :user-invalid
-			    { border-color: var(--fail-color) }
-
-					wijit-form button,
-					wijit-form fieldset,
-					wijit-form hr,
-					wijit-form input,
-					wijit-form input[type="checkbox"]::before,
-					wijit-form option,
-					wijit-form progress,
-					wijit-form progress::-webkit-progress-value,
-					wijit-form progress::-webkit-progress-bar,
-					wijit-form section,
-					wijit-form select,
-					wijit-form textarea,
-					wijit-form .error,
-					wijit-form .success
-					{ border-radius: .5rem; }
-
-					wijit-form input[type="radio"]
-					{ border-radius: 50%; }
-
-					wijit-form option
-					{ border-radius: 0; }
-
-					wijit-form option:first-child
-					{ border-radius: .5rem .5rem 0 0; }
-
-					wijit-form option:last-child
-					{ border-radius: 0 0 .5rem .5rem; }
-
-			    wijit-form :focus-visible
-			    {
-			    	border-color: transparent;
-			    	outline: 1px solid var(--accent-color);
-			    }
-
-			    .success
-			    { border-color: var(--pass-color); }
-
-			    .error
-			    { border-color: var(--fail-color); }
-
-		    /******************************/
-		    /*********** Accent ***********/
-		    /******************************/
-
-			    wijit-form input
-			    { accent-color: var(--accent-color); }
-
-		    /******************************/
-		    /************ Text ************/
-		    /******************************/
-
-			    wijit-form label.required:after
-			    { color: var(--fail-color) }
-
-			    wijit-form button,
-			    wijit-form input,
-			    wijit-form fieldset,
-			    wijit-form label,
-			    wijit-form legend,
-			    wijit-form option,
-			    wijit-form select,
-			    wijit-form textarea
-			    { color: var(--text-color); }
-
-			    wijit-form option,
-			    wijit-form button,
-			    wijit-form input,
-			    wijit-form fieldset,
-			    wijit-form label,
-			    wijit-form legend,
-			    wijit-form option,
-			    wijit-form select,
-			    wijit-form textarea
-			    {
-			        font-size: 1rem;
-			        letter-spacing: .1rem;
-			    }
-
-			    wijit-form input[type="checkbox"]::before,
-			    wijit-form input[type="radio"]::before
-			    {
-			    	font-size: 2.5rem;
-			    	line-height: 2.4rem;
-			    }
-
-			    wijit-form label.required
-			    { font-size: small }
-
-			    wijit-form button,
-			    wijit-form input[type="reset"],
-			    wijit-form input[type="submit"],
-			    wijit-form label,
-			    wijit-form legend,
-			    wijit-form option,
-			    wijit-form .error,
-			    wijit-form .success
-			    { font-weight:bold; }
-
-			    wijit-form .error,
-			    wijit-form .success
-			    { text-align: center; }
-
-		    /*********************/
-		    /****** Shadows ******/
-		    /*********************/
-
-			    wijit-form  button:hover,
-			    wijit-form input[type="submit"]:hover,
-			    wijit-form input[type="reset"]:hover,
-			    wijit-form option:hover
-			    { box-shadow: 2px 2px 5px black; }
-
-			    wijit-form button:active,
-			    wijit-form input[type="submit"]:active,
-			    wijit-form input[type="reset"]:active,
-			    wijit-form option:active,
-			    wijit-form option:checked
-			    { box-shadow: inset 2px 2px 5px black; }
-
-		    /*********************/
-		    /******* Cursor ******/
-		    /*********************/
-
-			    wijit-form input[type="checkbox"],
-			    wijit-form input[type="radio"],
-			    wijit-form input[type="color"],
-			    wijit-form input[type="range"],
-			    wijit-form input[type="reset"],
-			    wijit-form input[type="submit"],
-			    wijit-form label,
-			    wijit-form button,
-			    wijit-form select
-			    { cursor: pointer; }
-
-			    wijit-form [disabled]
-			    { cursor: not-allowed; }
-
-		    /*********************/
-		    /***** Structure *****/
-		    /*********************/
-
-			    wijit-form button,
-			    wijit-form input[type=submit],
-			    wijit-form input[type=reset] {
-			    	margin: 1rem;
-			    }
-
-					wijit-form fieldset {
-						display: flex;
-						flex-direction: column;
-						flex-wrap: wrap;
-						gap: 0.5rem;
-						overflow: auto;
-				  	min-inline-size: 200px;
-					}
-
-					wijit-form div {
-						align-items: stretch;
-						display: flex;
-						flex-direction: column;
-						flex-wrap: wrap;
-						gap: 0.5rem;
-						justify-content: center;
-					}
-
-					wijit-form div.row
-					{ align-items: center; }
-
-					wijit-form div > *,
-					wijit-form fieldset > *,
-					wijit-form section > *
-					{ flex: 1; }
-
-					wijit-form button,
-					wijit-form input {
-					max-height: var(--min);
-			    	min-height: var(--min);
-			    	min-width: var(--min);
-			    	padding: var(--pad);
-					}
-
-					wijit-form hr {
-						min-width: 100%;
-						max-height: 5px;
-					}
-
-					wijit-form .row > hr {
-						min-width: 5px;
-						margin: 0;
-						max-width: 5px;
-						max-height: 100%;
-					}
-
-			    wijit-form input[type="checkbox"]:checked:after,
-			    wijit-form input[type="radio"]:checked:after {
-			    	align-items: center;
-			    	display: flex;
-			    	font-size: var(--min);
-			    	font-weight: bold;
-			    	height: 100%;
-			    	line-height: 1rem;
-			    	justify-content: center;
-			    }
-
-			    wijit-form input[type="color"],
-			    wijit-form input[type="checkbox"],
-			    wijit-form input[type="radio"] {
-			    	flex: 0;
-			    	flex-basis: var(--min);
-			    	padding: 0;
-			    	width: var(--min);
-			    }
-
-			  	wijit-form input[type=range] {
-						-webkit-appearance: none;
-						-moz-appearance: none;
-						appearance: none;
-						inline-size: 100%;
-						min-height: 5px;
-						max-height: 5px;
-						max-width: 95%;
-					}
-
-					wijit-form input[type="range"]::-webkit-slider-thumb {
-						width: 35px;
-						height: 35px;
-					}
-
-					wijit-form input[type="range"]::-moz-range-thumb {
-						width: 35px;
-						height: 35px;
-					}
-
-					wijit-form label {
-						flex: 0;
-						white-space: nowrap;
-					}
-
-					wijit-form option {
-						padding: 1rem;
-					}
-
-					wijit-form progress {
-						-webkit-appearance: none;
-						-moz-appearance: none;
-						appearance: none;
-						inline-size: 100%;
-						min-height: 1rem;
-					}
-
-					wijit-form progress::-webkit-progress-value
-					{ min-height: 1rem; }
-
-					wijit-form section {
-						display: flex;
-						flex-direction: column;
-						flex-wrap: wrap;
-						gap: 0.5rem;
-						overflow: auto;
-				  	min-inline-size: 200px;
-					}
-
-					wijit-form section + section
-					{ margin: 1rem 0; }
-
-					wijit-form select {
-			    	min-height: var(--min);
-			    	min-width: var(--min);
-			    	padding: var(--pad);
-					}
-
-			    wijit-form textarea
-			    {
-			    	min-height: 5rem;
-			    	min-width: 10rem;
-			    	padding: var(--pad);
-			    	width: 100%;
-			    }
-
-			    wijit-form .required:after {
-			    	content: "*";
-			    	font-size: x-large;
-			    	vertical-align: super;
-			    }
-
-			    /* Classes */
-
-					wijit-form .center {
-						justify-content: center;
-						align-content: center;
-					}
-
-					wijit-form .center > *
-					{ flex: 1; }
-
-					wijit-form .end {
-						align-content: flex-end;
-						justify-content: flex-end;
-					}
-
-					wijit-form .reverse.end {
-						align-content: flex-start;
-						justify-content: flex-start;
-					}
-
-					wijit-form .end > *
-					{ flex: 1; }
-
-					wijit-form .nowrap
-					{ flex-wrap: nowrap}
-
-					wijit-form .reverse
-					{ flex-direction: column-reverse; }
-
-					wijit-form .row
-					{ flex-direction: row; }
-
-					wijit-form .row.reverse
-					{ flex-direction: row-reverse; }
-
-					wijit-form .start {
-						align-content: flex-start;
-						justify-content: flex-start;
-					}
-
-					wijit-form .reverse.start {
-						align-content: flex-end;
-						justify-content: flex-end;
-					}
-
-					wijit-form .start > *
-					{ flex: 1; }
-
-			</style>
-
 			<style>
 				:host {
-					--fail-color: darksalmon;
-					--pass-color: limegreen;
+					--fail: darksalmon;
+					--pass: limegreen;
 				}
 
 				button {
-					background-color: var(--accent-color);
-					border-color: var(--border-color);
+					border-color: var(--border);
 					border-radius: 5px;
 					cursor: pointer;
 					font-size: large;
 					font-weight: bold;
-					outline-color: var(--accent-color);
+					outline-color: var(--accent);
 					padding: .5rem;
 				}
 
@@ -616,7 +176,7 @@ export default class WijitForm extends HTMLElement {
 					background: transparent;
 					border: none;
 					box-sizing: border-box;
-					color: var(--text-color);
+					color: var(--text);
 					outline: none;
 					text-align: center;
 				}
@@ -632,7 +192,6 @@ export default class WijitForm extends HTMLElement {
 					backdrop-filter: blur(.3rem);
 					height: 100%;
 					outline: none;
-					overflow: hidden;
 					padding: 0;
 					top: 0;
 					width: 100%;
@@ -646,8 +205,8 @@ export default class WijitForm extends HTMLElement {
 				{ display: none; }
 
 				#dialog-message {
-					background-color: var(--bg3-color);
-					border: 1px solid var(--border-color);
+					background-color: var(--bg3);
+					border: 1px solid var(--border);
 					border-radius: 10px;
 					display: table-cell;
 					padding: 1rem;
@@ -656,6 +215,7 @@ export default class WijitForm extends HTMLElement {
 
 				dialog.modeless #dialog-message {
 					transition: all 1s;
+
 				}
 
 				#dialog-message.waiting {
@@ -667,16 +227,16 @@ export default class WijitForm extends HTMLElement {
 				}
 
 				#dialog-message.error {
-					border-color: var(--fail-color);
+					border-color: var(--fail);
 				}
 
 				#dialog-message.success {
-					border-color: var(--pass-color);
+					border-color: var(--pass);
 				}
 
 				#wrapper {
 					position: relative;
-
+					overflow: hidden;
 				}
 
 				@media (prefers-color-scheme: dark) {
@@ -686,7 +246,6 @@ export default class WijitForm extends HTMLElement {
 					}
 				}
 			</style>
-
 			<div id="wrapper">
 				<slot></slot>
 				<slot name="dialog">
@@ -1219,7 +778,419 @@ export default class WijitForm extends HTMLElement {
 	 * @returns {HTMLStyleElement}
 	 */
 	defaultCss() {
-		return this.shadowRoot.querySelector('#wijit-form-css')
+		const style = `
+			<style id="wijit-form-css">
+				html, body * { box-sizing: border-box; }
+				@layer wijit-form {
+
+					wijit-form {
+					    --bg1: rgb(250,250,250);
+					    --bg2: rgb(245,245,245);
+					    --bg3: white;
+					    --text: rgb(60,60,60);
+					    --border: silver;
+					    --fail: hsl(6, 93%, 80%);
+					    --pass: hsl(112, 70%, 75%);
+					    --accent: lightskyblue;
+					    --min: 2.5rem;
+					    --pad: .25rem;
+
+					    @media (prefers-color-scheme: dark) {
+					        --text: rgb(240,240,240);
+					        --bg1: rgb(35,35,35);
+					        --bg2: rgb(40,40,40);
+					        --bg3: rgb(60,60,60);
+						    --accent: dodgerblue;
+					        --border: dimgray;
+					    }
+
+					    background-color: var(--bg1);
+					    border-radius: 10px;
+					    color: var(--text);
+					    display: inline-block;
+					    padding: 1rem;
+					    width: 100%;
+					    overflow: auto;
+					}
+
+				    /*********************/
+				    /**** Backgrounds ****/
+				    /*********************/
+
+					    wijit-form details > *,
+					    wijit-form fieldset,
+					    wijit-form section
+					    { background-color: var(--bg2); }
+
+					    wijit-form button,
+					    wijit-form input,
+					    wijit-form progress,
+					    wijit-form select,
+					    wijit-form textarea
+					    { background-color: var(--bg3); }
+
+					    wijit-form hr
+					    { background-color: silver; }
+
+					    wijit-form .primary,
+					    wijit-form option:checked
+					    { background-color: var(--accent); }
+
+					    wijit-form progress::-webkit-progress-value
+					    { background-color: var(--accent); }
+
+						wijit-form progress::-moz-progress-bar
+						{ background-color: var(--accent); }
+
+					    wijit-form .error
+					    { background-color: var(--fail); }
+
+					    wijit-form .success
+					    { background-color: var(--pass); }
+
+				    /********************************/
+				    /****** Borders / Outlines ******/
+				    /********************************/
+
+					    wijit-form button,
+					    wijit-form fieldset,
+					    wijit-form input,
+					    wijit-form input[type="checkbox"]::before,
+					    wijit-form input[type="radio"]::before,
+					    wijit-form progress,
+					    wijit-form select,
+					    wijit-form textarea,
+					    wijit-form .error,
+					    wijit-form .success
+					    { border: 1px solid var(--border); }
+
+					    wijit-form option
+					    { border-bottom: 1px solid var(--border); }
+
+					    wijit-form hr,
+					    wijit-form option:last-child
+					    { border: none; }
+
+					    wijit-form input:user-valid:not([type="submit"]):not([type="reset"])
+					    { border-color: var(--pass) }
+
+					    wijit-form :user-invalid
+					    { border-color: var(--fail) }
+
+						wijit-form button,
+						wijit-form fieldset,
+						wijit-form hr,
+						wijit-form input,
+						wijit-form input[type="checkbox"]::before,
+						wijit-form option,
+						wijit-form progress,
+						wijit-form progress::-webkit-progress-value,
+						wijit-form progress::-webkit-progress-bar,
+						wijit-form section,
+						wijit-form select,
+						wijit-form textarea,
+						wijit-form .error,
+						wijit-form .success
+						{ border-radius: .5rem; }
+
+						wijit-form input[type="radio"]
+						{ border-radius: 50%; }
+
+						wijit-form option
+						{ border-radius: 0; }
+
+						wijit-form option:first-child
+						{ border-radius: .5rem .5rem 0 0; }
+
+						wijit-form option:last-child
+						{ border-radius: 0 0 .5rem .5rem; }
+
+					    wijit-form :focus-visible
+					    {
+					    	border-color: transparent;
+					    	outline: 1px solid var(--accent);
+					    }
+
+					    .success
+					    { border-color: var(--pass); }
+
+					    .error
+					    { border-color: var(--fail);
+					}
+
+				    /******************************/
+				    /*********** Accent ***********/
+				    /******************************/
+					    wijit-form input
+					    { accent-color: var(--accent); }
+
+				    /******************************/
+				    /************ Text ************/
+				    /******************************/
+
+					    wijit-form label.required:after
+					    { color: var(--fail) }
+
+					    wijit-form button,
+					    wijit-form input,
+					    wijit-form option,
+					    wijit-form select,
+					    wijit-form textarea
+					    { color: var(--text); }
+
+					    wijit-form option,
+					    wijit-form button,
+					    wijit-form input,
+					    wijit-form fieldset,
+					    wijit-form label,
+					    wijit-form legend,
+					    wijit-form option,
+					    wijit-form select,
+					    wijit-form textarea
+					    {
+					        font-size: 1rem;
+					        letter-spacing: .1rem;
+					    }
+
+					    wijit-form input[type="checkbox"]::before,
+					    wijit-form input[type="radio"]::before
+					    {
+					    	font-size: 2.5rem;
+					    	line-height: 2.4rem;
+					    }
+
+					    wijit-form label.required
+					    { font-size: small }
+
+					    wijit-form button,
+					    wijit-form input[type="reset"],
+					    wijit-form input[type="submit"],
+					    wijit-form label,
+					    wijit-form legend,
+					    wijit-form option,
+					    wijit-form .error,
+					    wijit-form .success
+					    { font-weight:bold; }
+
+					    wijit-form .error,
+					    wijit-form .success
+					    { text-align: center; }
+
+				    /*********************/
+				    /****** Shadows ******/
+				    /*********************/
+
+					    wijit-form  button:hover,
+					    wijit-form input[type="submit"]:hover,
+					    wijit-form input[type="reset"]:hover,
+					    wijit-form option:hover
+					    { box-shadow: 2px 2px 5px black; }
+
+					    wijit-form button:active,
+					    wijit-form input[type="submit"]:active,
+					    wijit-form input[type="reset"]:active,
+					    wijit-form option:active,
+					    wijit-form option:checked
+					    { box-shadow: inset 2px 2px 5px black; }
+
+				    /*********************/
+				    /******* Cursor ******/
+				    /*********************/
+
+					    wijit-form input[type="checkbox"],
+					    wijit-form input[type="radio"],
+					    wijit-form input[type="color"],
+					    wijit-form input[type="range"],
+					    wijit-form input[type="reset"],
+					    wijit-form input[type="submit"],
+					    wijit-form label,
+					    wijit-form button,
+					    wijit-form select
+					    { cursor: pointer; }
+
+					    wijit-form [disabled]
+					    { cursor: not-allowed; }
+
+				    /*********************/
+				    /***** Structure *****/
+				    /*********************/
+
+					    wijit-form button,
+					    wijit-form input[type=submit],
+					    wijit-form input[type=reset] {
+					    	margin: 1rem;
+					    }
+
+						wijit-form button,
+						wijit-form input,
+						wijit-form select {
+					    	min-height: var(--min);
+					    	min-width: var(--min);
+					        padding: var(--pad);
+					    }
+
+					    wijit-form button,
+						wijit-form input
+						{ max-height: var(--min); }
+
+						wijit-form div {
+							align-items: stretch;
+							display: flex;
+							flex-direction: column;
+							flex-wrap: wrap;
+							gap: 0.5rem;
+							justify-content: center;
+						}
+
+						wijit-form div.row
+						{ align-items: center; }
+
+						wijit-form div > *,
+						wijit-form fieldset > *,
+						wijit-form section > *
+						{ flex: 1; }
+
+						wijit-form fieldset:has(pre) {
+							overflow: auto;
+						}
+
+						wijit-form fieldset,
+						wijit-form section {
+							display: flex;
+							flex-direction: column;
+							flex-wrap: wrap;
+							gap: 0.5rem;
+						    min-inline-size: 200px;
+						}
+
+					    wijit-form hr {
+							min-width: 100%;
+							max-height: 5px;
+						}
+
+						wijit-form .row > hr {
+							min-width: 5px;
+							margin: 0;
+							max-width: 5px;
+							max-height: 100%;
+						}
+
+					    wijit-form input[type="checkbox"],
+					    wijit-form input[type="radio"] {
+					    	appearance: none;
+					    }
+
+					    wijit-form input[type="checkbox"]:checked:after,
+					    wijit-form input[type="radio"]:checked:after {
+					    	align-items: center;
+					    	display: flex;
+					    	font-size: var(--min);
+					    	font-weight: bold;
+					    	height: 100%;
+					    	line-height: 1rem;
+					    	justify-content: center;
+					    }
+
+					    wijit-form input[type="checkbox"]:checked:after
+					    { content: "✔"; }
+
+					    wijit-form input[type="radio"]:checked:after
+					    { content: "⬤"; }
+
+					    wijit-form input[type="color"],
+					    wijit-form input[type="checkbox"],
+					    wijit-form input[type="radio"] {
+					    	flex: 0;
+					    	flex-basis: var(--min);
+					    	padding: 0;
+					    	width: var(--min);
+					    }
+
+						wijit-form label {
+							flex: 0;
+							white-space: nowrap;
+						}
+
+						wijit-form option {
+							padding: 1rem;
+						}
+
+						wijit-form progress {
+							-webkit-appearance: none;
+							-moz-appearance: none;
+							appearance: none;
+							inline-size: 100%;
+							min-height: 1rem;
+						}
+
+						wijit-form progress::-webkit-progress-value
+						{ min-height: 1rem; }
+
+						wijit-form section + section
+						{ margin: 1rem 0; }
+
+						wijit-form select
+					    {
+					    	min-width: 10rem;
+					        padding: var(--pad);
+					    	overflow: auto;
+					    	width: max-content;
+					    }
+
+					    wijit-form textarea
+					    {
+					    	flex: 1;
+					    	min-height: 5rem;
+					    	min-width: 10rem;
+					    	padding: var(--pad);
+					    }
+
+					    wijit-form .required:after {
+					    	content: "*";
+					    	font-size: x-large;
+					    	vertical-align: super;
+					    }
+
+					    /* Classes */
+
+						wijit-form .center {
+							justify-content: center;
+							align-content: center;
+						}
+
+						wijit-form .center > *
+						{ flex: 0; }
+
+						wijit-form .end {
+							align-content: flex-end;
+							justify-content: flex-end;
+						}
+
+						wijit-form .end > *
+						{ flex: 0; }
+
+						wijit-form .nowrap
+						{ flex-wrap: nowrap}
+
+						wijit-form .reverse
+						{ flex-direction: column-reverse; }
+
+						wijit-form .row
+						{ flex-direction: row; }
+
+						wijit-form .row.reverse
+						{ flex-direction: row-reverse; }
+
+						wijit-form .start
+						{ align-content: flex-start; }
+
+						wijit-form .start > *
+						{ flex: 0; }
+					} /* @layer */
+            </style>
+		`;
+
+		return document.createRange().createContextualFragment(style);
 	}
 
 	/**

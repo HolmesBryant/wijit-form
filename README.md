@@ -2,6 +2,21 @@
 
 This component serves simply as a convenience to make styling forms and configuring waiting effects and confirmation/error messages less time consuming.
 
+## Changelog
+- v1.01
+    - Fixed some css issues
+    - Added css for input type="range"
+- v1.02
+    - changed css variable names:
+        - --bg1 to --bg1-color
+		    - --bg2 to --bg2-color
+		    - --bg3 to --bg3-color
+		    - --text to --text-color
+		    - --border to --border-color
+		    - --fail to --fail-color
+		    - --pass to --pass-color
+		    - --accent to --accent-color
+
 ## Features ##
 
 - Set custom "waiting", "success" and "error" messages.
