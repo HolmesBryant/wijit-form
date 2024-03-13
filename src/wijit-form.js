@@ -759,11 +759,13 @@ export default class WijitForm extends HTMLElement {
 		this.successElems = this.querySelectorAll('[slot=success]');
 		this.waitingElems = this.querySelectorAll('[slot=waiting]');
 
-		if (!this.customCss) this.addDefaultCss();
-		if (this.form) this.form.addEventListener('submit', (event) => this.submitData(event), {signal: this.mainAbortController.signal});
-		this.dialog.addEventListener('close', (event) => {
-			if (this.reset) this.resetFormElements(this.form);
-		}, {signal: this.mainAbortController.signal});
+		if ( !this.customCss ) this.addDefaultCss();
+		if ( this.form && !this.form.action.endsWith( 'false') ) {
+			this.form.addEventListener('submit', (event) => this.submitData(event), {signal: this.mainAbortController.signal});
+		}
+		this.dialog.addEventListener( 'close', event => {
+			if ( this.reset ) this.resetFormElements( this.form );
+		}, { signal:this.mainAbortController.signal } );
 		this.addFocusListeners();
 	}
 
@@ -778,7 +780,7 @@ export default class WijitForm extends HTMLElement {
 	 *
 	 * @return {Void}
 	 */
-	attributeChangedCallback (attr, oldval, newval) {
+	attributeChangedCallback ( attr, oldval, newval ) {
 		// if attribute name has hypons, camel-case it.
 		if (attr.indexOf('-') > -1) {
 			attr = attr.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join("");
@@ -807,46 +809,46 @@ export default class WijitForm extends HTMLElement {
 	 * @returns {Promise<{data: any, status: number}>} - The result of the fetch operation (in testing mode).
 	 * @see {@link fetchData}
 	 */
-	async submitData(event) {
+	async submitData( event ) {
 		event.preventDefault();
 		let url, result;
-		const data = new FormData (event.target);
-		const accept = (this.response === 'html') ? "text/html" : "application/json";
-		const options = this.setFetchOptions(event, accept);
+		const data = new FormData ( event.target );
+		const accept = ( this.response === 'html' ) ? "text/html" : "application/json";
+		const options = this.setFetchOptions( event, accept );
 
-		if (!this.testing) this.showDialog(this.waiting, null);
+		if (!this.testing) this.showDialog( this.waiting, null );
 
-		if (event.target.action.indexOf('false') === -1) {
+		if ( event.target.action.indexOf( 'false' ) === -1 ) {
 			url = event.target.action;
 			this.#server = true;
 		} else {
 			this.#server = false;
 		}
 
-		if (options.method === 'GET' || options.method === 'HEAD') {
+		if ( options.method === 'GET' || options.method === 'HEAD' ) {
 			let i = 0;
 			url += '?';
-			for (const entry of data.entries()) {
+			for ( const entry of data.entries() ) {
 				url += (i === 0) ? entry.join('=') : `&${entry.join('=')}`;
 				i++;
 			}
-			url = encodeURI(url);
+			url = encodeURI( url );
 		} else {
 			options.body = data;
 		}
 
-		if (this.#server) {
-			result = await this.fetchData(url, options);
-			if (this.testing) {
-				return this.setMessage(result.data, result.status);
+		if ( this.#server ) {
+			result = await this.fetchData( url, options );
+			if ( this.testing ) {
+				return this.setMessage( result.data, result.status );
 			} else {
-				this.showDialog(result.data, result.status);
+				this.showDialog( result.data, result.status );
 			}
 		} else {
-			result = this.simulateServer(options);
-			setTimeout (() => {
-				this.showDialog(result.data, result.status);
-			}, 1000);
+			result = this.simulateServer( options );
+			setTimeout ( () => {
+				this.showDialog( result.data, result.status );
+			}, 1000 );
 		}
 	}
 
@@ -856,7 +858,7 @@ export default class WijitForm extends HTMLElement {
 	 * @param  	{object} options 	Options object for Fetch
 	 * @returns {object}			{data: string, status: number}
 	 */
-	async fetchData(url, options) {
+	async fetchData( url, options ) {
 		let data;
 
 		try {
@@ -878,7 +880,7 @@ export default class WijitForm extends HTMLElement {
 	 *                        	- data: The simulated response data.
 	 *                         	- status: The HTTP status code of the simulated response.
 	 */
-	simulateServer(data) {
+	simulateServer( data ) {
 		let msg, status;
 		const formdata = data.body;
 		const caveat = '<p>This result is a simulation. No server side form processing was performed.';
@@ -922,7 +924,7 @@ export default class WijitForm extends HTMLElement {
 	 * @remarks This method is invoked to prepare options for the fetchData method.
 	 * @see {@link fetchData}
 	 */
-	setFetchOptions(event, accept) {
+	setFetchOptions( event, accept ) {
 		const options = (this.fetchOptions) ? JSON.parse (JSON.stringify (this.fetchOptions)) : {};
 		const method = event.target.getAttribute('method') || 'POST';
 		options.method = method.toUpperCase();
@@ -947,7 +949,7 @@ export default class WijitForm extends HTMLElement {
 	 * @remarks This method is invoked after data has been fetched from a server.
 	 * @see {@link setMessage}
 	 */
-	showDialog(dataFromServer, statusCode) {
+	showDialog( dataFromServer, statusCode ) {
 
 		const { container, dialog, modal } = this;
 		const message = this.setMessage(dataFromServer, statusCode);
@@ -995,7 +997,7 @@ export default class WijitForm extends HTMLElement {
 	 * @remarks This method is invoked to prepare a message before displaying a dialog.
 	 * @see {@link showDialog}
 	 */
-	setMessage(messageFromServer, statusCode) {
+	setMessage( messageFromServer, statusCode ) {
 
 		const { waitingElems, errorElems, successElems, container } = this;
 		this.clearMessage();
@@ -1064,7 +1066,7 @@ export default class WijitForm extends HTMLElement {
 	 * @returns {string}			 - The string with placeholders replaced.
 	 * @remarks This method is used to create dynamic messages based on user input and server data.
 	 */
-	replacePlaceholders(userdata, jsondata) {
+	replacePlaceholders( userdata, jsondata ) {
 		const placeholderRegex = /{{([^{}]+)}}/g;
 		let text = userdata;
 		let match;
@@ -1091,7 +1093,7 @@ export default class WijitForm extends HTMLElement {
 	 * @param  {String} 	response	The response from the server
 	 * @return {NodeList}				The collection with placeholders replaced with data
 	 */
-	replaceNodeContents(nodeList, response) {
+	replaceNodeContents( nodeList, response ) {
 		const placeholderRegex = /{{([^{}]+)}}/g;
 
 		for (const node of nodeList) {
@@ -1119,11 +1121,11 @@ export default class WijitForm extends HTMLElement {
 
 	addFocusListeners() {
 		if (!this.form) return;
-		for (const input of this.form.elements) {
-			if (input.localName === 'textarea') continue;
-			input.addEventListener('focus', () => {
-				if (typeof input.select === 'function') input.select();
-			}, {signal: this.mainAbortController.signal});
+		for ( const input of this.form.elements ) {
+			if ( input.localName === 'textarea' ) continue;
+			input.addEventListener( 'focus', () => {
+				if ( typeof input.select === 'function' ) input.select();
+			}, { signal:this.mainAbortController.signal } );
 		}
 	}
 
@@ -1132,7 +1134,7 @@ export default class WijitForm extends HTMLElement {
 	 * @param  {HTMLElement} form The html form
 	 * @returns {Void}
 	 */
-	resetFormElements(form) {
+	resetFormElements( form ) {
 		const inputs = form.querySelectorAll('input, select, textarea');
 		try {
 			this.form.reset();
@@ -1175,7 +1177,7 @@ export default class WijitForm extends HTMLElement {
 	 * @returns {string} - The cleaned HTML.
 	 * @remarks This method is used to sanitize user-provided HTML to prevent potential security risks like cross-site scripting (XSS).
 	 */
-	cleanHTML(html) {
+	cleanHTML( html ) {
 		const allowedElements = new Set(['p', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'b', 'strong', 'i', 'hr', 'br']);
 		const allowedAttributes = new Set(['id', 'class', 'style']);
 		const tempDiv = document.createElement('div');
@@ -1215,7 +1217,7 @@ export default class WijitForm extends HTMLElement {
 	 * @returns {boolean|any} - Returns true if the string is valid JSON, false if invalid, or the parsed JSON object if successful.
 	 * @remarks This method prioritizes direct parsing for efficiency and only applies minimal adjustments if necessary.
 	 */
-	validateJson(string) {
+	validateJson( string ) {
 		try {
 			// Attempt parsing directly, avoiding unnecessary regex replacement
 			return JSON.parse(string);
@@ -1251,9 +1253,8 @@ export default class WijitForm extends HTMLElement {
 	/**
 	 * @returns {boolean}
 	 */
-	get customCss () { return this.#customCss }
-
-	set customCss (value) {
+	get customCss() { return this.#customCss }
+	set customCss( value ) {
 		switch (value) {
 		case '':
 		case 'true':
@@ -1271,17 +1272,16 @@ export default class WijitForm extends HTMLElement {
 	/**
 	 * @returns {string}
 	 */
-	get dialogMessageId () { return this.#dialogMessageId }
-
-	set dialogMessageId (value) {
+	get dialogMessageId() { return this.#dialogMessageId }
+	set dialogMessageId( value ) {
 		this.#dialogMessageId = value;
 	}
 
 	/**
 	 * @returns {object}
 	 */
-	get fetchOptions () { return this.#fetchOptions; }
-	set fetchOptions (value) {
+	get fetchOptions() { return this.#fetchOptions; }
+	set fetchOptions( value ) {
 		value = this.validateJson(value);
 		if (value === null) {
 			this.#fetchOptions = {};
@@ -1300,7 +1300,7 @@ export default class WijitForm extends HTMLElement {
 	 * @description If you use this, make sure the server script handles it and returns an http status code greater than 399.
 	 * @param  {string} value Empty string or "true" for true, any other string for false
 	 */
-	set forceError(value) {
+	set forceError( value ) {
 		let input = this.form.querySelector('input[name=fail]');
 
 		switch (value.toLowerCase()) {
@@ -1326,8 +1326,8 @@ export default class WijitForm extends HTMLElement {
 	/**
 	 * @returns {boolean}
 	 */
-	get modal () { return this.#modal; }
-	set modal (value) {
+	get modal() { return this.#modal; }
+	set modal( value ) {
 		switch (value.toLowerCase()) {
 		case '':
 		case 'true':
@@ -1344,7 +1344,7 @@ export default class WijitForm extends HTMLElement {
 	 * @returns {boolean}
 	 */
 	get resetForm () { return this.#resetForm; }
-	set resetForm (value) {
+	set resetForm ( value ) {
 		switch (value.toLowerCase()) {
 		case '':
 		case 'true':
@@ -1361,7 +1361,7 @@ export default class WijitForm extends HTMLElement {
 	 * @returns {string}
 	 */
 	get response () { return this.#response; }
-	set response (value) {
+	set response ( value ) {
 		this.#response = value.toLowerCase();
 	}
 
@@ -1369,7 +1369,7 @@ export default class WijitForm extends HTMLElement {
 	 * @returns {string}
 	 */
 	get error () { return this.#error; }
-	set error (value) {
+	set error ( value ) {
 		value = this.cleanHTML(value);
 		switch (value) {
 			case 'null':
@@ -1383,7 +1383,7 @@ export default class WijitForm extends HTMLElement {
 	 * @returns {string}
 	 */
 	get success () { return this.#success; }
-	set success (value) {
+	set success ( value ) {
 		value = this.cleanHTML(value);
 		switch (value) {
 			case 'null':
@@ -1397,7 +1397,7 @@ export default class WijitForm extends HTMLElement {
 	 * @returns {string}
 	 */
 	get waiting () { return this.#waiting; }
-	set waiting (value) {
+	set waiting ( value ) {
 		value = this.cleanHTML(value);
 		switch (value) {
 			case 'null':
