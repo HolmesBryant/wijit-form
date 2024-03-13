@@ -2,7 +2,7 @@
  * @class WijitForm
  * @summary Represents a custom form component for handling form submissions, data fetching, and dialog display.
  * @remarks This class extends HTMLElement, allowing it to be used as a custom HTML element in web pages.
- * @author Holmes Bryant <webbmaastaa@gmail.com>
+ * @author Holmes Bryant <https://github.com/HolmesBryant>
  * @license GPL-3.0
  */
 export default class WijitForm extends HTMLElement {
@@ -198,6 +198,7 @@ export default class WijitForm extends HTMLElement {
 
 			    wijit-form button,
 			    wijit-form input,
+			    wijit-form input::before,
 			    wijit-form progress,
 			    wijit-form select,
 			    wijit-form textarea
@@ -229,8 +230,7 @@ export default class WijitForm extends HTMLElement {
 			    wijit-form button,
 			    wijit-form fieldset,
 			    wijit-form input,
-			    wijit-form input[type="checkbox"]::before,
-			    wijit-form input[type="radio"]::before,
+			    wijit-form input::before,
 			    wijit-form progress,
 			    wijit-form select,
 			    wijit-form textarea,
@@ -251,11 +251,17 @@ export default class WijitForm extends HTMLElement {
 			    wijit-form :user-invalid
 			    { border-color: var(--fail-color) }
 
+			    wijit-form .success
+			    { border-color: var(--pass-color); }
+
+			    wijit-form .error
+			    { border-color: var(--fail-color); }
+
 					wijit-form button,
 					wijit-form fieldset,
 					wijit-form hr,
 					wijit-form input,
-					wijit-form input[type="checkbox"]::before,
+					wijit-form input::before,
 					wijit-form option,
 					wijit-form progress,
 					wijit-form progress::-webkit-progress-value,
@@ -267,7 +273,8 @@ export default class WijitForm extends HTMLElement {
 					wijit-form .success
 					{ border-radius: .5rem; }
 
-					wijit-form input[type="radio"]
+					wijit-form input[type="radio"],
+					wijit-form input[type="radio"]::before
 					{ border-radius: 50%; }
 
 					wijit-form option
@@ -285,17 +292,14 @@ export default class WijitForm extends HTMLElement {
 			    	outline: 1px solid var(--accent-color);
 			    }
 
-			    .success
-			    { border-color: var(--pass-color); }
-
-			    .error
-			    { border-color: var(--fail-color); }
+			    wijit-form input:checked::before
+			    { outline: 2px solid var(--accent-color); }
 
 		    /******************************/
 		    /*********** Accent ***********/
 		    /******************************/
 
-			    wijit-form input
+			    wijit-form input,
 			    { accent-color: var(--accent-color); }
 
 		    /******************************/
@@ -315,6 +319,10 @@ export default class WijitForm extends HTMLElement {
 			    wijit-form textarea
 			    { color: var(--text-color); }
 
+			    wijit-form input:checked::before {
+			      color: var(--accent-color);
+			    }
+
 			    wijit-form option,
 			    wijit-form button,
 			    wijit-form input,
@@ -331,12 +339,9 @@ export default class WijitForm extends HTMLElement {
 
 			    wijit-form input[type="checkbox"]::before,
 			    wijit-form input[type="radio"]::before
-			    {
-			    	font-size: 2.5rem;
-			    	line-height: 2.4rem;
-			    }
+			    { font-size: var(--min); }
 
-			    wijit-form label.required
+			    wijit-form label.required:after
 			    { font-size: small }
 
 			    wijit-form button,
@@ -385,7 +390,8 @@ export default class WijitForm extends HTMLElement {
 			    wijit-form select
 			    { cursor: pointer; }
 
-			    wijit-form [disabled]
+			    wijit-form input:disabled,
+			    wijit-form *[disabled]
 			    { cursor: not-allowed; }
 
 		    /*********************/
@@ -444,15 +450,35 @@ export default class WijitForm extends HTMLElement {
 						max-height: 100%;
 					}
 
-			    wijit-form input[type="checkbox"]:checked:after,
-			    wijit-form input[type="radio"]:checked:after {
-			    	align-items: center;
-			    	display: flex;
-			    	font-size: var(--min);
-			    	font-weight: bold;
-			    	height: 100%;
-			    	line-height: 1rem;
-			    	justify-content: center;
+			    wijit-form input:disabled {
+			      opacity: 0.7;
+			    }
+
+					wijit-form input[type="checkbox"],
+					wijit-form input[type="radio"] {
+      			appearance: none;
+			      height: var(--min);
+			      position: relative;
+			      width: var(--min);
+			    }
+
+			    wijit-form input:checked::before {
+			      content: "";
+			      line-height: 0;
+			      position: absolute;
+			      display: flex;
+			      height: 100%;
+			      width: 100%;
+			      align-items: center;
+			      justify-content: center;
+			    }
+
+			    wijit-form input[type="checkbox"]:checked::before {
+			    	content: "✔";
+			    }
+
+			    wijit-form input[type="radio"]:checked::before {
+			      content: "⬤";
 			    }
 
 			    wijit-form input[type="color"],
