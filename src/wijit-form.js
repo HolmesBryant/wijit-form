@@ -149,42 +149,54 @@ export default class WijitForm extends HTMLElement {
 		this.shadowRoot.innerHTML = `
 			<style id="wijit-form-css">
 				@layer wijit-form {
-					html, body * { box-sizing: border-box; }
 
 					wijit-form {
-						    --bg1-color: rgb(250,250,250);
-						    --bg2-color: rgb(245,245,245);
-						    --bg3-color: white;
-						    --text-color: rgb(60,60,60);
-						    --border-color: silver;
-						    --fail-color: hsl(6, 93%, 80%);
-						    --pass-color: hsl(112, 70%, 75%);
-						    --accent-color: lightskyblue;
-						    --min: 2.5rem;
-						    --pad: .25rem;
+				    --accent-color: orange;
+				    --bg1-color: rgb(250,250,250);
+				    --bg2-color: rgb(245,245,245);
+				    --bg3-color: white;
+				    --border-color: silver;
+				    --fail-color: hsl(6, 93%, 80%);
+				    --pass-color: hsl(112, 70%, 75%);
+				    --text-color-: rgb(40,40,40);
+				    --text-color-light: rgb(240,240,240);
+				    --text-color-dark: rgb(40,40,40);
+				    --gap: .5rem;
+				    --min: 35px;
+				    --min-panel: 260px;
+				    --pad: .5rem;
 
-						    background-color: var(--bg1-color);
-						    border-radius: 10px;
-						    color: var(--text-color);
-						    display: inline-block;
-						    padding: 1rem;
-						    width: 100%;
-						    overflow: auto;
-						    scrollbar-gutter: stable both-edges;
-								scrollbar-color: var(--bg2-color) var(--bg3-color);
+				    background-color: var(--bg1-color);
+				    border-radius: 10px;
+				    color: var(--text-color);
+				    display: inline-block;
+				    padding: var(--pad);
+				    width: 100%;
+				    overflow: auto;
+				    scrollbar-gutter: stable both-edges;
+						scrollbar-color: var(--bg2-color) var(--bg3-color);
+					}
 
+					wijit-form > * {
+						box-sizing: border-box;
 					}
 
 					@media (prefers-color-scheme: dark) {
-						 		wijit-form {
-					        --text-color: rgb(240,240,240);
-					        --bg1-color: rgb(35,35,35);
-					        --bg2-color: rgb(40,40,40);
-					        --bg3-color: rgb(60,60,60);
-							    --accent-color: dodgerblue;
-					        --border-color: dimgray;
-						 		}
-				    }
+				 		wijit-form {
+			        --bg1-color: rgb(35,35,35);
+			        --bg2-color: rgb(40,40,40);
+			        --bg3-color: rgb(60,60,60);
+			        --border-color: dimgray;
+			        --text-color: rgb(240,240,240);
+				 		}
+				   }
+
+				   @media only screen and (max-width: 380px) {
+				   	wijit-form {
+				   		--pad: 0;
+				   		--gap: .25rem;
+				   	}
+				   }
 				} /* layer */
 
 		    /*********************/
@@ -223,6 +235,12 @@ export default class WijitForm extends HTMLElement {
 			    wijit-form .success
 			    { background-color: var(--pass-color); }
 
+			    wijit-form input[type=range]::-webkit-slider-thumb
+			    { background-color: var(--accent-color); }
+
+			    wijit-form input[type=range]::-moz-range-thumb
+			    { background-color: var(--accent-color); }
+
 		    /********************************/
 		    /****** Borders / Outlines ******/
 		    /********************************/
@@ -245,7 +263,7 @@ export default class WijitForm extends HTMLElement {
 			    wijit-form option:last-child
 			    { border: none; }
 
-			    wijit-form input:user-valid:not([type="submit"]):not([type="reset"])
+			    wijit-form input:user-valid:not([type="submit"]):not([type="reset"]):not([type="range"])
 			    { border-color: var(--pass-color) }
 
 			    wijit-form :user-invalid
@@ -272,6 +290,12 @@ export default class WijitForm extends HTMLElement {
 					wijit-form .error,
 					wijit-form .success
 					{ border-radius: .5rem; }
+
+					wijit-form input[type=range]::-webkit-slider-thumb
+			    { border-radius: 50%; }
+
+			    wijit-form input[type=range]::-moz-range-thumb
+			    { border-radius: 50%; }
 
 					wijit-form input[type="radio"],
 					wijit-form input[type="radio"]::before
@@ -319,6 +343,10 @@ export default class WijitForm extends HTMLElement {
 			    wijit-form textarea
 			    { color: var(--text-color); }
 
+			    wijit-form .primary,
+			    wijit-form option:checked
+			    { color: var(--text-color-light); }
+
 			    wijit-form input:checked::before {
 			      color: var(--accent-color);
 			    }
@@ -344,12 +372,18 @@ export default class WijitForm extends HTMLElement {
 			    wijit-form label.required:after
 			    { font-size: small }
 
+			    wijit-form select:not([multiple]):not([size]) option {
+						font-size: larger;
+					}
+
 			    wijit-form button,
+			    wijit-form input[type="button"],
 			    wijit-form input[type="reset"],
 			    wijit-form input[type="submit"],
 			    wijit-form label,
 			    wijit-form legend,
 			    wijit-form option,
+			    wijit-form select,
 			    wijit-form .error,
 			    wijit-form .success
 			    { font-weight:bold; }
@@ -358,27 +392,60 @@ export default class WijitForm extends HTMLElement {
 			    wijit-form .success
 			    { text-align: center; }
 
+			    wijit-form .primary,
+			    wijit-form option:checked
+			    { text-shadow: 1px 1px 1px black; }
+
 		    /*********************/
 		    /****** Shadows ******/
 		    /*********************/
 
 			    wijit-form  button:hover,
+			    wijit-form input[type="button"]:hover,
+			    wijit-form input[type="image"]:hover,
 			    wijit-form input[type="submit"]:hover,
 			    wijit-form input[type="reset"]:hover,
 			    wijit-form option:hover
 			    { box-shadow: 2px 2px 5px black; }
 
 			    wijit-form button:active,
+			    wijit-form input[type="button"]:active,
+			    wijit-form input[type="image"]:active,
 			    wijit-form input[type="submit"]:active,
 			    wijit-form input[type="reset"]:active,
 			    wijit-form option:active,
 			    wijit-form option:checked
 			    { box-shadow: inset 2px 2px 5px black; }
 
+			    wijit-form input[type=range]::-webkit-slider-thumb:hover {
+		        box-shadow: 2px 2px 5px black;
+		      }
+
+		      wijit-form input[type=range]::-moz-range-thumb:hover {
+		        box-shadow: 2px 2px 5px black;
+		      }
+
+		      wijit-form input[type=range]:active::-webkit-slider-thumb {
+		        box-shadow: inset 2px 2px 5px black;
+		      }
+
+		      wijit-form input[type=range]:active::-moz-range-thumb {
+		        box-shadow: inset 2px 2px 5px black;
+		      }
+
+		      wijit-form input[type=range]:focus::-webkit-slider-thumb {
+		        box-shadow: inset 2px 2px 5px black;
+		      }
+
+		      wijit-form input[type=range]:focus::-moz-range-thumb {
+		        box-shadow: inset 2px 2px 5px black;
+		      }
+
 		    /*********************/
 		    /******* Cursor ******/
 		    /*********************/
 
+			    wijit-form input[type="button"],
 			    wijit-form input[type="checkbox"],
 			    wijit-form input[type="radio"],
 			    wijit-form input[type="color"],
@@ -401,16 +468,14 @@ export default class WijitForm extends HTMLElement {
 			    wijit-form button,
 			    wijit-form input[type=submit],
 			    wijit-form input[type=reset] {
-			    	margin: 1rem;
+			    	margin: var(--gap);
 			    }
 
-					wijit-form fieldset {
-						display: flex;
-						flex-direction: column;
-						flex-wrap: wrap;
-						gap: 0.5rem;
-						overflow: auto;
-				  	min-inline-size: 200px;
+			    wijit-form button,
+					wijit-form input {
+			    	min-height: var(--min);
+			    	min-width: var(--min);
+			    	padding: var(--pad);
 					}
 
 					wijit-form div {
@@ -418,8 +483,9 @@ export default class WijitForm extends HTMLElement {
 						display: flex;
 						flex-direction: column;
 						flex-wrap: wrap;
-						gap: 0.5rem;
+						gap: 0 var(--gap);
 						justify-content: center;
+						margin: 1rem 0;
 					}
 
 					wijit-form div.row
@@ -430,12 +496,21 @@ export default class WijitForm extends HTMLElement {
 					wijit-form section > *
 					{ flex: 1; }
 
-					wijit-form button,
-					wijit-form input {
-					max-height: var(--min);
-			    	min-height: var(--min);
-			    	min-width: var(--min);
-			    	padding: var(--pad);
+					wijit-form fieldset {
+						display: flex;
+						flex-direction: column;
+						flex-wrap: wrap;
+						gap: var(--gap);
+						overflow-x: hidden;
+						overflow-y: auto;
+						padding: var(--pad);
+				  	min-inline-size: var(--min-panel);
+					}
+
+					wijit-form header {
+						display: block;
+						flex-grow: 0;
+						flex-shrink: 0;
 					}
 
 					wijit-form hr {
@@ -490,25 +565,51 @@ export default class WijitForm extends HTMLElement {
 			    	width: var(--min);
 			    }
 
-			  	wijit-form input[type=range] {
-						-webkit-appearance: none;
-						-moz-appearance: none;
-						appearance: none;
-						inline-size: 100%;
-						min-height: 5px;
-						max-height: 5px;
-						max-width: 95%;
-					}
+			    wijit-form input[type=file]::file-selector-button {
+			    	background-color: var(--bg2-color);
+		    		border: 1px solid var(--border-color);
+		    		border-radius: .5rem;
+		    		color: var(--text-color);
+		    		font-weight: bold;
+		    		padding: var(--pad);
+			    }
 
-					wijit-form input[type="range"]::-webkit-slider-thumb {
-						width: 35px;
-						height: 35px;
-					}
+			    /***** Range *****/
 
-					wijit-form input[type="range"]::-moz-range-thumb {
-						width: 35px;
-						height: 35px;
-					}
+			    wijit-form div:has(input[type=range]) > label::after {
+			    	content: attr(data-value);
+			    	margin: 0 var(--gap);
+			    	font-weight: normal;
+			    }
+
+			    wijit-form input[type=range] {
+			    	appearance: none;
+			    	-webkit-appearance: none;
+		        width: 100%;
+		        cursor: pointer;
+		        outline: none;
+		        padding: 0;
+		        max-height: var(--pad);
+		        min-height: var(--pad);
+		      }
+
+		      wijit-form input[type=range]::-webkit-slider-thumb {
+		        -webkit-appearance: none;
+		        height: var(--min);
+		        width: var(--min);
+		      }
+
+		      wijit-form input[type=range]::-moz-range-thumb {
+		      	appearance: none;
+		        height: var(--min);
+		        width: var(--min);
+		      }
+
+		      /***** /Range *****/
+
+		      wijit-form div:has(input[type=range]) > label {
+		      	margin-bottom: var(--gap);
+		      }
 
 					wijit-form label {
 						flex: 0;
@@ -516,7 +617,7 @@ export default class WijitForm extends HTMLElement {
 					}
 
 					wijit-form option {
-						padding: 1rem;
+						padding: var(--pad);
 					}
 
 					wijit-form progress {
@@ -527,6 +628,12 @@ export default class WijitForm extends HTMLElement {
 						min-height: 1rem;
 					}
 
+					wijit-form div:has(progress) label::after {
+						content: attr(data-value);
+						font-weight: normal;
+						margin: 0 var(--gap);
+					}
+
 					wijit-form progress::-webkit-progress-value
 					{ min-height: 1rem; }
 
@@ -534,9 +641,10 @@ export default class WijitForm extends HTMLElement {
 						display: flex;
 						flex-direction: column;
 						flex-wrap: wrap;
-						gap: 0.5rem;
+						gap: var(--gap);
 						overflow: auto;
-				  	min-inline-size: 200px;
+						padding: var(--pad);
+				  	min-inline-size: var(--min-panel);
 					}
 
 					wijit-form section + section
@@ -545,7 +653,7 @@ export default class WijitForm extends HTMLElement {
 					wijit-form select {
 			    	min-height: var(--min);
 			    	min-width: var(--min);
-			    	padding: var(--pad);
+			    	overflow-y: auto;
 					}
 
 			    wijit-form textarea
@@ -562,15 +670,19 @@ export default class WijitForm extends HTMLElement {
 			    	vertical-align: super;
 			    }
 
-			    /* Classes */
+			   /**** Classes ****/
+
+					wijit-form .center > *,
+					wijit-form .start > *,
+					wijit-form .end > *,
+					wijit-form .space-around > *,
+					wijit-form .space-between > *
+					{ flex: 0 1 max-content; }
 
 					wijit-form .center {
 						justify-content: center;
-						align-content: center;
+						align-items: center;
 					}
-
-					wijit-form .center > *
-					{ flex: 1; }
 
 					wijit-form .end {
 						align-content: flex-end;
@@ -581,9 +693,6 @@ export default class WijitForm extends HTMLElement {
 						align-content: flex-start;
 						justify-content: flex-start;
 					}
-
-					wijit-form .end > *
-					{ flex: 1; }
 
 					wijit-form .nowrap
 					{ flex-wrap: nowrap}
@@ -597,19 +706,43 @@ export default class WijitForm extends HTMLElement {
 					wijit-form .row.reverse
 					{ flex-direction: row-reverse; }
 
-					wijit-form .start {
-						align-content: flex-start;
-						justify-content: flex-start;
+					wijit-form .space-around {
+						justify-content: space-around;
+						align-content: space-around;
 					}
+
+					wijit-form .space-between {
+						justify-content: space-between;
+
+					}
+
+					wijit-form .row.space-between {
+						align-content: space-between;
+					}
+
+					wijit-form .start {
+						/*align-content: flex-start;*/
+						/*justify-content: flex-start;*/
+					}
+
+					wijit-form .row.start {}
 
 					wijit-form .reverse.start {
 						align-content: flex-end;
 						justify-content: flex-end;
 					}
 
-					wijit-form .start > *
-					{ flex: 1; }
+					wijit-form .flex0 {
+						flex: 0;
+					}
 
+					wijit-form .flex1 {
+						flex: 1;
+					}
+
+					wijit-form .flex2 {
+						flex: 2;
+					}
 			</style>
 
 			<style>
@@ -626,7 +759,7 @@ export default class WijitForm extends HTMLElement {
 					font-size: large;
 					font-weight: bold;
 					outline-color: var(--accent-color);
-					padding: .5rem;
+					padding: var(--pad);
 				}
 
 				button:hover,
@@ -760,9 +893,15 @@ export default class WijitForm extends HTMLElement {
 		this.waitingElems = this.querySelectorAll('[slot=waiting]');
 
 		if ( !this.customCss ) this.addDefaultCss();
-		if ( this.form && !this.form.action.endsWith( 'false') ) {
+
+		this.handleRangeInputs( this.querySelectorAll( 'input[type=range]' ));
+
+		this.handleProgressElems( this.querySelectorAll( 'progress' ));
+
+		if ( this.form ) {
 			this.form.addEventListener('submit', (event) => this.submitData(event), {signal: this.mainAbortController.signal});
 		}
+
 		this.dialog.addEventListener( 'close', event => {
 			if ( this.reset ) this.resetFormElements( this.form );
 		}, { signal:this.mainAbortController.signal } );
@@ -811,6 +950,7 @@ export default class WijitForm extends HTMLElement {
 	 */
 	async submitData( event ) {
 		event.preventDefault();
+		if (event.target.action.endsWith( 'false')) return;
 		let url, result;
 		const data = new FormData ( event.target );
 		const accept = ( this.response === 'html' ) ? "text/html" : "application/json";
@@ -818,11 +958,11 @@ export default class WijitForm extends HTMLElement {
 
 		if (!this.testing) this.showDialog( this.waiting, null );
 
-		if ( event.target.action.indexOf( 'false' ) === -1 ) {
-			url = event.target.action;
-			this.#server = true;
-		} else {
+		if ( event.target.action.endsWith( 'test' ) ) {
 			this.#server = false;
+		} else {
+			this.#server = true;
+			url = event.target.action;
 		}
 
 		if ( options.method === 'GET' || options.method === 'HEAD' ) {
@@ -1237,6 +1377,64 @@ export default class WijitForm extends HTMLElement {
 		}
 	}
 
+	handleRangeInputs( collection ) {
+		if ( collection.length === 0 ) return;
+		for ( const input of collection ) {
+			const prog = (input.value / input.max) * 100;
+			const label = input.parentElement.querySelector('label');
+			const dval = input.getAttribute('data-value');
+
+			if (dval) {
+				const newval = dval.replace(/[\d]+/, input.value);
+				label.setAttribute('data-value', newval);
+			}
+
+			input.style.background = `linear-gradient(to right, var(--accent-color) ${prog}%, transparent ${prog}%)`;
+
+
+			input.addEventListener("input", (event) => {
+        const progress = (event.target.value / input.max) * 100;
+
+        if (dval) {
+	        const newval = dval.replace(/[\d]+/, input.value);
+					label.setAttribute('data-value', newval);
+        }
+
+        input.style.background = `linear-gradient(to right, var(--accent-color) ${progress}%, transparent ${progress}%)`;
+      });
+		}
+	}
+
+	handleProgressElems( collection ) {
+		if ( collection.length === 0 ) return;
+
+		const setLabel = function (elem) {
+			const label = elem.parentElement.querySelector('label');
+			const dval = elem.getAttribute('data-value');
+
+			if (dval) {
+				const newval = dval.replace(/[\d]+/, elem.value);
+				label.setAttribute('data-value', newval);
+			}
+		}
+
+		const observer = new MutationObserver((mutations) => {
+  		mutations.forEach((mutation) => {
+    		if (mutation.attributeName === "value") {
+      		const newValue = mutation.target.value;
+      		setLabel(mutation.target);
+    		}
+  		});
+		});
+
+		const config = { attributes: true, attributeFilter: ["value"] };
+
+		for ( const elem of collection ) {
+			setLabel (elem);
+			observer.observe(elem, config);
+		}
+	}
+
 	addDefaultCss() {
 		const style = document.head.querySelector('#wijit-form-css');
 		if (!style) document.head.append (this.defaultCss());
@@ -1408,7 +1606,117 @@ export default class WijitForm extends HTMLElement {
 	}
 }
 
+class WijitRange extends HTMLElement {
+  constructor() {
+    super();
+    this.shadow = this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    const track = document.createElement('div');
+    track.classList.add('track');
+
+    const thumb = document.createElement('div');
+    thumb.classList.add('thumb');
+
+    this.shadow.append(track, thumb);
+
+    this.min = this.hasAttribute('min') ? parseFloat(this.getAttribute('min')) : 0;
+    this.max = this.hasAttribute('max') ? parseFloat(getAttribute('max')) : 100;
+    this.value = this.hasAttribute('value') ? parseFloat(this.getAttribute('value')) : this.min;
+
+    thumb.addEventListener('mousedown', (event) => this.onMouseDown(event));
+
+    track.style.width = '100%';
+    track.style.height = '10px';
+    track.style.backgroundColor = '#ddd';
+    track.style.borderRadius = '5px';
+
+    thumb.style.position = 'absolute';
+    thumb.style.width = '20px';
+    thumb.style.height = '20px';
+    thumb.style.backgroundColor = 'blue';
+    thumb.style.borderRadius = '50%';
+    thumb.style.cursor = 'pointer';
+
+    this.updateThumbPosition();
+  }
+
+  onMouseDown(event) {
+    event.preventDefault();
+    this.dragging = true;
+
+    // Calculate initial offset relative to the thumb itself
+    const rect = this.shadow.querySelector('.thumb').getBoundingClientRect();
+    this.offsetX = event.clientX - rect.left;
+    this.offsetY = event.clientY - rect.top;
+  }
+
+  onMouseMove(event) {
+    if (!this.dragging) return;
+
+    const rect = this.shadow.getBoundingClientRect();
+    const clientX = event.clientX - this.offsetX;
+    const clientY = event.clientY - this.offsetY;
+
+    // Constrain movement within the shadow DOM boundaries
+    const leftLimit = 0;
+    const rightLimit = rect.width - this.shadow.querySelector('.thumb').offsetWidth;
+    const topLimit = 0; // Assuming vertical movement is not allowed
+    const bottomLimit = rect.height - this.shadow.querySelector('.thumb').offsetHeight;
+
+    let newLeft = Math.min(Math.max(clientX, leftLimit), rightLimit);
+    // Restrict top and bottom movement (assuming horizontal movement only)
+    const newTop = bottomLimit;
+
+    const percentageX = (newLeft - leftLimit) / (rightLimit - leftLimit);
+
+    // Update value based on horizontal movement
+    this.value = this.min + percentageX * (this.max - this.min);
+    this.updateThumbPosition(newLeft, newTop); // Pass calculated positions
+
+    // Dispatch an event to notify listeners about the change
+    const changeEvent = new CustomEvent('change', { detail: { value: this.value } });
+    this.dispatchEvent(changeEvent);
+  }
+
+  onMouseUp() {
+    this.dragging = false;
+    this.shadow.removeEventListener('mousemove', this.onMouseMove);
+    this.shadow.removeEventListener('mouseup', this.onMouseUp);
+  }
+
+  updateThumbPosition(left = null, top = null) {
+    const thumb = this.shadow.querySelector('.thumb');
+    if (left !== null) {
+      thumb.style.left = `${left}px`;
+    }
+    if (top !== null) {
+      thumb.style.top = `${top}px`;
+    } else {
+      const percentage = (this.value - this.min) / (this.max - this.min);
+      const thumbLeft = percentage * this.shadow.clientWidth;
+      thumb.style.left = `${thumbLeft}px`;
+    }
+  }
+
+  static get observedAttributes() {
+    return ['min', 'max', 'value'];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === 'min' || name === 'max' || name === 'value') {
+      this[name] = parseFloat(newValue);
+      this.updateThumbPosition();
+    }
+  }
+}
+
 
 document.addEventListener('DOMContentLoaded', customElements.define('wijit-form', WijitForm));
+
+if (!customElements.get('wijit-range')) {
+	document.addEventListener('DOMContentLoaded', customElements.define('wijit-range', WijitRange));
+}
 
 

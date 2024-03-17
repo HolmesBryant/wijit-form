@@ -6,6 +6,7 @@
     <title>Wijit-Form Web Component</title>
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="src/wijit-form.js"></script>
+    <script type="module" src="extra/wijit-code.js"></script>
     <script type="module" src="extra/wijit-icon01.js"></script>
 
     <!-----------------------------------------
@@ -31,377 +32,821 @@
                 --border: dimgray;
             }
         }
-
     </style>
 </head>
 <body>
+  <header>
+    <h1>Wijit-Form Web Component</h1>
+    <strong>Makes styling and configuring forms less time consuming</strong>
+  </header>
     <details>
-        <summary><h1>Wijit Form Web Component</h1></summary>
-            <article>
-            <p><a href="tests/test-attributes.html" target="_blank">Test Attribute Combinations</a></p>
-            <p><a href="tests/test-unit.html" target="_blank">Unit Tests</a></p>
-            <p><a href="docs/css-guide.html" target="_blank">Guide to styling Wijit Forms</a>
-            </article>
-        <article>
-        <p>This component serves as a convenience to make styling forms and configuring waiting effects and confirmation/error messages less time consuming.</p>
-
-        <h2>Features</h2>
-        <ul>
-        <li>Set custom "waiting", "success" and "error" messages.</li>
-        <li>Custom messages can be set by either attributes or slots.</li>
-        <li>Receive and display messages from the server sent in HTML or JSON format.</li>
-        <li>Choose whether the messages appear as a modal.</li>
-        <li>Set custom http headers and other fetch options, such as CORS etc.</li>
-        <li>Choose whether to reset the form when it is submitted.</li>
-        <li>Use the component's default css to style the form, or use your own styles.</li>
-        </ul>
-
-        <h2>Usage</h2>
-
-        <p>Add the script to your page:</p>
-        <pre><code>&lt;script type="module" src="/wijit-form.js"&gt;&lt;/script&gt;
-        </code></pre>
-
-        <p>Add the tag around your form:</p>
-        <pre><code>
-        &lt;wijit-form&gt;
-            &lt;form action="/some/url/"&gt;...&lt;/form&gt;
-        &lt;/wijit-form&gt;
-        </code></pre>
-
-        <h2>Description of Features</h2>
-        <h3>Custom Messages</h3>
-
-        <p>Instead of displaying the component's default messages, you can display whatever (HTML) message the server sends or you can display your own <strong><em>waiting</em></strong>, <strong><em>success</em></strong> and/or <strong><em>error</em></strong> messages. You may set these messages by either attributes or slots.</p>
-
-        <p>If you don't define a <strong><em>waiting</em></strong> message, the component's default message will display.</p>
-        <p>If you don't define a <strong><em>success</em></strong> and/or <strong><em>error</em></strong> message, the displayed message depends on the <strong><em>response</em></strong> attribute:</p>
-
-        <ul>
-        <li>If <strong><em>response</em></strong> is set to "json" (default), the component's default message will display.</li>
-        <li>If <strong><em>response</em></strong> is set to "html", the response from the server is displayed.</li>
-        </ul>
-
-        <p>If the server typically returns an HTML response and you simply wish to display whatever the server sends, you must set  the <strong><em>response</em></strong> attribute to "html".</p>
-
-        <pre><code>&lt;wijit-form response="html"&gt;...&lt;/wijit-form&gt;
-        </code></pre>
-
-        <h4>Custom Message via Attributes</h4>
-
-        <p>To set custom messages with attributes:</p>
-
-        <pre><code>
-        &lt;wijit-form
-        waiting="&lt;h1&gt;Waiting Message&lt;/h1&gt;"
-        success="&lt;h2&gt;Success&lt;/h2&gt;&lt;p&gt;message&lt;/p&gt;"
-        error="error message"&gt;
-        ...
-        &lt;/wijit-form&gt;
-        </code></pre>
-
-        <h4>Custom Message via Slots</h4>
-
-        <p>To set custom messages with slots:</p>
-        <pre><code>
-        &lt;wijit-form&gt;
-            &lt;form&gt;...&lt;/form&gt;
-            &lt;div slot="waiting" class="animated-icon"&gt;&lt;/div&gt;
-            &lt;div slot="success"&gt;&lt;h1&gt;Success!&lt;/h1&gt;&lt;p&gt;Thank You&lt;/p&gt;&lt;/div&gt;
-            &lt;p slot="error"&gt;An error occured&lt;/p&gt;
-        &lt;/wijit-form&gt;
-        </code></pre>
-
-        <h4>Placeholders</h4>
-
-        <p>If the server/script to which you submit the form returns responses in JSON format, you have the option to include placeholders in your custom "success" or "error" messages" which map to specific bits of data in the response.</p>
-        <p>For example, if the server sends back JSON data in the form of:</p>
-        <pre><code>
-        {
-            "status":"success",
-            "message":"Thank You",
-            "data": {
-                "name": "Foo"
-            }
-        }
-        </code></pre>
-
-        <p>You can write your custom success message as:</p>
-        <pre><code>
-        &lt;wijit-form success="{{message}} {{data.name}}"&gt;...&lt;/wijit-form&gt;
-        </code></pre>
-
-        <p>Or </p>
-        <pre><code>
-        &lt;wijit-form&gt;
-            &lt;form&gt;...&lt;/form&gt;
-            &lt;div slot="success"&gt;&lt;h1&gt;{{status}}&lt;/h1&gt;&lt;p&gt;Thanks {{data.name}}&lt;/p&gt;&lt;/div&gt;
-        &lt;/wijit-form&gt;
-        </code></pre>
-
-        <p>Since "json" is the default value of the "response" property, you don't need to add a "response" attribute manually.</p>
-
-        <h3>Modal vs Non-modal</h3>
-
-        <p>You may also set whether the messages appear as a modal. If you add the "modal" attribute, an overlay will appear over the entire screen and the waiting/success/error message will appear centered in the screen. If the modal attribute is absent, or if it is set to "false", the waiting/success/error messages will only appear over the form which was submitted.</p>
-
-        <p>To enable a modal dialog:</p>
-
-        <pre><code>
-        &lt;wijit-form modal&gt;...&lt;/wijit-form&gt;
-        </code></pre>
-
-        <h3>Custom Fetch Options</h3>
-
-        <p>This web component intercepts the form submission and sends the request to the server via fetch(). You may need to set custom http headers or other fetch options such as CORS directives. These options should be written in valid JSON syntax.</p>
-
-        <p>You do not need to set an "Accept" header. This is done automatically with the "response" attribute. If the value of "response" is "html" the "Accept" header is set to "text/html". If the value of the "response" attribute is "json" (default), the Accept header is set to "application/json".</p>
-
-        <p>To set a custom http header:</p>
-
-        <pre><code>
-        &lt;wijit-form
-        fetch-options="{headers:{"X-Requested-With":"XMLHttpRequest"}}"&gt;
-            ...
-        &lt;/wijit-form&gt;
-        </code></pre>
-
-        <p>If you have many custom fetch options, you may want to add them with javascript.</p>
-
-        <pre><code>
-        &lt;script&gt;
-            const component = document.querySelector("wijit-form");
-            // options should be a String!
-            const options = `{
-                headers: {...},
-                mode: "cors",
-                cache: "default"
-            }`;
-            component.setAttribute('fetch-options', options);
-        &lt;/script&gt;
-        </code></pre>
-
-        <h3>Reset Form</h3>
-
-        <p>By default, the form will reset on submission, if you do not want the form to reset, add the "reset-form" attribute with a value of "false".</p>
-
-        <pre><code>
-        &lt;wijit-form reset-form="false"&gt;...&lt;/wijit-form&gt;
-        </code></pre>
-
-        <h3>Custom CSS</h3>
-
-        <p>By default, the component styles the form and fields with it's own default css styles. If you wish to use your own styles, add this attribute. You may give the attribute a value of "true", or you may omit the value.</p>
-
-        <pre><code>
-        &lt;wijit-form custom-css&gt;...&lt;/wijit-form&gt;
-        </code></pre>
-
-        <h2>Attributes</h2>
-
-        <p>All of these attributes are optional</p>
-
-        <ul>
-            <li><strong>fetch-options (default: null)</strong> Acceptable values: [Any valid fetch option from: <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/fetch#options">The MDN Docs</a>]. This should be formatted as a valid JSON string. </li>
-
-            <li>User Supplied Confirmation Messages. These attributes accept strings. The string may contain HTML.
-                <ul>
-                    <li><strong>waiting (default: "<code>&lt;h1&gt;Please Wait...&lt;/h1&gt;</code>")</strong> Acceptable values: [any string] This is the message displayed after the form is submitted, while the page is waiting for a response from the server. </li>
-
-                    <li><strong>success (default: "<code>&lt;h3&gt;Submission Received&lt;/h3&gt;&lt;p&gt;Thank you!&lt;/p&gt;</code>")</strong> Acceptable values: [any string] This is the message displayed upon a successful response from the server, meaning the server sent an http status code lower than 400.</li>
-
-                    <li><strong>error (default: "<code>&lt;h3&gt;Oopsie!&lt;/h3&gt;&lt;p&gt;There was an error. Your submission was not received.&lt;/p&gt;</code>")</strong> Acceptable values: [any string] This is the message displayed when the server reports an error, meaning it sent an http status code greater than 399.</li>
-                </ul>
-            </li>
-
-            <li><strong>response (default: "json")</strong> Acceptable values: ["html", "json"] The Content Type expected from the server. </li>
-
-            <li><strong>modal (default: "false")</strong> Acceptable values: ["true", "false"] Whether to open the confirmation dialog as a modal. A modal dialog/overlay covers the entire screen. When this value is false, the confirmation dialog/overlay only covers the form which was submitted. </li>
-
-            <li><strong>reset-form (default: "true")</strong> Acceptable values: ["true", "false"] Whether to reset the form after it is submitted. </li>
-
-            <li><strong>custom-css (default: "false")</strong> Acceptable values: ["true", "false"] Whether to use your own custom css styles on the form instead of the default styles.
-                <ul>
-                    <li><a href="../docs/css-guide.html" target="_blank">Guide to using the default styles in your form</a></li>
-            </li>
-        </ul>
-        </article>
+      <summary>Instructions</summary>
+      <article id="instructions"></article>
     </details>
+    <section id="demo">
+      <wijit-form id="demo-form">
+        <form action="test">
+          <section class="row">
+            <section>
+              <div>
+                <label for="demo-fetchoptions">fetch-options</label>
+                <textarea
+                  id="demo-fetchoptions"
+                  oninput="change(event, 'fetch-options')"
+                  placeholder='Example: {headers:{"X-Requested-With":"XMLHttpRequest"}}'></textarea>
+              </div>
+            </section>
 
-    <section>
-        <header><h2>Demo</h2></header>
-        <wijit-form id="demo-form">
-            <form action="false">
-                <section class="row">
-                    <div>
-                        <label for="demo-fetchoptions">fetch-options</label>
-                        <textarea
-                            id="demo-fetchoptions"
-                            oninput="change(event, 'fetch-options')"
-                            placeholder="Example: {headers:{Accept:'text/html'}}"></textarea>
-                    </div>
+            <fieldset>
+            <legend>Custom Messages</legend>
+              <div>
+                <label for="demo-waiting">waiting</label>
+                <textarea id="demo-waiting" placeholder="Example: <h1>Waiting</h1>" oninput="change(event, 'waiting')"></textarea>
+              </div>
+              <div>
+                <label for="demo-success">success</label>
+                <textarea name="success" id="demo-success" placeholder="Example: <p>Thanks {{data.first}}</p> (Placeholders only work when response is 'json')" oninput="change(event, 'success')"></textarea>
+              </div>
+              <div>
+                <label for="demo-error">error</label>
+                <textarea id="demo-error" placeholder="Example: <h1>Nope!</h1><p>There was an error</p>" oninput="change(event, 'error')"></textarea>
+              </div>
+            </fieldset>
 
-                    <fieldset>
-                    <legend>Custom Messages</legend>
-                        <div>
-                            <label for="demo-waiting">waiting</label>
-                            <textarea id="demo-waiting" placeholder="Example: <h1>Waiting</h1>" oninput="change(event, 'waiting')"></textarea>
-                        </div>
-                        <div>
-                            <label for="demo-success">success</label>
-                            <textarea name="success" id="demo-success" placeholder="Example: <p>Thanks {{data.first}}</p> (Placeholders only work when response is 'json')" oninput="change(event, 'success')"></textarea>
-                        </div>
-                        <div>
-                            <label for="demo-error">error</label>
-                            <textarea id="demo-error" placeholder="Example: <h1>Nope!</h1><p>There was an error</p>" oninput="change(event, 'error')"></textarea>
-                        </div>
-                    </fieldset>
+            <section>
+              <fieldset class="row">
+              <legend>response</legend>
+                <div>
+                  <label for="demo-response-html">html</label>
+                  <input type="radio" name="response" value="html" id="demo-response-html" onchange="change(event, 'response')">
+                </div>
+                <div>
+                  <label for="demo-response-json">json</label>
+                  <input checked type="radio" name="response" value="json" id="demo-response-json" onchange="change(event, 'response')">
+                </div>
+                <div>
+                  <label for="demo-force-error">Force Error</label>
+                  <input type="checkbox" value="true" id="demo-force-error" onchange="change(event,'force-error')">
+                </div>
+              </fieldset>
 
-                    <section>
-                        <fieldset class="row">
-                        <legend>response</legend>
-                            <div class="row center">
-                                <div>
-                                    <label for="demo-response-html">html</label>
-                                    <input type="radio" name="response" value="html" id="demo-response-html" onchange="change(event, 'response')">
-                                </div>
-                                <div>
-                                    <label for="demo-response-json">json</label>
-                                    <input checked type="radio" name="response" value="json" id="demo-response-json" onchange="change(event, 'response')">
-                                </div>
-                            </div>
-                            <hr>
-                            <div>
-                                <label for="demo-force-error">Force Error</label>
-                                <input type="checkbox" value="true" id="demo-force-error" onchange="change(event,'force-error')">
-                            </div>
-                        </fieldset>
+              <fieldset class="row">
+              <legend>modal</legend>
+                <select size="2" onchange="change(event, 'modal')">
+                  <option>True</option>
+                  <option selected>False</option>
+                </select>
+              </fieldset>
 
-                        <fieldset class="row">
-                        <legend>modal</legend>
-                            <select size="2" onchange="change(event, 'modal')">
-                                <option>True</option>
-                                <option selected>False</option>
-                            </select>
+              <fieldset class="row">
+              <legend>reset</legend>
+                <select size="2" onchange="change(event, 'reset-form')">
+                  <option>True</option>
+                  <option selected>False</option>
+                </select>
+              </fieldset>
+            </section>
+          </section>
 
-                        </fieldset>
+          <section class="row center">
+            <div>
+              <label for="demo-name1">First</label>
+              <input name="first" id="demo-name1" autocomplete="given-name" value="Foo">
+            </div>
+            <div>
+              <label for="demo-name2">Last</label>
+              <input name="last" id="demo-name2" autocomplete="family-name">
+            </div>
 
-                        <fieldset class="row">
-                        <legend>reset</legend>
-                            <select size="2" onchange="change(event, 'reset-form')">
-                                <option>True</option>
-                                <option selected>False</option>
-                            </select>
-                        </fieldset>
-                    </section>
-                </section>
+            <div class="end">
+              <button class="primary">Submit</button>
+            </div>
+          </section>
+        </form>
+      </wijit-form>
+    </section>
 
-                <section class="row center">
-                    <div class="row">
-                        <label for="demo-name1">First</label>
-                        <input name="first" id="demo-name1" autocomplete="given-name" value="Foo">
-                    </div>
-                    <div class="row">
-                        <label for="demo-name2">Last</label>
-                        <input name="last" id="demo-name2" autocomplete="family-name">
-                    </div>
-
-                    <div class="end">
-                        <button class="primary">Submit</button>
-                    </div>
-                </section>
+    <section class="center" id="examples">
+      <header><h2>Examples</h2></header>
+      <article>
+        <header><h3>Basic Example</h3></header>
+        <wijit-form id="ex1">
+            <form action="test">
+                <div>
+                    <label for="ex1-name">Name</label>
+                    <input name="name" id="ex1-name" autocomplete="name" value="Foo">
+                </div>
+                <div>
+                    <label for="ex1-email">Email</label>
+                    <input type="email" name="email" id="ex1-email" autocomplete="email">
+                </div>
+                <button>Spam Me!</button>
             </form>
         </wijit-form>
+      </article>
+
+      <article>
+        <header><h3>HTML Response</h3></header>
+        <wijit-form response="html" id="ex2">
+            <form action="test">
+                <div>
+                    <label for="ex2-name">Name</label>
+                    <input name="name" id="ex2-name" autocomplete="name">
+                </div>
+                <div>
+                    <label for="ex2-email">Email</label>
+                    <input type="email" name="email" id="ex2-email" autocomplete="email">
+                </div>
+                <button>Spam Me!</button>
+            </form>
+        </wijit-form>
+      </article>
+
+      <article>
+        <header><h3>Custom Messages</h3></header>
+        <wijit-form id="ex3">
+            <form action="test">
+                <div>
+                    <label for="ex3-name" class="required">Name</label>
+                    <input required name="name" id="ex3-name" value="Foo" autocomplete="name">
+                </div>
+                <div>
+                    <label for="ex3-email">Email</label>
+                    <input type="email" name="email" id="ex3-email" autocomplete="email">
+                </div>
+                <button>Spame Me!</button>
+            </form>
+
+            <wijit-icon01 slot="waiting" animate color="lime" style="width:85%; margin:auto">Please Wait</wijit-icon01>
+            <div slot="success">
+                <h1>Success!</h1>
+                <p>Thank you {{data.name}}</p>
+            </div>
+            <div slot="error">
+                <h1>{{status}}</h1>
+                <p>Please seek help.</p>
+            </div>
+        </wijit-form>
+      </article>
+
+      <article>
+        <header><h3>Modal</h3></header>
+        <wijit-form modal id="ex4">
+            <form action="test">
+                <div>
+                    <label for="ex4-name">Name</label>
+                    <input name="name" id="ex4-name" autocomplete="name">
+                </div>
+                <div>
+                    <label for="ex4-email">Email</label>
+                    <input type="email" name="email" id="ex4-email" autocomplete="email">
+                </div>
+                <button>Spammie!</button>
+            </form>
+        </wijit-form>
+      </article>
     </section>
 
-    <section class="center">
-        <header><h2>Examples</h2></header>
-        <article>
-            <header><h3>Basic Example</h3></header>
-            <wijit-form id="ex1">
-                <form action="false">
-                    <div>
-                        <label for="ex1-name">Name</label>
-                        <input name="name" id="ex1-name" autocomplete="name" value="Foo">
-                    </div>
-                    <div>
-                        <label for="ex1-email">Email</label>
-                        <input type="email" name="email" id="ex1-email" autocomplete="email">
-                    </div>
-                    <button>Spam Me!</button>
-                </form>
+    <section class="center" id="code-samples">
+      <header><h2>Code Samples</h2></header>
+      <article>
+      <header><h3>Basic Input</h3></header>
+        <wijit-form action="false">
+          <div>
+            <label for="ex-basic">Label</label>
+            <input id="ex-basic" name="name">
+          </div>
+        </wijit-form>
+
+        <wijit-code highlight="html" indent="1">
+          <wijit-form>
+            <form>
+              <div>
+                <label>Label</label>
+                <input name="name">
+              </div>
+            </form>
+          </wijit-form>
+        </wijit-code>
+      </article>
+
+      <article>
+      <header><h3>Label on bottom</h3></header>
+        <wijit-form>
+          <form action="false">
+            <div class="reverse">
+              <label for="ex-rev">Label</label>
+              <input id="ex-rev" name="name">
+            </div>
+          </form>
+        </wijit-form>
+
+        <wijit-code highlight="html" indent="1">
+          <wijit-form>
+          <form>
+            <div class="reverse">
+              <label>label</label>
+              <input name="name">
+            </div>
+          </form>
+        </wijit-form>
+        </wijit-code>
+      </article>
+
+      <article>
+      <header><h3>Label beside input</h3></header>
+        <wijit-form>
+          <form action="false">
+            <div class="row">
+              <label for="ex-row">Label</label>
+              <input id="ex-row" name="name">
+            </div>
+          </form>
+        </wijit-form>
+
+        <wijit-code highlight="html" indent="1">
+          <wijit-form>
+          <form>
+            <div class="row">
+              <label>Label</label>
+              <input name="name">
+            </div>
+          </form>
+        </wijit-form>
+        </wijit-code>
+      </article>
+
+      <article>
+      <header><h3>Label reversed</h3></header>
+        <wijit-form>
+          <form action="false">
+            <div class="row reverse">
+              <label for="ex-row-rev">Label</label>
+              <input id="ex-row-rev" name="name">
+            </div>
+          </form>
+        </wijit-form>
+
+        <wijit-code highlight="html" indent="1">
+          <wijit-form>
+          <form>
+            <div class="row reverse">
+              <label>Label</label>
+              <input name="name">
+            </div>
+          </form>
+        </wijit-form>
+        </wijit-code>
+      </article>
+
+      <article>
+      <header><h3>Section</h3></header>
+        <wijit-form>
+          <form action="false">
+            <section>
+              <div>
+                <label for="f5f5800e">
+                  Name
+                </label>
+                <input
+                  id="f5f5800e"
+                  name="name">
+              </div>
+              <div>
+                <label for="91656a5d">
+                  Email
+                </label>
+                <input
+                  id="91656a5d"
+                  name="email">
+              </div>
+            </section>
+            <button class="primary">
+              Submit
+            </button>
+          </form>
+        </wijit-form>
+
+        <wijit-code highlight="html" indent="1">
+          <textarea>
+            <wijit-form>
+              <form>
+                <section>
+                  <div>
+                    <label for="ca847f03">
+                      Name
+                    </label>
+                    <input
+                      id="ca847f03"
+                      name="name">
+                  </div>
+                  <div>
+                    <label for="dfc79b2b">
+                      Email
+                    </label>
+                    <input
+                      id="dfc79b2b"
+                      name="email">
+                  </div>
+                </section>
+                <button class="primary">
+                  Submit
+                </button>
+              </form>
             </wijit-form>
-        </article>
+          </textarea>
+        </wijit-code>
+      </article>
 
-        <article>
-            <header><h3>HTML Response</h3></header>
-            <wijit-form response="html" id="ex2">
-                <form action="false">
-                    <div>
-                        <label for="ex2-name">Name</label>
-                        <input name="name" id="ex2-name" autocomplete="name">
-                    </div>
-                    <div>
-                        <label for="ex2-email">Email</label>
-                        <input type="email" name="email" id="ex2-email" autocomplete="email">
-                    </div>
-                    <button>Spam Me!</button>
-                </form>
+      <article class="wide">
+      <header><h3>Section (row)</h3></header>
+        <wijit-form>
+          <form action="false">
+            <section class="row">
+              <div>
+                <label for="f5f5800d">
+                  Name
+                </label>
+                <input
+                  id="f5f5800d"
+                  name="name">
+              </div>
+              <div>
+                <label for="91656a5e">
+                  Email
+                </label>
+                <input
+                  id="91656a5e"
+                  name="email">
+              </div>
+            </section>
+            <button class="primary">
+              Submit
+            </button>
+          </form>
+        </wijit-form>
+
+        <wijit-code highlight="html" indent="1">
+          <textarea>
+            <wijit-form>
+              <form>
+                <section>
+                  <div>
+                    <label for="ca847f03">
+                      Name
+                    </label>
+                    <input
+                      id="ca847f03"
+                      name="name">
+                  </div>
+                  <div>
+                    <label for="dfc79b2b">
+                      Email
+                    </label>
+                    <input
+                      id="dfc79b2b"
+                      name="email">
+                  </div>
+                </section>
+                <button class="primary">
+                  Submit
+                </button>
+              </form>
             </wijit-form>
-        </article>
+          </textarea>
+        </wijit-code>
+      </article>
 
-        <article>
-            <header><h3>Custom Messages</h3></header>
-            <wijit-form id="ex3">
-                <form action="false">
-                    <div>
-                        <label for="ex3-name" class="required">Name</label>
-                        <input required name="name" id="ex3-name" value="Foo" autocomplete="name">
-                    </div>
-                    <div>
-                        <label for="ex3-email">Email</label>
-                        <input type="email" name="email" id="ex3-email" autocomplete="email">
-                    </div>
-                    <button>Spame Me!</button>
-                </form>
+      <article>
+      <header><h3>Fieldset</h3></header>
+        <wijit-form>
+          <form action="false">
+            <fieldset>
+              <legend>Options</legend>
+              <div class="row reverse start">
+                <label for="c8c861a0">One</label>
+                <input type="checkbox" id="c8c861a0">
+              </div>
+              <div class="row reverse start">
+                <label for="8896dbd5">Two</label>
+                <input type="checkbox" id="8896dbd5">
+              </div>
+              <div class="row reverse start">
+                <label for="1582e189">Three</label>
+                <input type="checkbox" id="1582e189">
+              </div>
+            </fieldset>
+          </form>
+        </wijit-form>
 
-                <wijit-icon01 slot="waiting" animate color="lime" style="width:85%; margin:auto">Please Wait</wijit-icon01>
-                <div slot="success">
-                    <h1>Success!</h1>
-                    <p>Thank you {{data.name}}</p>
+        <wijit-code highlight="html">
+          <textarea>
+            <wijit-form>
+            <form>
+              <fieldset>
+                <legend>Options</legend>
+                <div class="row reverse start">
+                  <label for="60e5b1be">
+                    One
+                  </label>
+                  <input
+                    type="checkbox"
+                    id="60e5b1be">
                 </div>
-                <div slot="error">
-                    <h1>{{status}}</h1>
-                    <p>Please seek help.</p>
+                <div class="row reverse start">
+                  <label for="ee70c172">
+                    Two
+                  </label>
+                  <input
+                    type="checkbox"
+                    id="ee70c172">
                 </div>
-            </wijit-form>
-        </article>
+                <div class="row reverse start">
+                  <label for="bfdf343">
+                    Three
+                  </label>
+                  <input
+                    type="checkbox"
+                    id="bfdf343">
+                </div>
+              </fieldset>
+            </form>
+          </wijit-form>
+        </textarea>
+        </wijit-code>
+      </article>
 
-        <article>
-            <header><h3>Modal</h3></header>
-            <wijit-form modal id="ex4">
-                <form action="false">
-                    <div>
-                        <label for="ex4-name">Name</label>
-                        <input name="name" id="ex4-name" autocomplete="name">
-                    </div>
-                    <div>
-                        <label for="ex4-email">Email</label>
-                        <input type="email" name="email" id="ex4-email" autocomplete="email">
-                    </div>
-                    <button>Spammie!</button>
-                </form>
+      <article>
+      <header><h3>Fieldset (row)</h3></header>
+        <wijit-form>
+          <form action="false">
+            <fieldset class="row center">
+              <legend>Options</legend>
+              <div>
+                <label for="e12c5e3">One</label>
+                <input type="radio" id="e12c5e3" name="options">
+              </div>
+              <div>
+                <label for="db2f67d8">Two</label>
+                <input type="radio" id="db2f67d8" name="options">
+              </div>
+              <div>
+                <label for="edbeaef4">Three</label>
+                <input type="radio" id="edbeaef4" name="options">
+              </div>
+            </fieldset>
+          </form>
+        </wijit-form>
+
+        <wijit-code highlight="html" indent="1">
+          <textarea>
+            <wijit-form>
+              <form>
+                <fieldset class="row center">
+                  <legend>Options</legend>
+                  <div>
+                    <label for="fccd227f">
+                      One
+                    </label>
+                    <input
+                      type="radio"
+                      name="options"
+                      id="fccd227f">
+                  </div>
+                  <div>
+                    <label for="ac13608d">
+                      Two
+                    </label>
+                    <input
+                      type="radio"
+                      name="options"
+                      id="ac13608d">
+                  </div>
+                  <div>
+                    <label for="f225eac4">
+                      Three
+                    </label>
+                    <input
+                      type="radio"
+                      id="f225eac4"
+                      name="options">
+                  </div>
+                </fieldset>
+              </form>
             </wijit-form>
-        </article>
+          </textarea>
+        </wijit-code>
+      </article>
+
+      <article>
+      <header><h3>Fieldset (row)</h3></header>
+        <wijit-form>
+          <form action="false">
+            <fieldset class="row">
+              <legend>Options</legend>
+              <div class="end">
+                <label for="e12c5e4">One</label>
+                <input type="radio" id="e12c5e4" name="options">
+              </div>
+              <div class="start">
+                <label for="db2f67d7">Two</label>
+                <input type="radio" id="db2f67d7" name="options">
+              </div>
+              <div class="center">
+                <label for="edbeaef3">Three</label>
+                <input type="checkbox" id="edbeaef3">
+              </div>
+            </fieldset>
+          </form>
+        </wijit-form>
+
+        <wijit-code highlight="html" indent="1">
+          <textarea>
+            <wijit-form>
+            <form>
+              <fieldset class="row">
+                <legend>Options</legend>
+                <div class="end">
+                  <label for="e12c5e4">
+                    One
+                  </label>
+                  <input
+                    type="radio"
+                    name="options"
+                    id="e12c5e4">
+                </div>
+                <div class="start">
+                  <label for="db2f67d7">
+                    Two
+                  </label>
+                  <input
+                    type="radio"
+                    name="options"
+                    id="db2f67d7">
+                </div>
+                <div class="center">
+                  <label for="edbeaef3">
+                    Three
+                  </label>
+                  <input
+                    type="checkbox"
+                    id="edbeaef3">
+                </div>
+              </fieldset>
+            </form>
+          </wijit-form>
+        </textarea>
+        </wijit-code>
+      </article>
     </section>
 
+    <section>
+      <header>
+        <h2>Combining sections and fieldsets</h2>
+      </header>
+      <wijit-form>
+        <section class="row">
+          <fieldset>
+          <legend>Text(ish) Inputs</legend>
+            <div>
+              <label for="aa64">Text</label>
+              <input id="aa64" placeholder="Enter some text">
+            </div>
+
+            <div>
+              <label for="ede30c85">Search</label>
+              <input type="search" id="ede30c85">
+            </div>
+
+            <div>
+              <label for="df93">Password</label>
+              <input type="password" id="df93" value="password">
+            </div>
+
+            <div>
+              <label for="a4abf1e3">Telephone</label>
+              <input type="tel" id="a4abf1e3" value="(123)456-7890">
+            </div>
+
+            <div>
+              <label for="b3368483">URL</label>
+              <input type="url" id="b3368483" value="https://foo.com">
+            </div>
+
+            <div>
+              <label for="ff53eab6">Email</label>
+              <input type="email" id="ff53eab6" value="foo@bar">
+            </div>
+
+            <div>
+              <label for="bdece97e">Number</label>
+              <input type="number" id="bdece97e">
+            </div>
+
+
+            <div>
+              <label for="a1539947">Textarea</label>
+              <textarea id="a1539947"></textarea>
+            </div>
+          </fieldset>
+
+          <fieldset class="start">
+          <legend>Date / Time Inputs</legend>
+            <div>
+              <label for="def74cf1">Date</label>
+              <input type="date" id="def74cf1" value="1970-01-01">
+            </div>
+
+            <div>
+              <label for="efbe5d51">Time</label>
+              <input type="time" id="efbe5d51">
+            </div>
+
+            <div>
+              <label for="ba00bdb9">DateTime Local</label>
+              <input type="datetime-local" id="ba00bdb9">
+            </div>
+
+            <div>
+              <label for="a1f2f4f0">Week</label>
+              <input type="week" id="a1f2f4f0">
+            </div>
+
+            <div>
+              <label for="b6487e66">Month</label>
+              <input type="month" id="b6487e66">
+            </div>
+          </fieldset>
+
+          <fieldset class="space-between">
+          <legend>Select / Checkbox</legend>
+            <div>
+              <label for="a5959a51">Select</label>
+              <select id="a5959a51">
+                <option>One</option>
+                <option>Two</option>
+                <option>Three</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="c93a1aad">Select Multi</label>
+              <select multiple id="c93a1aad" size="3">
+                <option selected>One</option>
+                <option>Two</option>
+                <option selected>Three</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="be34f8f">Select Switch</label>
+              <select id="be34f8f" size="2">
+                <option>One</option>
+                <option selected>Two</option>
+              </select>
+            </div>
+
+            <section>
+              <header><b>Checkboxes</b></header>
+              <section class="row space-around">
+                <div>
+                  <label for="aba9260">One</label>
+                  <input checked type="checkbox" id="aba9260">
+                </div>
+
+                <div>
+                  <label for="ddb4a5cc">Two</label>
+                  <input type="checkbox" id="ddb4a5cc">
+                </div>
+
+                <div>
+                  <label for="deee620b">Three</label>
+                  <input type="checkbox" id="deee620b">
+                </div>
+              </section>
+            </section>
+          </fieldset><!-- select/checkboxes -->
+
+          <fieldset class="space-around">
+          <legend>Button / Radio</legend>
+            <fieldset class="row center">
+            <legend>Buttons</legend>
+              <div>
+                <button class="primary">Primary Button</button>
+              </div>
+
+              <div>
+                <button>Normal Button</button>
+              </div>
+
+              <div>
+                <input type="button" id="b799e58" value="Input type=button">
+              </div>
+
+              <div>
+                <label for="d3cfa9a8">Input (image)</label>
+                <input type="image" id="d3cfa9a8" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Scooter" alt="an image input">
+              </div>
+
+              <div>
+                <label aria-hidden="true">
+                  Submit and Reset Inputs
+                </label>
+                <div class="row">
+                  <input id="a06c4030" type="submit">
+                  <input id="abb2" type="reset">
+                </div>
+              </div>
+            </fieldset> <!-- buttons -->
+
+            <fieldset class="row space-between">
+            <legend>Radio Inputs</legend>
+              <div>
+                <label for="fe64">One</label>
+                <input type="radio" name="radio">
+              </div>
+
+              <div>
+                <label for="a073ddec">Two</label>
+                <input checked type="radio" id="a073ddec" name="radio">
+              </div>
+
+              <div>
+                <label for="b629">Three</label>
+                <input type="radio" id="b629" name="radio">
+              </div>
+            </fieldset> <!-- radio inputs -->
+          </fieldset><!-- buttons/radios -->
+        </section>
+
+        <fieldset>
+        <legend>Other Inputs</legend>
+          <section class="row space-around">
+            <div>
+              <label for="aa67">Color</label>
+              <input type="color" id="aa67">
+            </div>
+
+            <div>
+              <label for="bf78">File</label>
+              <input type="file" id="bf78">
+            </div>
+
+            <div>
+              <label for="f3c1ea4f">Range</label>
+              <input type="range" id="f3c1ea4f" min="0" max="100" value="75" data-value="$0">
+            </div>
+          </section>
+
+            <div>
+              <label for="fb95f04f">Progress</label>
+              <progress
+                id="fb95f04f"
+                max="100"
+                value="75"
+                data-value="0 Hamburgers Served!">
+              </progress>
+            </div>
+
+            <div>
+              <label for="f3c1ea4g">Range</label>
+              <input type="range" id="f3c1ea4g" min="0" max="100" value="75" data-value="0 cm">
+            </div>
+        </fieldset>
+
+      </wijit-form>
+
+      <wijit-code highlight="html" style="--indent:1rem">
+        <textarea>
+        <wijit-form>
+          <form>
+            ...todo
+          </form>
+        </wijit-form>
+        </textarea>
+      </wijit-code>
+    </section>
 
     <script>
-        function change (event, attr) {
-            const elem = document.querySelector('#demo-form');
-            const value = (attr === 'force-error') ? event.target.checked : event.target.value;
-            elem.setAttribute(attr, value);
-        }
+      function change (event, attr) {
+        const elem = document.querySelector('#demo-form');
+        const value = (attr === 'force-error') ? event.target.checked : event.target.value;
+        elem.setAttribute(attr, value);
+      }
+
+      /**
+       * Grab the README file and stick it in the "instructions" container
+       */
+      function getReadme () {
+        const elem = document.querySelector('#instructions');
+        fetch ('./README.md')
+        .then (response => response.text())
+        .then (text => {
+          elem.textContent = text;
+        });
+      }
+
+      getReadme();
     </script>
 </body>
 </html>
