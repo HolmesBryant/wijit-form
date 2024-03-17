@@ -138,6 +138,16 @@ If you have many custom fetch options, you may want to add them with javascript.
 	</script>
 				
 
+OR
+
+	<script>
+		customElements.whenDefined('wijit-form')
+		.then( () => {
+			const elem = document.querySelector('wijit-form');
+			elem.fetchOptions = {...};
+		});
+	</script>
+
 ## Reset Form ##
 
 By default, the form will reset on submission, if you do not want the form to reset, add the "reset-form" attribute with a value of "false".

@@ -1359,10 +1359,8 @@ export default class WijitForm extends HTMLElement {
 	 */
 	validateJson( string ) {
 		try {
-			// Attempt parsing directly, avoiding unnecessary regex replacement
 			return JSON.parse(string);
 		} catch (error) {
-			// If parsing fails, attempt minimal adjustments and try again
 			try {
 				// Remove problematic characters while preserving essential quotes
 				const adjustedString = string
@@ -1480,7 +1478,10 @@ export default class WijitForm extends HTMLElement {
 	 */
 	get fetchOptions() { return this.#fetchOptions; }
 	set fetchOptions( value ) {
-		value = this.validateJson(value);
+		if (typeof value === 'string') {
+			value = this.validateJson(value);
+		}
+
 		if (value === null) {
 			this.#fetchOptions = {};
 		} else {
@@ -1494,8 +1495,8 @@ export default class WijitForm extends HTMLElement {
 	get forceError() { return this.#forceError; }
 
 	/**
-	 * @summary Adds to the form a hidden input having a name of "fail"
-	 * @description If you use this, make sure the server script handles it and returns an http status code greater than 399.
+	 * Adds to the form a hidden input having a name of "fail"
+	 * @remarks If you use this, make sure the server script handles it and returns an http status code greater than 399.
 	 * @param  {string} value Empty string or "true" for true, any other string for false
 	 */
 	set forceError( value ) {
@@ -1606,117 +1607,6 @@ export default class WijitForm extends HTMLElement {
 	}
 }
 
-class WijitRange extends HTMLElement {
-  constructor() {
-    super();
-    this.shadow = this.attachShadow({ mode: 'open' });
-  }
-
-  connectedCallback() {
-    const track = document.createElement('div');
-    track.classList.add('track');
-
-    const thumb = document.createElement('div');
-    thumb.classList.add('thumb');
-
-    this.shadow.append(track, thumb);
-
-    this.min = this.hasAttribute('min') ? parseFloat(this.getAttribute('min')) : 0;
-    this.max = this.hasAttribute('max') ? parseFloat(getAttribute('max')) : 100;
-    this.value = this.hasAttribute('value') ? parseFloat(this.getAttribute('value')) : this.min;
-
-    thumb.addEventListener('mousedown', (event) => this.onMouseDown(event));
-
-    track.style.width = '100%';
-    track.style.height = '10px';
-    track.style.backgroundColor = '#ddd';
-    track.style.borderRadius = '5px';
-
-    thumb.style.position = 'absolute';
-    thumb.style.width = '20px';
-    thumb.style.height = '20px';
-    thumb.style.backgroundColor = 'blue';
-    thumb.style.borderRadius = '50%';
-    thumb.style.cursor = 'pointer';
-
-    this.updateThumbPosition();
-  }
-
-  onMouseDown(event) {
-    event.preventDefault();
-    this.dragging = true;
-
-    // Calculate initial offset relative to the thumb itself
-    const rect = this.shadow.querySelector('.thumb').getBoundingClientRect();
-    this.offsetX = event.clientX - rect.left;
-    this.offsetY = event.clientY - rect.top;
-  }
-
-  onMouseMove(event) {
-    if (!this.dragging) return;
-
-    const rect = this.shadow.getBoundingClientRect();
-    const clientX = event.clientX - this.offsetX;
-    const clientY = event.clientY - this.offsetY;
-
-    // Constrain movement within the shadow DOM boundaries
-    const leftLimit = 0;
-    const rightLimit = rect.width - this.shadow.querySelector('.thumb').offsetWidth;
-    const topLimit = 0; // Assuming vertical movement is not allowed
-    const bottomLimit = rect.height - this.shadow.querySelector('.thumb').offsetHeight;
-
-    let newLeft = Math.min(Math.max(clientX, leftLimit), rightLimit);
-    // Restrict top and bottom movement (assuming horizontal movement only)
-    const newTop = bottomLimit;
-
-    const percentageX = (newLeft - leftLimit) / (rightLimit - leftLimit);
-
-    // Update value based on horizontal movement
-    this.value = this.min + percentageX * (this.max - this.min);
-    this.updateThumbPosition(newLeft, newTop); // Pass calculated positions
-
-    // Dispatch an event to notify listeners about the change
-    const changeEvent = new CustomEvent('change', { detail: { value: this.value } });
-    this.dispatchEvent(changeEvent);
-  }
-
-  onMouseUp() {
-    this.dragging = false;
-    this.shadow.removeEventListener('mousemove', this.onMouseMove);
-    this.shadow.removeEventListener('mouseup', this.onMouseUp);
-  }
-
-  updateThumbPosition(left = null, top = null) {
-    const thumb = this.shadow.querySelector('.thumb');
-    if (left !== null) {
-      thumb.style.left = `${left}px`;
-    }
-    if (top !== null) {
-      thumb.style.top = `${top}px`;
-    } else {
-      const percentage = (this.value - this.min) / (this.max - this.min);
-      const thumbLeft = percentage * this.shadow.clientWidth;
-      thumb.style.left = `${thumbLeft}px`;
-    }
-  }
-
-  static get observedAttributes() {
-    return ['min', 'max', 'value'];
-  }
-
-  attributeChangedCallback(name, oldValue, newValue) {
-    if (name === 'min' || name === 'max' || name === 'value') {
-      this[name] = parseFloat(newValue);
-      this.updateThumbPosition();
-    }
-  }
-}
-
-
 document.addEventListener('DOMContentLoaded', customElements.define('wijit-form', WijitForm));
-
-if (!customElements.get('wijit-range')) {
-	document.addEventListener('DOMContentLoaded', customElements.define('wijit-range', WijitRange));
-}
 
 
