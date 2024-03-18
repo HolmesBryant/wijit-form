@@ -191,9 +191,19 @@ By default, the form will reset on submission, if you do not want the form to re
 
 	<wijit-form reset-form="false">...</wijit-form>
 
+## Range Input and Progress Elements ##
+
+Range inputs and progress elements can have their values displayed after the label (if you follow the conventions for using the default css).
+
+In addition to providing a value attribute, also add a data-value attribute whose value contains a number (such as 0) and some text (such as a measurement). The number will be replaced by the value of the range or progress element.
+
+    <input type="range" value="50.00" step=".01" data-value="$0">
+    <input type="range" value="50" data-value="0 cm">
+    <progress value="50" data-value="0 Widgets Served!!">
+
 ## Custom CSS ##
 
-By default, the component styles the form and fields with it's own default css styles. If you wish to use your own styles, add this attribute. You may give the attribute a value of "true", or you may omit the value.
+By default, the component styles the form and fields with it's own default css styles. If you wish to use your own styles, add this attribute. You may give the attribute a value of "true", or you may omit the value. This will prevent the component from inserting its own css into the document head.
 
 	<wijit-form custom-css>...</wijit-form>
 
