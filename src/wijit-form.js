@@ -151,7 +151,7 @@ export default class WijitForm extends HTMLElement {
 				@layer wijit-form {
 
 					wijit-form {
-				    --accent-color: orange;
+				    --accent-color: dodgerblue;
 				    --bg1-color: rgb(250,250,250);
 				    --bg2-color: rgb(245,245,245);
 				    --bg3-color: white;
@@ -163,7 +163,7 @@ export default class WijitForm extends HTMLElement {
 				    --text-color-dark: rgb(40,40,40);
 				    --gap: .5rem;
 				    --min: 35px;
-				    --min-panel: 260px;
+				    --min-panel: 270px;
 				    --pad: .5rem;
 
 				    background-color: var(--bg1-color);
@@ -189,14 +189,21 @@ export default class WijitForm extends HTMLElement {
 			        --border-color: dimgray;
 			        --text-color: rgb(240,240,240);
 				 		}
-				   }
+				  }
 
-				   @media only screen and (max-width: 380px) {
+				  @media only screen and (max-width: 1024px) {
 				   	wijit-form {
-				   		--pad: 0;
+				   		--pad: .25rem;
 				   		--gap: .25rem;
 				   	}
-				   }
+				  }
+
+				  @media only screen and (max-width: 380px) {
+				   	wijit-form {
+				   		--pad: 0;
+				   		--gap: 5px;
+				   	}
+				  }
 				} /* layer */
 
 		    /*********************/
@@ -211,7 +218,6 @@ export default class WijitForm extends HTMLElement {
 			    wijit-form button,
 			    wijit-form input,
 			    wijit-form input::before,
-			    wijit-form progress,
 			    wijit-form select,
 			    wijit-form textarea
 			    { background-color: var(--bg3-color); }
@@ -222,6 +228,12 @@ export default class WijitForm extends HTMLElement {
 			    wijit-form .primary,
 			    wijit-form option:checked
 			    { background-color: var(--accent-color); }
+
+			    wijit-form progress
+			    { background-color: transparent; }
+
+			    wijit-form progress::-webkit-progress-bar
+			    { background: transparent; }
 
 			    wijit-form progress::-webkit-progress-value
 			    { background-color: var(--accent-color); }
@@ -323,7 +335,7 @@ export default class WijitForm extends HTMLElement {
 		    /*********** Accent ***********/
 		    /******************************/
 
-			    wijit-form input,
+			    wijit-form input
 			    { accent-color: var(--accent-color); }
 
 		    /******************************/
@@ -574,7 +586,7 @@ export default class WijitForm extends HTMLElement {
 		    		padding: var(--pad);
 			    }
 
-			    /***** Range *****/
+			    /***** Input Range *****/
 
 			    wijit-form div:has(input[type=range]) > label::after {
 			    	content: attr(data-value);
@@ -617,7 +629,8 @@ export default class WijitForm extends HTMLElement {
 					}
 
 					wijit-form option {
-						padding: var(--pad);
+						padding: 1rem;
+						min-height: var(--min);
 					}
 
 					wijit-form progress {
@@ -684,6 +697,10 @@ export default class WijitForm extends HTMLElement {
 						align-items: center;
 					}
 
+					wijit-form section.row.center {
+						align-items: normal;
+					}
+
 					wijit-form .end {
 						align-content: flex-end;
 						justify-content: flex-end;
@@ -719,13 +736,6 @@ export default class WijitForm extends HTMLElement {
 					wijit-form .row.space-between {
 						align-content: space-between;
 					}
-
-					wijit-form .start {
-						/*align-content: flex-start;*/
-						/*justify-content: flex-start;*/
-					}
-
-					wijit-form .row.start {}
 
 					wijit-form .reverse.start {
 						align-content: flex-end;

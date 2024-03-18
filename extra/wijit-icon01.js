@@ -1,3 +1,7 @@
+/**
+ * @author Holmes Bryant <webbmaastaa@gmail.com>
+ * @license GPL-3.0
+ */
 export default class WijitIcon01 extends HTMLElement {
 	#animate = false;
 	#color = 'black';

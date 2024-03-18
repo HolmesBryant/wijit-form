@@ -24,7 +24,7 @@ Demo: [https://holmesbryant.github.io/wijit-form/](https://holmesbryant.github.i
 - Set custom "waiting", "success" and "error" messages.
 - Custom messages can be set by either attributes or slots.
 - Receive and display messages from the server sent in HTML or JSON format.
-- Choose whether the messages appear as a modal.
+- Choose whether confirmation/error messages appear as a modal.
 - Set custom http headers and other fetch options, such as CORS etc.
 - Choose whether to reset the form when it is submitted.
 - Use the component's default css to style the form, or use your own styles.
@@ -40,6 +40,43 @@ Add the tag around your form:
 		<form action="/some/url/">...</form>
 	</wijit-form>
 
+## Attributes ##
+
+All of these attributes are optional
+
+- **fetch-options** (default: null)
+    - Acceptable values: [Any valid fetch option from: <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/fetch#options">The MDN Docs</a>].
+    - This should be formatted as a valid JSON string.
+
+- **Confirmation Messages.** These attributes accept strings. The string may contain HTML.
+
+  - **waiting** (default: "`<h1>Please Wait...</h1>`")
+      - Acceptable values: [any string]
+      - This is the message displayed after the form is submitted, while the page is waiting for a response from the server.
+
+   - **success** (default: "`<h3>Submission Received</h3><p>Thank you!</p>`")
+       - Acceptable values: [any string]
+       - This is the message displayed upon a successful response from the server, meaning the server sent an http status code lower than 400.
+
+   - **error** (default: "`<h3>Oopsie!</h3><p>There was an error. Your submission was not received.</p>`")
+       - Acceptable values: [any string]
+       - This is the message displayed when the server reports an error, meaning it sent an http status code greater than 399.
+
+- **response** (default: "json")
+    - Acceptable values: ["html", "json"]
+    - The Content Type expected from the server.
+
+- **modal** (default: "false")
+    - Acceptable values: ["true", "false"]
+    - Whether to open the confirmation dialog as a modal. A modal dialog/overlay covers the entire screen. When this value is false, the confirmation dialog/overlay only covers the form which was submitted.
+
+- **reset-form** (default: "true")
+    - Acceptable values: ["true", "false"]
+    - Whether to reset the form after it is submitted.
+
+- **custom-css** (default: "false")
+    - Acceptable values: ["true", "false"]
+    - Whether to use your own custom css styles on the form instead of the default styles.
 
 ## Custom Messages
 
@@ -160,42 +197,34 @@ By default, the component styles the form and fields with it's own default css s
 
 	<wijit-form custom-css>...</wijit-form>
 
+## Using the Default CSS ##
 
-## Attributes ##
+The default CSS uses flexbox for layout.
 
-All of these attributes are optional
+It is necessary to follow some conventions in order to use the default styles successfully.
 
-- **fetch-options** (default: null)
-    - Acceptable values: [Any valid fetch option from: <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/fetch#options">The MDN Docs</a>].
-    - This should be formatted as a valid JSON string.
-
-- **Confirmation Messages.** These attributes accept strings. The string may contain HTML.
-
-  - **waiting** (default: "`<h1>Please Wait...</h1>`")
-      - Acceptable values: [any string]
-      - This is the message displayed after the form is submitted, while the page is waiting for a response from the server.
-
-   - **success** (default: "`<h3>Submission Received</h3><p>Thank you!</p>`")
-       - Acceptable values: [any string]
-       - This is the message displayed upon a successful response from the server, meaning the server sent an http status code lower than 400.
-
-   - **error** (default: "`<h3>Oopsie!</h3><p>There was an error. Your submission was not received.</p>`")
-       - Acceptable values: [any string]
-       - This is the message displayed when the server reports an error, meaning it sent an http status code greater than 399.
-
- 
-- **response** (default: "json")
-    - Acceptable values: ["html", "json"]
-    - The Content Type expected from the server.
-
-- **modal** (default: "false")
-    - Acceptable values: ["true", "false"]
-    - Whether to open the confirmation dialog as a modal. A modal dialog/overlay covers the entire screen. When this value is false, the confirmation dialog/overlay only covers the form which was submitted.
-
-- **reset-form** (default: "true")
-    - Acceptable values: ["true", "false"]
-    - Whether to reset the form after it is submitted.
-
-- **custom-css** (default: "false")
-    - Acceptable values: ["true", "false"]
-    - Whether to use your own custom css styles on the form instead of the default styles.
+- Place everything in one of the following elements:
+    - div
+    - fieldset
+    - section
+- Place each label/input combination in a div.
+    - Always place the label before the input.
+    - By default, the label will appear above the input.
+    - To place the label under the input, add `class="reverse"` to the containing div.
+    - To place the label beside the input, add `class="row"` to the containing div.
+    - To place the label beside the input, but after it, add `class="row reverse"` to the containing div.
+- sections and fieldsets are meant to hold a group of controls.
+    - By default, all controls inside section and fieldset tags are stacked vertically.
+    - To place these items side-by-side, add `class="row"` to the containing section or fieldset.
+- You can nest sections and fieldsets.
+- Additional css classes are also provided. These are:
+    - "center" : Prevents children from stretching and centers them in the container.
+	- "start" : Prevents children from stretching and stacks them at the start of the container.
+	- "end" : Prevents children from stretching and stacks them at the end of the container.
+	- "space-around" : Behaves like the css property `space-around`
+	- "space-between" : behaves like the css property `space-between`
+	- "nowrap" : Prevents children from wrapping to a new row.
+	- "flex0" : Sets flex:0 on the element
+	- "flex1" : Sets flex:1 on the element
+	- "flex2" : Sets flex:2 on the element
+- Any element that is not an input, select, textarea, label, progress, fieldset or section may need custom css.

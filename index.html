@@ -6,38 +6,38 @@
     <title>Wijit-Form Web Component</title>
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="src/wijit-form.js"></script>
-    <script type="module" src="extra/wijit-code.js"></script>
+    <script type="module" src="extra/wijit-code.min.js"></script>
     <script type="module" src="extra/wijit-icon01.js"></script>
 
     <!-----------------------------------------
      You can change the colors of the form by changing the values of these css variables
     ------------------------------------------->
     <style>
-        wijit-form {
-            --bg1: rgb(250,250,250);
-            --bg2: rgb(245,245,245);
-            --bg3: white;
-            --text: rgb(60,60,60);
-            --border: silver;
-            --fail: hsl(6, 93%, 80%);
-            --pass: hsl(112, 70%, 75%);
-            --accent: lightskyblue;
+      wijit-form {
+        --bg1: rgb(250,250,250);
+        --bg2: rgb(245,245,245);
+        --bg3: white;
+        --text: rgb(60,60,60);
+        --border: silver;
+        --fail: hsl(6, 93%, 80%);
+        --pass: hsl(112, 70%, 75%);
+        --accent: lightskyblue;
 
-            @media (prefers-color-scheme: dark) {
-                --text: rgb(240,240,240);
-                --bg1: rgb(35,35,35);
-                --bg2: rgb(40,40,40);
-                --bg3: rgb(60,60,60);
-                --accent: dodgerblue;
-                --border: dimgray;
-            }
+        @media (prefers-color-scheme: dark) {
+            --text: rgb(240,240,240);
+            --bg1: rgb(35,35,35);
+            --bg2: rgb(40,40,40);
+            --bg3: rgb(60,60,60);
+            --accent: dodgerblue;
+            --border: dimgray;
         }
+      }
     </style>
 </head>
 <body>
   <header>
     <h1>Wijit-Form Web Component</h1>
-    <strong>Makes styling and configuring forms less time consuming</strong>
+    <p>Makes styling and configuring forms less time consuming</p>
   </header>
     <details>
       <summary>Instructions</summary>
@@ -126,183 +126,198 @@
       </wijit-form>
     </section>
 
-    <section class="center" id="examples">
+    <section>
       <header><h2>Examples</h2></header>
-      <article>
-        <header><h3>Basic Example</h3></header>
-        <wijit-form id="ex1">
-            <form action="test">
-                <div>
-                    <label for="ex1-name">Name</label>
-                    <input name="name" id="ex1-name" autocomplete="name" value="Foo">
-                </div>
-                <div>
-                    <label for="ex1-email">Email</label>
-                    <input type="email" name="email" id="ex1-email" autocomplete="email">
-                </div>
-                <button>Spam Me!</button>
-            </form>
-        </wijit-form>
-      </article>
+      <section class="row" id="examples">
+        <article>
+          <header><h3>Basic Example</h3></header>
+          <wijit-form id="ex1">
+              <form action="test">
+                  <div>
+                      <label for="ex1-name">Name</label>
+                      <input name="name" id="ex1-name" autocomplete="name" value="Foo">
+                  </div>
+                  <div>
+                      <label for="ex1-email">Email</label>
+                      <input type="email" name="email" id="ex1-email" autocomplete="email">
+                  </div>
+                  <button>Spam Me!</button>
+              </form>
+          </wijit-form>
+        </article>
 
-      <article>
-        <header><h3>HTML Response</h3></header>
-        <wijit-form response="html" id="ex2">
-            <form action="test">
-                <div>
-                    <label for="ex2-name">Name</label>
-                    <input name="name" id="ex2-name" autocomplete="name">
-                </div>
-                <div>
-                    <label for="ex2-email">Email</label>
-                    <input type="email" name="email" id="ex2-email" autocomplete="email">
-                </div>
-                <button>Spam Me!</button>
-            </form>
-        </wijit-form>
-      </article>
+        <article>
+          <header><h3>HTML Response</h3></header>
+          <wijit-form response="html" id="ex2">
+              <form action="test">
+                  <div>
+                      <label for="ex2-name">Name</label>
+                      <input name="name" id="ex2-name" autocomplete="name">
+                  </div>
+                  <div>
+                      <label for="ex2-email">Email</label>
+                      <input type="email" name="email" id="ex2-email" autocomplete="email">
+                  </div>
+                  <button>Spam Me!</button>
+              </form>
+          </wijit-form>
+        </article>
 
-      <article>
-        <header><h3>Custom Messages</h3></header>
-        <wijit-form id="ex3">
-            <form action="test">
-                <div>
-                    <label for="ex3-name" class="required">Name</label>
-                    <input required name="name" id="ex3-name" value="Foo" autocomplete="name">
-                </div>
-                <div>
-                    <label for="ex3-email">Email</label>
-                    <input type="email" name="email" id="ex3-email" autocomplete="email">
-                </div>
-                <button>Spame Me!</button>
-            </form>
+        <article>
+          <header><h3>Custom Messages</h3></header>
+          <wijit-form id="ex3">
+              <form action="test">
+                  <div>
+                      <label for="ex3-name" class="required">Name</label>
+                      <input required name="name" id="ex3-name" value="Foo" autocomplete="name">
+                  </div>
+                  <div>
+                      <label for="ex3-email">Email</label>
+                      <input type="email" name="email" id="ex3-email" autocomplete="email">
+                  </div>
+                  <button>Spame Me!</button>
+              </form>
 
-            <wijit-icon01 slot="waiting" animate color="lime" style="width:85%; margin:auto">Please Wait</wijit-icon01>
-            <div slot="success">
-                <h1>Success!</h1>
-                <p>Thank you {{data.name}}</p>
-            </div>
-            <div slot="error">
-                <h1>{{status}}</h1>
-                <p>Please seek help.</p>
-            </div>
-        </wijit-form>
-      </article>
+              <wijit-icon01 slot="waiting" animate color="lime" style="width:85%; margin:auto">Please Wait</wijit-icon01>
+              <div slot="success">
+                  <h1>Success!</h1>
+                  <p>Thank you {{data.name}}</p>
+              </div>
+              <div slot="error">
+                  <h1>{{status}}</h1>
+                  <p>Please seek help.</p>
+              </div>
+          </wijit-form>
+        </article>
 
-      <article>
-        <header><h3>Modal</h3></header>
-        <wijit-form modal id="ex4">
-            <form action="test">
-                <div>
-                    <label for="ex4-name">Name</label>
-                    <input name="name" id="ex4-name" autocomplete="name">
-                </div>
-                <div>
-                    <label for="ex4-email">Email</label>
-                    <input type="email" name="email" id="ex4-email" autocomplete="email">
-                </div>
-                <button>Spammie!</button>
-            </form>
-        </wijit-form>
-      </article>
+        <article>
+          <header><h3>Modal</h3></header>
+          <wijit-form modal id="ex4">
+              <form action="test">
+                  <div>
+                      <label for="ex4-name">Name</label>
+                      <input name="name" id="ex4-name" autocomplete="name">
+                  </div>
+                  <div>
+                      <label for="ex4-email">Email</label>
+                      <input type="email" name="email" id="ex4-email" autocomplete="email">
+                  </div>
+                  <button>Spammie!</button>
+              </form>
+          </wijit-form>
+        </article>
+      </section>
     </section>
 
-    <section class="center" id="code-samples">
-      <header><h2>Code Samples</h2></header>
-      <article>
-      <header><h3>Basic Input</h3></header>
-        <wijit-form action="false">
-          <div>
-            <label for="ex-basic">Label</label>
-            <input id="ex-basic" name="name">
-          </div>
-        </wijit-form>
-
-        <wijit-code highlight="html" indent="1">
-          <wijit-form>
-            <form>
-              <div>
-                <label>Label</label>
-                <input name="name">
-              </div>
-            </form>
+    <section>
+      <header><h2>Working with Inputs</h2></header>
+      <section class="row" id="code-samples">
+        <article>
+        <header><h3>Basic Input</h3></header>
+          <wijit-form action="false">
+            <div>
+              <label for="ex-basic">Label</label>
+              <input id="ex-basic" name="name">
+            </div>
           </wijit-form>
-        </wijit-code>
-      </article>
 
-      <article>
-      <header><h3>Label on bottom</h3></header>
-        <wijit-form>
-          <form action="false">
+          <details class="maxcontent">
+            <summary>Code</summary>
+            <div>
+              <wijit-code highlight="html" indent="1">
+                <wijit-form>
+                  <form>
+                    <div>
+                      <label>Label</label>
+                      <input name="name">
+                    </div>
+                  </form>
+                </wijit-form>
+              </wijit-code>
+            </div>
+          </details>
+        </article>
+
+        <article>
+        <header><h3>Label on bottom</h3></header>
+          <wijit-form>
             <div class="reverse">
               <label for="ex-rev">Label</label>
               <input id="ex-rev" name="name">
             </div>
-          </form>
-        </wijit-form>
+          </wijit-form>
 
-        <wijit-code highlight="html" indent="1">
+          <details class="maxcontent">
+            <summary>Code</summary>
+            <div>
+              <wijit-code highlight="html" indent="1">
+                <wijit-form>
+                  <div class="reverse">
+                    <label>label</label>
+                    <input name="name">
+                  </div>
+                </wijit-form>
+              </wijit-code>
+            </div>
+          </details>
+        </article>
+
+        <article>
+        <header><h3>Label beside input</h3></header>
           <wijit-form>
-          <form>
-            <div class="reverse">
-              <label>label</label>
-              <input name="name">
-            </div>
-          </form>
-        </wijit-form>
-        </wijit-code>
-      </article>
+              <div class="row">
+                <label for="ex-row">Label</label>
+                <input id="ex-row" name="name">
+              </div>
+          </wijit-form>
 
-      <article>
-      <header><h3>Label beside input</h3></header>
-        <wijit-form>
-          <form action="false">
-            <div class="row">
-              <label for="ex-row">Label</label>
-              <input id="ex-row" name="name">
+          <details class="maxcontent">
+            <summary>Code</summary>
+            <div>
+              <wijit-code highlight="html" indent="1">
+                <wijit-form>
+                  <div class="row">
+                    <label>Label</label>
+                    <input name="name">
+                  </div>
+                </wijit-form>
+              </wijit-code>
             </div>
-          </form>
-        </wijit-form>
+          </details>
+        </article>
 
-        <wijit-code highlight="html" indent="1">
+        <article>
+        <header><h3>Label reversed</h3></header>
           <wijit-form>
-          <form>
-            <div class="row">
-              <label>Label</label>
-              <input name="name">
-            </div>
-          </form>
-        </wijit-form>
-        </wijit-code>
-      </article>
-
-      <article>
-      <header><h3>Label reversed</h3></header>
-        <wijit-form>
-          <form action="false">
             <div class="row reverse">
               <label for="ex-row-rev">Label</label>
               <input id="ex-row-rev" name="name">
             </div>
-          </form>
-        </wijit-form>
+          </wijit-form>
 
-        <wijit-code highlight="html" indent="1">
-          <wijit-form>
-          <form>
-            <div class="row reverse">
-              <label>Label</label>
-              <input name="name">
+          <details class="maxcontent">
+            <summary>Code</summary>
+            <div>
+              <wijit-code highlight="html" indent="1">
+                <wijit-form>
+                  <div class="row reverse">
+                    <label>Label</label>
+                    <input name="name">
+                  </div>
+                </wijit-form>
+              </wijit-code>
             </div>
-          </form>
-        </wijit-form>
-        </wijit-code>
-      </article>
+          </details>
+        </article>
+      </section>
+    </section>
 
-      <article>
-      <header><h3>Section</h3></header>
-        <wijit-form>
-          <form action="false">
+    <section>
+      <header><h2>Working with Sections</h2></header>
+      <section class="row center">
+        <article>
+        <header><h3>Section Column</h3></header>
+          <wijit-form>
             <section>
               <div>
                 <label for="f5f5800e">
@@ -324,44 +339,45 @@
             <button class="primary">
               Submit
             </button>
-          </form>
-        </wijit-form>
+          </wijit-form>
 
-        <wijit-code highlight="html" indent="1">
-          <textarea>
-            <wijit-form>
-              <form>
-                <section>
-                  <div>
-                    <label for="ca847f03">
-                      Name
-                    </label>
-                    <input
-                      id="ca847f03"
-                      name="name">
-                  </div>
-                  <div>
-                    <label for="dfc79b2b">
-                      Email
-                    </label>
-                    <input
-                      id="dfc79b2b"
-                      name="email">
-                  </div>
-                </section>
-                <button class="primary">
-                  Submit
-                </button>
-              </form>
-            </wijit-form>
-          </textarea>
-        </wijit-code>
-      </article>
+          <details class="maxcontent">
+            <summary>Code</summary>
+            <div>
+              <wijit-code highlight="html" indent="1">
+                <textarea>
+                  <wijit-form>
+                    <section>
+                      <div>
+                        <label for="ca847f03">
+                          Name
+                        </label>
+                        <input
+                          id="ca847f03"
+                          name="name">
+                      </div>
+                      <div>
+                        <label for="dfc79b2b">
+                          Email
+                        </label>
+                        <input
+                          id="dfc79b2b"
+                          name="email">
+                      </div>
+                    </section>
+                    <button class="primary">
+                      Submit
+                    </button>
+                  </wijit-form>
+                </textarea>
+              </wijit-code>
+            </div>
+          </details>
+        </article>
 
-      <article class="wide">
-      <header><h3>Section (row)</h3></header>
-        <wijit-form>
-          <form action="false">
+        <article>
+        <header><h3>Section Row</h3></header>
+          <wijit-form>
             <section class="row">
               <div>
                 <label for="f5f5800d">
@@ -383,44 +399,50 @@
             <button class="primary">
               Submit
             </button>
-          </form>
-        </wijit-form>
+          </wijit-form>
 
-        <wijit-code highlight="html" indent="1">
-          <textarea>
-            <wijit-form>
-              <form>
-                <section>
-                  <div>
-                    <label for="ca847f03">
-                      Name
-                    </label>
-                    <input
-                      id="ca847f03"
-                      name="name">
-                  </div>
-                  <div>
-                    <label for="dfc79b2b">
-                      Email
-                    </label>
-                    <input
-                      id="dfc79b2b"
-                      name="email">
-                  </div>
-                </section>
-                <button class="primary">
-                  Submit
-                </button>
-              </form>
-            </wijit-form>
-          </textarea>
-        </wijit-code>
-      </article>
+          <details class="maxcontent">
+            <summary>Code</summary>
+            <div>
+              <wijit-code highlight="html" indent="1">
+                <textarea>
+                  <wijit-form>
+                    <section class="row">
+                      <div>
+                        <label for="ca847f03">
+                          Name
+                        </label>
+                        <input
+                          id="ca847f03"
+                          name="name">
+                      </div>
+                      <div>
+                        <label for="dfc79b2b">
+                          Email
+                        </label>
+                        <input
+                          id="dfc79b2b"
+                          name="email">
+                      </div>
+                    </section>
+                    <button class="primary">
+                      Submit
+                    </button>
+                  </wijit-form>
+                </textarea>
+              </wijit-code>
+            </div>
+          </details>
+        </article>
+      </section>
+    </section>
 
-      <article>
-      <header><h3>Fieldset</h3></header>
-        <wijit-form>
-          <form action="false">
+    <section>
+      <header><h2>Working with Fieldsets</h2></header>
+      <section class="row center">
+        <article>
+        <header><h3>Fieldset Column</h3></header>
+          <wijit-form>
             <fieldset>
               <legend>Options</legend>
               <div class="row reverse start">
@@ -436,50 +458,51 @@
                 <input type="checkbox" id="1582e189">
               </div>
             </fieldset>
-          </form>
-        </wijit-form>
-
-        <wijit-code highlight="html">
-          <textarea>
-            <wijit-form>
-            <form>
-              <fieldset>
-                <legend>Options</legend>
-                <div class="row reverse start">
-                  <label for="60e5b1be">
-                    One
-                  </label>
-                  <input
-                    type="checkbox"
-                    id="60e5b1be">
-                </div>
-                <div class="row reverse start">
-                  <label for="ee70c172">
-                    Two
-                  </label>
-                  <input
-                    type="checkbox"
-                    id="ee70c172">
-                </div>
-                <div class="row reverse start">
-                  <label for="bfdf343">
-                    Three
-                  </label>
-                  <input
-                    type="checkbox"
-                    id="bfdf343">
-                </div>
-              </fieldset>
-            </form>
           </wijit-form>
-        </textarea>
-        </wijit-code>
-      </article>
 
-      <article>
-      <header><h3>Fieldset (row)</h3></header>
-        <wijit-form>
-          <form action="false">
+          <details class="maxcontent">
+            <summary>Code</summary>
+            <div>
+              <wijit-code highlight="html">
+                <textarea>
+                  <wijit-form>
+                    <fieldset>
+                      <legend>Options</legend>
+                      <div class="row reverse start">
+                        <label for="60e5b1be">
+                          One
+                        </label>
+                        <input
+                          type="checkbox"
+                          id="60e5b1be">
+                      </div>
+                      <div class="row reverse start">
+                        <label for="ee70c172">
+                          Two
+                        </label>
+                        <input
+                          type="checkbox"
+                          id="ee70c172">
+                      </div>
+                      <div class="row reverse start">
+                        <label for="bfdf343">
+                          Three
+                        </label>
+                        <input
+                          type="checkbox"
+                          id="bfdf343">
+                      </div>
+                    </fieldset>
+                  </wijit-form>
+                </textarea>
+              </wijit-code>
+            </div>
+          </details>
+        </article>
+
+        <article>
+        <header><h3>Fieldset Row</h3></header>
+          <wijit-form>
             <fieldset class="row center">
               <legend>Options</legend>
               <div>
@@ -495,53 +518,54 @@
                 <input type="radio" id="edbeaef4" name="options">
               </div>
             </fieldset>
-          </form>
-        </wijit-form>
+          </wijit-form>
 
-        <wijit-code highlight="html" indent="1">
-          <textarea>
-            <wijit-form>
-              <form>
-                <fieldset class="row center">
-                  <legend>Options</legend>
-                  <div>
-                    <label for="fccd227f">
-                      One
-                    </label>
-                    <input
-                      type="radio"
-                      name="options"
-                      id="fccd227f">
-                  </div>
-                  <div>
-                    <label for="ac13608d">
-                      Two
-                    </label>
-                    <input
-                      type="radio"
-                      name="options"
-                      id="ac13608d">
-                  </div>
-                  <div>
-                    <label for="f225eac4">
-                      Three
-                    </label>
-                    <input
-                      type="radio"
-                      id="f225eac4"
-                      name="options">
-                  </div>
-                </fieldset>
-              </form>
-            </wijit-form>
-          </textarea>
-        </wijit-code>
-      </article>
+          <details class="maxcontent">
+            <summary>Code</summary>
+            <div>
+              <wijit-code highlight="html" indent="1">
+                <textarea>
+                  <wijit-form>
+                    <fieldset class="row center">
+                      <legend>Options</legend>
+                      <div>
+                        <label for="fccd227f">
+                          One
+                        </label>
+                        <input
+                          type="radio"
+                          name="options"
+                          id="fccd227f">
+                      </div>
+                      <div>
+                        <label for="ac13608d">
+                          Two
+                        </label>
+                        <input
+                          type="radio"
+                          name="options"
+                          id="ac13608d">
+                      </div>
+                      <div>
+                        <label for="f225eac4">
+                          Three
+                        </label>
+                        <input
+                          type="radio"
+                          id="f225eac4"
+                          name="options">
+                      </div>
+                    </fieldset>
+                  </wijit-form>
+                </textarea>
+              </wijit-code>
+            </div>
+          </details>
+        </article>
 
-      <article>
-      <header><h3>Fieldset (row)</h3></header>
-        <wijit-form>
-          <form action="false">
+        <article>
+        <header><h3>Fieldset Row</h3></header>
+          <wijit-form>
             <fieldset class="row">
               <legend>Options</legend>
               <div class="end">
@@ -557,275 +581,521 @@
                 <input type="checkbox" id="edbeaef3">
               </div>
             </fieldset>
-          </form>
-        </wijit-form>
-
-        <wijit-code highlight="html" indent="1">
-          <textarea>
-            <wijit-form>
-            <form>
-              <fieldset class="row">
-                <legend>Options</legend>
-                <div class="end">
-                  <label for="e12c5e4">
-                    One
-                  </label>
-                  <input
-                    type="radio"
-                    name="options"
-                    id="e12c5e4">
-                </div>
-                <div class="start">
-                  <label for="db2f67d7">
-                    Two
-                  </label>
-                  <input
-                    type="radio"
-                    name="options"
-                    id="db2f67d7">
-                </div>
-                <div class="center">
-                  <label for="edbeaef3">
-                    Three
-                  </label>
-                  <input
-                    type="checkbox"
-                    id="edbeaef3">
-                </div>
-              </fieldset>
-            </form>
           </wijit-form>
-        </textarea>
-        </wijit-code>
-      </article>
+
+          <details class="maxcontent">
+            <summary>Code</summary>
+            <div>
+              <wijit-code highlight="html" indent="1">
+                <textarea>
+                  <wijit-form>
+                    <fieldset class="row">
+                      <legend>Options</legend>
+                      <div class="end">
+                        <label for="e12c5e4">
+                          One
+                        </label>
+                        <input
+                          type="radio"
+                          name="options"
+                          id="e12c5e4">
+                      </div>
+                      <div class="start">
+                        <label for="db2f67d7">
+                          Two
+                        </label>
+                        <input
+                          type="radio"
+                          name="options"
+                          id="db2f67d7">
+                      </div>
+                      <div class="center">
+                        <label for="edbeaef3">
+                          Three
+                        </label>
+                        <input
+                          type="checkbox"
+                          id="edbeaef3">
+                      </div>
+                    </fieldset>
+                  </wijit-form>
+                </textarea>
+              </wijit-code>
+            </div>
+          </details>
+        </article>
+      </section>
     </section>
 
     <section>
       <header>
-        <h2>Combining sections and fieldsets</h2>
+        <h2>Combining Sections and Fieldsets</h2>
       </header>
       <wijit-form>
-        <section class="row">
-          <fieldset>
-          <legend>Text(ish) Inputs</legend>
-            <div>
-              <label for="aa64">Text</label>
-              <input id="aa64" placeholder="Enter some text">
-            </div>
-
-            <div>
-              <label for="ede30c85">Search</label>
-              <input type="search" id="ede30c85">
-            </div>
-
-            <div>
-              <label for="df93">Password</label>
-              <input type="password" id="df93" value="password">
-            </div>
-
-            <div>
-              <label for="a4abf1e3">Telephone</label>
-              <input type="tel" id="a4abf1e3" value="(123)456-7890">
-            </div>
-
-            <div>
-              <label for="b3368483">URL</label>
-              <input type="url" id="b3368483" value="https://foo.com">
-            </div>
-
-            <div>
-              <label for="ff53eab6">Email</label>
-              <input type="email" id="ff53eab6" value="foo@bar">
-            </div>
-
-            <div>
-              <label for="bdece97e">Number</label>
-              <input type="number" id="bdece97e">
-            </div>
-
-
-            <div>
-              <label for="a1539947">Textarea</label>
-              <textarea id="a1539947"></textarea>
-            </div>
-          </fieldset>
-
-          <fieldset class="start">
-          <legend>Date / Time Inputs</legend>
-            <div>
-              <label for="def74cf1">Date</label>
-              <input type="date" id="def74cf1" value="1970-01-01">
-            </div>
-
-            <div>
-              <label for="efbe5d51">Time</label>
-              <input type="time" id="efbe5d51">
-            </div>
-
-            <div>
-              <label for="ba00bdb9">DateTime Local</label>
-              <input type="datetime-local" id="ba00bdb9">
-            </div>
-
-            <div>
-              <label for="a1f2f4f0">Week</label>
-              <input type="week" id="a1f2f4f0">
-            </div>
-
-            <div>
-              <label for="b6487e66">Month</label>
-              <input type="month" id="b6487e66">
-            </div>
-          </fieldset>
-
-          <fieldset class="space-between">
-          <legend>Select / Checkbox</legend>
-            <div>
-              <label for="a5959a51">Select</label>
-              <select id="a5959a51">
-                <option>One</option>
-                <option>Two</option>
-                <option>Three</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="c93a1aad">Select Multi</label>
-              <select multiple id="c93a1aad" size="3">
-                <option selected>One</option>
-                <option>Two</option>
-                <option selected>Three</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="be34f8f">Select Switch</label>
-              <select id="be34f8f" size="2">
-                <option>One</option>
-                <option selected>Two</option>
-              </select>
-            </div>
-
-            <section>
-              <header><b>Checkboxes</b></header>
-              <section class="row space-around">
-                <div>
-                  <label for="aba9260">One</label>
-                  <input checked type="checkbox" id="aba9260">
-                </div>
-
-                <div>
-                  <label for="ddb4a5cc">Two</label>
-                  <input type="checkbox" id="ddb4a5cc">
-                </div>
-
-                <div>
-                  <label for="deee620b">Three</label>
-                  <input type="checkbox" id="deee620b">
-                </div>
-              </section>
-            </section>
-          </fieldset><!-- select/checkboxes -->
-
-          <fieldset class="space-around">
-          <legend>Button / Radio</legend>
-            <fieldset class="row center">
-            <legend>Buttons</legend>
+        <section>
+          <section class="row center">
+            <fieldset>
+            <legend>Text-ish Inputs</legend>
               <div>
-                <button class="primary">Primary Button</button>
+                <label for="aa64">Text</label>
+                <input id="aa64" placeholder="Enter some text">
               </div>
 
               <div>
-                <button>Normal Button</button>
+                <label for="ede30c85">Search</label>
+                <input type="search" id="ede30c85">
               </div>
 
               <div>
-                <input type="button" id="b799e58" value="Input type=button">
+                <label for="df93">Password</label>
+                <input type="password" id="df93" value="password">
               </div>
 
               <div>
-                <label for="d3cfa9a8">Input (image)</label>
-                <input type="image" id="d3cfa9a8" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Scooter" alt="an image input">
+                <label for="a4abf1e3">Telephone</label>
+                <input type="tel" id="a4abf1e3" value="(123)456-7890">
               </div>
 
               <div>
-                <label aria-hidden="true">
-                  Submit and Reset Inputs
-                </label>
-                <div class="row">
-                  <input id="a06c4030" type="submit">
-                  <input id="abb2" type="reset">
-                </div>
-              </div>
-            </fieldset> <!-- buttons -->
-
-            <fieldset class="row space-between">
-            <legend>Radio Inputs</legend>
-              <div>
-                <label for="fe64">One</label>
-                <input type="radio" name="radio">
+                <label for="b3368483">URL</label>
+                <input type="url" id="b3368483" value="https://foo.com">
               </div>
 
               <div>
-                <label for="a073ddec">Two</label>
-                <input checked type="radio" id="a073ddec" name="radio">
+                <label for="ff53eab6">Email</label>
+                <input type="email" id="ff53eab6" value="foo@bar">
               </div>
 
               <div>
-                <label for="b629">Three</label>
-                <input type="radio" id="b629" name="radio">
+                <label for="bdece97e">Number</label>
+                <input type="number" id="bdece97e">
               </div>
-            </fieldset> <!-- radio inputs -->
-          </fieldset><!-- buttons/radios -->
-        </section>
 
-        <fieldset>
-        <legend>Other Inputs</legend>
-          <section class="row space-around">
-            <div>
-              <label for="aa67">Color</label>
-              <input type="color" id="aa67">
-            </div>
+              <div>
+                <label for="a1539947">Textarea</label>
+                <textarea id="a1539947"></textarea>
+              </div>
+            </fieldset>
 
-            <div>
-              <label for="bf78">File</label>
-              <input type="file" id="bf78">
-            </div>
+            <fieldset class="start">
+            <legend>Date / Time Inputs</legend>
+              <div>
+                <label for="def74cf1">Date</label>
+                <input type="date" id="def74cf1" value="1970-01-01">
+              </div>
 
-            <div>
-              <label for="f3c1ea4f">Range</label>
-              <input type="range" id="f3c1ea4f" min="0" max="100" value="75" data-value="$0">
-            </div>
+              <div>
+                <label for="efbe5d51">Time</label>
+                <input type="time" id="efbe5d51">
+              </div>
+
+              <div>
+                <label for="ba00bdb9">DateTime Local</label>
+                <input type="datetime-local" id="ba00bdb9">
+              </div>
+
+              <div>
+                <label for="a1f2f4f0">Week</label>
+                <input type="week" id="a1f2f4f0">
+              </div>
+
+              <div>
+                <label for="b6487e66">Month</label>
+                <input type="month" id="b6487e66">
+              </div>
+            </fieldset>
           </section>
 
-            <div>
-              <label for="fb95f04f">Progress</label>
-              <progress
-                id="fb95f04f"
-                max="100"
-                value="75"
-                data-value="0 Hamburgers Served!">
-              </progress>
-            </div>
+          <article>
+            <details>
+            <summary>Code</summary>
+              <div>
+                <wijit-code highlight="html" line-numbers>
+                  <textarea>
+                    <section class="row">
+                      <fieldset>
+                      <legend>Text-ish Inputs</legend>
+                        <div>
+                          <label for="aa64">Text</label>
+                          <input id="aa64" placeholder="Enter some text">
+                        </div>
 
-            <div>
-              <label for="f3c1ea4g">Range</label>
-              <input type="range" id="f3c1ea4g" min="0" max="100" value="75" data-value="0 cm">
-            </div>
-        </fieldset>
+                        <div>
+                          <label for="ede30c85">Search</label>
+                          <input type="search" id="ede30c85">
+                        </div>
 
+                        <div>
+                          <label for="df93">Password</label>
+                          <input type="password" id="df93" value="password">
+                        </div>
+
+                        <div>
+                          <label for="a4abf1e3">Telephone</label>
+                          <input type="tel" id="a4abf1e3" value="(123)456-7890">
+                        </div>
+
+                        <div>
+                          <label for="b3368483">URL</label>
+                          <input type="url" id="b3368483" value="https://foo.com">
+                        </div>
+
+                        <div>
+                          <label for="ff53eab6">Email</label>
+                          <input type="email" id="ff53eab6" value="foo@bar">
+                        </div>
+
+                        <div>
+                          <label for="bdece97e">Number</label>
+                          <input type="number" id="bdece97e">
+                        </div>
+
+                        <div>
+                          <label for="a1539947">Textarea</label>
+                          <textarea id="a1539947"><\/textarea>
+                        </div>
+                      </fieldset>
+
+                      <fieldset class="start">
+                      <legend>Date / Time Inputs</legend>
+                        <div>
+                          <label for="def74cf1">Date</label>
+                          <input type="date" id="def74cf1" value="1970-01-01">
+                        </div>
+
+                        <div>
+                          <label for="efbe5d51">Time</label>
+                          <input type="time" id="efbe5d51">
+                        </div>
+
+                        <div>
+                          <label for="ba00bdb9">DateTime Local</label>
+                          <input type="datetime-local" id="ba00bdb9">
+                        </div>
+
+                        <div>
+                          <label for="a1f2f4f0">Week</label>
+                          <input type="week" id="a1f2f4f0">
+                        </div>
+
+                        <div>
+                          <label for="b6487e66">Month</label>
+                          <input type="month" id="b6487e66">
+                        </div>
+                      </fieldset>
+                    </section>
+                  </textarea>
+                </wijit-code>
+              </div>
+            </details>
+          </article>
+        </section>
+
+        <section>
+          <section class="row center">
+            <fieldset class="space-between">
+            <legend>Select / Checkbox</legend>
+              <div>
+                <label for="a5959a51">Select</label>
+                <select id="a5959a51">
+                  <option>One</option>
+                  <option>Two</option>
+                  <option>Three</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="c93a1aad">Select Multi</label>
+                <select multiple id="c93a1aad" size="3">
+                  <option selected>One</option>
+                  <option>Two</option>
+                  <option selected>Three</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="be34f8f">Select Switch</label>
+                <select id="be34f8f" size="2">
+                  <option>One</option>
+                  <option selected>Two</option>
+                </select>
+              </div>
+
+              <section>
+                <header><b>Checkboxes</b></header>
+                <section class="row space-around">
+                  <div>
+                    <label for="aba9260">One</label>
+                    <input checked type="checkbox" id="aba9260">
+                  </div>
+
+                  <div>
+                    <label for="ddb4a5cc">Two</label>
+                    <input type="checkbox" id="ddb4a5cc">
+                  </div>
+
+                  <div>
+                    <label for="deee620b">Three</label>
+                    <input type="checkbox" id="deee620b">
+                  </div>
+                </section>
+              </section>
+            </fieldset><!-- select/checkboxes -->
+
+            <fieldset class="space-around">
+            <legend>Button / Radio</legend>
+              <fieldset class="row center">
+              <legend>Buttons</legend>
+                <div>
+                  <button class="primary">Primary Button</button>
+                </div>
+
+                <div>
+                  <button>Normal Button</button>
+                </div>
+
+                <div>
+                  <input type="button" id="b799e58" value="Input type=button">
+                </div>
+
+                <div>
+                  <label for="d3cfa9a8">Input (image)</label>
+                  <input type="image" id="d3cfa9a8" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Scooter" alt="an image input">
+                </div>
+
+                <div>
+                  <label aria-hidden="true">
+                    Submit and Reset Inputs
+                  </label>
+                  <div class="row">
+                    <input id="a06c4030" type="submit">
+                    <input id="abb2" type="reset">
+                  </div>
+                </div>
+              </fieldset> <!-- buttons -->
+
+              <fieldset class="row center">
+              <legend>Radio Inputs</legend>
+                <div>
+                  <label for="fe64">One</label>
+                  <input type="radio" name="radio">
+                </div>
+
+                <div>
+                  <label for="a073ddec">Two</label>
+                  <input checked type="radio" id="a073ddec" name="radio">
+                </div>
+
+                <div>
+                  <label for="b629">Three</label>
+                  <input type="radio" id="b629" name="radio">
+                </div>
+              </fieldset> <!-- radio inputs -->
+            </fieldset><!-- buttons/radios -->
+          </section>
+
+          <article>
+            <details>
+            <summary>Code</summary>
+              <div>
+                <wijit-code highlight="html" line-numbers>
+                  <textarea>
+                    <section class="row">
+                      <fieldset class="space-between">
+                      <legend>Select / Checkbox</legend>
+                        <div>
+                          <label for="a5959a51">Select</label>
+                          <select id="a5959a51">
+                            <option>One</option>
+                            <option>Two</option>
+                            <option>Three</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label for="c93a1aad">Select Multi</label>
+                          <select multiple id="c93a1aad" size="3">
+                            <option selected>One</option>
+                            <option>Two</option>
+                            <option selected>Three</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label for="be34f8f">Select Switch</label>
+                          <select id="be34f8f" size="2">
+                            <option>One</option>
+                            <option selected>Two</option>
+                          </select>
+                        </div>
+
+                        <section>
+                          <header><b>Checkboxes</b></header>
+                          <section class="row space-around">
+                            <div>
+                              <label for="aba9260">One</label>
+                              <input checked type="checkbox" id="aba9260">
+                            </div>
+
+                            <div>
+                              <label for="ddb4a5cc">Two</label>
+                              <input type="checkbox" id="ddb4a5cc">
+                            </div>
+
+                            <div>
+                              <label for="deee620b">Three</label>
+                              <input type="checkbox" id="deee620b">
+                            </div>
+                          </section>
+                        </section>
+                      </fieldset><!-- select/checkboxes -->
+
+                      <fieldset class="space-around">
+                      <legend>Button / Radio</legend>
+                        <fieldset class="row center">
+                        <legend>Buttons</legend>
+                          <div>
+                            <button class="primary">Primary Button</button>
+                          </div>
+
+                          <div>
+                            <button>Normal Button</button>
+                          </div>
+
+                          <div>
+                            <input type="button" id="b799e58" value="Input type=button">
+                          </div>
+
+                          <div>
+                            <label for="d3cfa9a8">Input (image)</label>
+                            <input type="image" id="d3cfa9a8" src=">
+                          </div>
+
+                          <div>
+                            <label aria-hidden="true">
+                              Submit and Reset Inputs
+                            </label>
+                            <div class="row">
+                              <input id="a06c4030" type="submit">
+                              <input id="abb2" type="reset">
+                            </div>
+                          </div>
+                        </fieldset> <!-- buttons -->
+
+                        <fieldset class="row space-between">
+                        <legend>Radio Inputs</legend>
+                          <div>
+                            <label for="fe64">One</label>
+                            <input type="radio" name="radio">
+                          </div>
+
+                          <div>
+                            <label for="a073ddec">Two</label>
+                            <input checked type="radio" id="a073ddec" name="radio">
+                          </div>
+
+                          <div>
+                            <label for="b629">Three</label>
+                            <input type="radio" id="b629" name="radio">
+                          </div>
+                        </fieldset> <!-- radio inputs -->
+                      </fieldset><!-- buttons/radios -->
+                    </section>
+                  </textarea>
+                </wijit-code>
+              </div>
+            </details>
+          </article>
+        </section>
+
+        <section>
+          <section>
+            <fieldset>
+            <legend>Other Inputs</legend>
+              <section class="row space-around">
+                <div>
+                  <label for="aa67">Color</label>
+                  <input type="color" id="aa67">
+                </div>
+
+                <div>
+                  <label for="bf78">File</label>
+                  <input type="file" id="bf78">
+                </div>
+
+                <div>
+                  <label for="f3c1ea4f">Range</label>
+                  <input type="range" id="f3c1ea4f" min="0" max="100" value="75" data-value="$0">
+                </div>
+              </section>
+
+              <div>
+                <label for="fb95f04f">Progress</label>
+                <progress
+                  id="fb95f04f"
+                  max="100"
+                  value="75"
+                  data-value="0 Hamburgers Served!">
+                </progress>
+              </div>
+
+              <div>
+                <label for="f3c1ea4g">Range</label>
+                <input type="range" id="f3c1ea4g" min="0" max="100" value="75" data-value="0 cm">
+              </div>
+            </fieldset>
+          </section>
+
+          <article>
+            <details>
+            <summary>Code</summary>
+              <div>
+                <wijit-code highlight="html" line-numbers>
+                  <textarea>
+                    <section>
+                      <fieldset>
+                      <legend>Other Inputs</legend>
+                        <section class="row space-around">
+                          <div>
+                            <label for="aa67">Color</label>
+                            <input type="color" id="aa67">
+                          </div>
+
+                          <div>
+                            <label for="bf78">File</label>
+                            <input type="file" id="bf78">
+                          </div>
+
+                          <div>
+                            <label for="f3c1ea4f">Range</label>
+                            <input type="range" id="f3c1ea4f" min="0" max="100" value="75" data-value="$0">
+                          </div>
+                        </section>
+
+                        <div>
+                          <label for="fb95f04f">Progress</label>
+                          <progress
+                            id="fb95f04f"
+                            max="100"
+                            value="75"
+                            data-value="0 Hamburgers Served!">
+                          </progress>
+                        </div>
+
+                        <div>
+                          <label for="f3c1ea4g">Range</label>
+                          <input type="range" id="f3c1ea4g" min="0" max="100" value="75" data-value="0 cm">
+                        </div>
+                      </fieldset>
+                    </section>
+                  </textarea>
+                </wijit-code>
+              </div>
+            </details>
+          </article>
+        </section>
       </wijit-form>
-
-      <wijit-code highlight="html" style="--indent:1rem">
-        <textarea>
-        <wijit-form>
-          <form>
-            ...todo
-          </form>
-        </wijit-form>
-        </textarea>
-      </wijit-code>
-    </section>
+    </fieldset></section>
 
     <script>
       function change (event, attr) {
