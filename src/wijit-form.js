@@ -52,7 +52,7 @@ export default class WijitForm extends HTMLElement {
 	 * @default true
 	 * @summary Determines whether to reset the form after submission.
 	 */
-	#resetForm = true;
+	#reset = true;
 
 	#server = true;
 
@@ -882,22 +882,28 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
-	 * @summary Initializes the component when it is connected to the DOM.
-	 * @description This method performs the following actions:
-	 *  Retrieves references to key elements within the component's template, including:
-	 *  The form element
-	 *  dialog element
-	 *  The message container element
-	 *  Error, success, and waiting indicator elements
-	 *  Attaches event listeners to:
-	 *  The form's submit event, to handle data submission
-	 *  The dialog's close event, to optionally reset the form
-	 * @return {Void}
+	 * Initializes the component when it is connected to the DOM and attaches event listeners to the form's submit event to handle data submission and the dialog's close event, to optionally reset the form
+	 *
+	 * @test mock
+	  let form = self.querySelector('form');
+	  if (form) {
+	  	return;
+	  } else {
+		  form = document.createElement('form');
+		  form.action = 'test';
+	 		self.customEvent = new CustomEvent ('testEvent', {bubbles:true, cancelable:true, composed:true});
+		  const input = document.createElement('input');
+		  input.name = 'name';
+		  input.value='Foo';
+		  form.append(input);
+			form.addEventListener ('testEvent', event => {
+				self.submitData(event);
+			});
+		  self.append(form);
+	  } //
 	 */
 	connectedCallback () {
-		this.form = this.querySelector('form');
-		this.dialog = this.querySelector('dialog') || this.shadowRoot.querySelector('dialog');
-		this.container = this.dialog.querySelector(`#${this.dialogMessageId}`);
+		// Store references to errorElems, successElems and waitingElems because their slots change
 		this.errorElems = this.querySelectorAll('[slot=error]');
 		this.successElems = this.querySelectorAll('[slot=success]');
 		this.waitingElems = this.querySelectorAll('[slot=waiting]');
@@ -908,14 +914,7 @@ export default class WijitForm extends HTMLElement {
 
 		this.handleProgressElems( this.querySelectorAll( 'progress' ));
 
-		if ( this.form ) {
-			this.form.addEventListener('submit', (event) => this.submitData(event), {signal: this.mainAbortController.signal});
-		}
-
-		this.dialog.addEventListener( 'close', event => {
-			if ( this.reset ) this.resetFormElements( this.form );
-		}, { signal:this.mainAbortController.signal } );
-		this.addFocusListeners();
+		this.addEventListeners();
 	}
 
 	/**
@@ -944,9 +943,26 @@ export default class WijitForm extends HTMLElement {
 		this.mainAbortController.abort();
 	}
 
+	addEventListeners() {
+		const form = this.querySelector('form');
+		const dialog = this.querySelector('dialog') || this.shadowRoot.querySelector('dialog');
+
+		if ( form ) {
+			this.addFocusListeners(form);
+			form.addEventListener('submit', event => {
+				event.preventDefault();
+				this.submitData(event);
+			}, { signal: this.mainAbortController.signal });
+		}
+
+		dialog.addEventListener( 'close', (event, form) => {
+			if ( this.reset ) this.resetElements( form );
+		}, { signal:this.mainAbortController.signal } );
+	}
+
 	/**
-	 * @summary Handles form submission and data fetching.
-	 * @description This method performs the following actions:
+	 * Handles form submission and data fetching.
+	 * @remarks This method performs the following actions:
 	 *   Prevents the default form submission behavior.
 	 *   Extracts form data and target URL.
 	 *   Sets fetch options, including the appropriate Accept header.
@@ -954,9 +970,13 @@ export default class WijitForm extends HTMLElement {
 	 *   Constructs the request URL for GET/HEAD methods or sets the request body for other methods.
 	 *   Fetches data from the server using fetchData.
 	 *   Returns the result directly for testing purposes or displays a dialog with the result in regular mode.
-	 * @param {Event} event - The submit event from the form.
+	 * @param 	{Event} event - The submit event from the form.
 	 * @returns {Promise<{data: any, status: number}>} - The result of the fetch operation (in testing mode).
 	 * @see {@link fetchData}
+	 *
+	 * @test const form = self.querySelector('form');
+	 		form.dispatchEvent(self.customEvent);
+	 		return self.result.status // 200
 	 */
 	async submitData( event ) {
 		event.preventDefault();
@@ -992,12 +1012,12 @@ export default class WijitForm extends HTMLElement {
 			if ( this.testing ) {
 				return this.setMessage( result.data, result.status );
 			} else {
-				this.showDialog( result.data, result.status );
+				return this.showDialog( result.data, result.status );
 			}
 		} else {
-			result = this.simulateServer( options );
+			this.result = this.simulateServer( options );
 			setTimeout ( () => {
-				this.showDialog( result.data, result.status );
+				return this.showDialog( this.result.data, this.result.status );
 			}, 1000 );
 		}
 	}
@@ -1025,10 +1045,10 @@ export default class WijitForm extends HTMLElement {
 
 	/**
 	 * @summary Simulate server response for testing without a server side script.
-	 * @param {object} 	data 	An object containing simulated request data.
-	 * @returns {object} 		An object with the following properties:
-	 *                        	- data: The simulated response data.
-	 *                         	- status: The HTTP status code of the simulated response.
+	 * @param {object} 		- data 	An object containing simulated request data.
+	 * @returns {object} 	- An object with the following properties:
+	 * - data: The simulated response data.
+	 * - status: The HTTP status code of the simulated response.
 	 */
 	simulateServer( data ) {
 		let msg, status;
@@ -1100,10 +1120,11 @@ export default class WijitForm extends HTMLElement {
 	 * @see {@link setMessage}
 	 */
 	showDialog( dataFromServer, statusCode ) {
-
-		const { container, dialog, modal } = this;
+		const dialog = this.querySelector('dialog') || this.shadowRoot.querySelector('dialog');
+		const container = dialog.querySelector(`#${this.dialogMessageId}`);
+		const { modal } = this;
 		const message = this.setMessage(dataFromServer, statusCode);
-		const closeDialogForm = this.dialog.querySelector('form[method=dialog]');
+		const closeDialogForm = dialog.querySelector('form[method=dialog]');
 		const btn = closeDialogForm.querySelector('input[type=submit], button');
 
 		if (message) container.innerHTML = message;
@@ -1148,8 +1169,10 @@ export default class WijitForm extends HTMLElement {
 	 * @see {@link showDialog}
 	 */
 	setMessage( messageFromServer, statusCode ) {
+		const { waitingElems, errorElems, successElems } = this;
+		const dialog = this.querySelector('dialog') || this.shadowRoot.querySelector('dialog');
+		const container = dialog.querySelector(`#${this.dialogMessageId}`);
 
-		const { waitingElems, errorElems, successElems, container } = this;
 		this.clearMessage();
 		let type, nodeList, message;
 
@@ -1269,9 +1292,8 @@ export default class WijitForm extends HTMLElement {
 		return nodeList;
 	}
 
-	addFocusListeners() {
-		if (!this.form) return;
-		for ( const input of this.form.elements ) {
+	addFocusListeners( form ) {
+		for ( const input of form.elements ) {
 			if ( input.localName === 'textarea' ) continue;
 			input.addEventListener( 'focus', () => {
 				if ( typeof input.select === 'function' ) input.select();
@@ -1281,18 +1303,17 @@ export default class WijitForm extends HTMLElement {
 
 	/**
 	 * Resets form inputs to default values
-	 * @param  {HTMLElement} form The html form
-	 * @returns {Void}
+	 * @param  {HTMLElement} form The html form (if any)
+	 *
+	 * @test const form = self.querySelector('form');
+	  self.resetElements(form);
+	  return form.elements[0].matches(':focus') // true
 	 */
-	resetFormElements( form ) {
+	resetElements( form ) {
+		if (!form) return;
 		const inputs = form.querySelectorAll('input, select, textarea');
-		try {
-			this.form.reset();
+			form.reset();
 			inputs[0].focus();
-		} catch (error) {
-			console.debug(typeof this.form.reset, this.form);
-			console.error(this);
-		}
 	}
 
 	/**
@@ -1305,8 +1326,10 @@ export default class WijitForm extends HTMLElement {
 	 * @see {@link showDialog}
 	 */
 	clearMessage() {
-		this.container.classList.remove('error');
-		this.container.classList.remove('success');
+		const dialog = this.querySelector('dialog') || this.shadowRoot.querySelector('dialog');
+		const container = dialog.querySelector(`#${this.dialogMessageId}`);
+		container.classList.remove('error');
+		container.classList.remove('success');
 
 		for (const w of this.waitingElems) w.setAttribute('slot', 'waiting');
 		for (const e of this.errorElems) e.setAttribute('slot', 'error');
@@ -1510,26 +1533,30 @@ export default class WijitForm extends HTMLElement {
 	 * @param  {string} value Empty string or "true" for true, any other string for false
 	 */
 	set forceError( value ) {
-		let input = this.form.querySelector('input[name=fail]');
+		let input = this.querySelector('input[name=fail]');
+		const form = this.querySelector('form');
 
-		switch (value.toLowerCase()) {
-		case '':
-		case 'true':
-		case true:
-			value = true;
+		switch (value) {
+		case 'false':
+		case false:
+			this.#forceError = false;
+			if (input) input.remove();
+			break;
+		default:
+			this.#forceError = true;
 			if (!input) {
 				input = document.createElement('input');
 				input.name = 'fail';
 				input.value = 'true';
 				input.type = 'hidden';
-				this.form.append(input);
+				if (form) {
+					form.append(input);
+				} else {
+					this.append(input);
+				}
 			}
 			break;
-		default:
-			value = false;
-			if (input) input.remove();
 		}
-		this.#forceError = value;
 	}
 
 	/**
@@ -1552,18 +1579,19 @@ export default class WijitForm extends HTMLElement {
 	/**
 	 * @returns {boolean}
 	 */
-	get resetForm () { return this.#resetForm; }
-	set resetForm ( value ) {
-		switch (value.toLowerCase()) {
-		case '':
-		case 'true':
-			value = true;
+	get reset () { return this.#reset; }
+	set reset ( value ) {
+		switch (value) {
+		case 'false':
+		case false:
+			value = false;
 			break;
 		default:
-			value = false;
+			value = true;
+			break;
 		}
 
-		this.#resetForm = value;
+		this.#reset = value;
 	}
 
 	/**

@@ -18,6 +18,8 @@ Demo: [https://holmesbryant.github.io/wijit-form/](https://holmesbryant.github.i
 	    - --fail to --fail-color
 	    - --pass to --pass-color
 	    - --accent to --accent-color
+- v1.03
+    - Changed "resetForm" attribute to "reset"
 
 ## Features
 
