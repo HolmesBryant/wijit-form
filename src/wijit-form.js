@@ -1,7 +1,8 @@
 /**
+ * Represents a custom form component for easy styling of forms, handling form submissions, data fetching, and dialog display.
  * @class WijitForm
- * @summary Represents a custom form component for handling form submissions, data fetching, and dialog display.
- * @remarks This class extends HTMLElement, allowing it to be used as a custom HTML element in web pages.
+ * @extends HTMLElement
+ *
  * @author Holmes Bryant <https://github.com/HolmesBryant>
  * @license GPL-3.0
  */
@@ -39,10 +40,10 @@ export default class WijitForm extends HTMLElement {
 	#forceError = false;
 
 	/**
+	 * Determines whether the dialog should be modal.
 	 * @private
 	 * @type {boolean}
 	 * @default false
-	 * @summary Determines whether the dialog should be modal.
 	 */
 	#modal = false;
 
@@ -920,8 +921,8 @@ export default class WijitForm extends HTMLElement {
 	/**
 	 * @summary Responds to changes in observed attributes.
 	 * @description This method performs the following actions:
-	 *  Converts hyphenated attribute names to camelCase for internal property storage.
-	 *  Updates the corresponding internal property with the new attribute value.
+	 *  - Converts hyphenated attribute names to camelCase for internal property storage.
+	 *  - Updates the corresponding internal property with the new attribute value.
 	 * @param {string} attr 	- The name of the attribute that has changed.
 	 * @param {string} oldval 	- The previous value of the attribute.
 	 * @param {string} newval 	- The new value of the attribute.
@@ -947,8 +948,9 @@ export default class WijitForm extends HTMLElement {
 		const form = this.querySelector('form');
 		const dialog = this.querySelector('dialog') || this.shadowRoot.querySelector('dialog');
 
+		this.addFocusListeners(this.querySelectorAll('input'));
+
 		if ( form ) {
-			this.addFocusListeners(form);
 			form.addEventListener('submit', event => {
 				event.preventDefault();
 				this.submitData(event);
@@ -962,14 +964,16 @@ export default class WijitForm extends HTMLElement {
 
 	/**
 	 * Handles form submission and data fetching.
-	 * @remarks This method performs the following actions:
-	 *   Prevents the default form submission behavior.
-	 *   Extracts form data and target URL.
-	 *   Sets fetch options, including the appropriate Accept header.
-	 *   Displays a waiting dialog (if not in testing mode).
-	 *   Constructs the request URL for GET/HEAD methods or sets the request body for other methods.
-	 *   Fetches data from the server using fetchData.
-	 *   Returns the result directly for testing purposes or displays a dialog with the result in regular mode.
+	 * This method performs the following actions:
+	 *   - Prevents the default form submission behavior.
+	 *   - Extracts form data and target URL.
+	 *   - Sets fetch options, including the appropriate Accept header.
+	 *   - Displays a waiting dialog (if not in testing mode).
+	 *   - Constructs the request URL for GET/HEAD methods or sets the request body for other methods.
+	 *   - Fetches data from the server using fetchData.
+	 *   - Returns the result directly for testing purposes or displays a dialog with the result in regular mode.
+	 *
+	 * @async
 	 * @param 	{Event} event - The submit event from the form.
 	 * @returns {Promise<{data: any, status: number}>} - The result of the fetch operation (in testing mode).
 	 * @see {@link fetchData}
@@ -984,7 +988,8 @@ export default class WijitForm extends HTMLElement {
 		let url, result;
 		const data = new FormData ( event.target );
 		const accept = ( this.response === 'html' ) ? "text/html" : "application/json";
-		const options = this.setFetchOptions( event, accept );
+		const method = event.target.getAttribute('method') || 'POST';
+		const options = this.setFetchOptions( method, accept );
 
 		if (!this.testing) this.showDialog( this.waiting, null );
 
@@ -1023,14 +1028,19 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
-	 * @summary Send data to server and return result
+	 * Send data to server and return result
+	 *
+	 * @async
 	 * @param  	{string} url     	The url to the server
 	 * @param  	{object} options 	Options object for Fetch
 	 * @returns {object}			{data: string, status: number}
+	 *
+	 * @test return async function() {
+     	  return await self.fetchData( '/wijit-form/extra/test-server.php' );
+     	}( self )  // 'the result'
 	 */
 	async fetchData( url, options ) {
 		let data;
-
 		try {
 			const response = await fetch (url, options);
 			const status = response.status;
@@ -1044,7 +1054,7 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
-	 * @summary Simulate server response for testing without a server side script.
+	 * Simulate server response for testing without a server side script.
 	 * @param {object} 		- data 	An object containing simulated request data.
 	 * @returns {object} 	- An object with the following properties:
 	 * - data: The simulated response data.
@@ -1080,23 +1090,24 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
+	 * This method performs the following actions:
+	 *  - Creates a copy of the default fetch options.
+	 *  - Determines the HTTP method from the form's method attribute, defaulting to POST.
+	 *  - Sets the HTTP method in the options object.
+	 *  - Ensures the options object has a headers property.
+	 *  - Sets the Accept header based on the provided accept value, potentially overriding it with a value from the default options.
+	 *  - Returns the modified options object.
 	 * @summary Sets options for a fetch request.
-	 * @description This method performs the following actions:
-	 *  Creates a copy of the default fetch options.
-	 *  Determines the HTTP method from the form's method attribute, defaulting to POST.
-	 *  Sets the HTTP method in the options object.
-	 *  Ensures the options object has a headers property.
-	 *  Sets the Accept header based on the provided accept value, potentially overriding it with a value from the default options.
-	 *  Returns the modified options object.
 	 * @param {Event} event - The submit event from the form.
 	 * @param {string} accept - The desired Accept header value.
 	 * @returns {object} - The modified options object for the fetch request.
-	 * @remarks This method is invoked to prepare options for the fetchData method.
 	 * @see {@link fetchData}
+	 *
+	 * @test self.setFetchOptions('text/html').method // 'POST'
+	 * @test self.setFetchOptions('text/html').Accept // 'text/html'
 	 */
-	setFetchOptions( event, accept ) {
+	setFetchOptions( accept, method = 'POST' ) {
 		const options = (this.fetchOptions) ? JSON.parse (JSON.stringify (this.fetchOptions)) : {};
-		const method = event.target.getAttribute('method') || 'POST';
 		options.method = method.toUpperCase();
 		options.headers = options.headers || {};
 		// options.headers overrides 'accept' var
@@ -1105,30 +1116,30 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
-	 * @summary Displays a dialog with a message and optional form.
-	 * @description This method performs the following actions:
-	 *  Constructs a message based on the provided data and status code.
-	 *  Retrieves a form for closing the dialog.
-	 *  Sets the message content within the dialog container.
-	 *  Appends the close dialog form to the container (if a status code is present).
-	 *  Shows the dialog in either modal or modeless mode.
-	 *  Focuses on the close button (if a status code is present).
+	 * This method is invoked after data has been fetched from a server. It displays a dialog with a message and optional form.
+	 * This method performs the following actions:
+	 * 	- Constructs a message based on the provided data and status code.
+	 *  - Retrieves a form for closing the dialog.
+	 *  - Sets the message content within the dialog container.
+	 *  - Appends the close dialog form to the container (if a status code is present).
+	 *  - Shows the dialog in either modal or modeless mode.
+	 *  - Focuses on the close button (if a status code is present).
 	 * @param 	{string} 			dataFromServer 	- Data received from the server.
 	 * @param 	{number | null} 	statusCode 		- The HTTP status code of the response (optional).
 	 * @returns {string | null} 				- The message that was set in the dialog.
-	 * @remarks This method is invoked after data has been fetched from a server.
 	 * @see {@link setMessage}
+	 *
+	 * @test self.showDialog('<h1>Foo</h1>', 200) // '<h1>Foo</h1>'
+	 * @test self.showDialog('{"data":"foo"}', 200) // {"data":"foo"}
 	 */
 	showDialog( dataFromServer, statusCode ) {
 		const dialog = this.querySelector('dialog') || this.shadowRoot.querySelector('dialog');
 		const container = dialog.querySelector(`#${this.dialogMessageId}`);
-		const { modal } = this;
 		const message = this.setMessage(dataFromServer, statusCode);
 		const closeDialogForm = dialog.querySelector('form[method=dialog]');
 		const btn = closeDialogForm.querySelector('input[type=submit], button');
 
 		if (message) container.innerHTML = message;
-
 		container.append(closeDialogForm);
 
 		// If there is no status code, it means the dialog is showing the "Waiting" message and no "close" form/button should be show.
@@ -1139,7 +1150,7 @@ export default class WijitForm extends HTMLElement {
 			closeDialogForm.classList.add('hidden');
 		}
 
-		if (modal) {
+		if (this.modal) {
 			dialog.classList.remove('modeless');
 			dialog.showModal();
 		} else {
@@ -1151,22 +1162,24 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
-	 * @summary Constructs and sets a message based on data and status.
+	 * @summary This method is invoked to prepare a message before displaying a dialog. It constructs and sets a message based on data and status.
 	 * @description This method performs the following actions:
-	 *  Clears any existing message.
-	 *  Determines the message type (waiting, error, or success) based on the status code.
-	 *  Retrieves appropriate message elements or slots based on the type.
-	 *  Constructs the message using one of the following approaches:
-	 *   User-supplied custom message via attributes (with placeholder replacement for JSON data)
-	 *   User-supplied custom message via slots (with content replacement for JSON data)
-	 *   Default message (for waiting state or non-HTML responses)
-	 *   Message sent from the server (for HTML responses with a status code)
-	 *   Returns the constructed message.
+	 *  - Clears any existing message.
+	 *  - Determines the message type (waiting, error, or success) based on the status code.
+	 *  - Retrieves appropriate message elements or slots based on the type.
+	 *  - Constructs the message using one of the following approaches:
+	 *   - User-supplied custom message via attributes (with placeholder replacement for JSON data)
+	 *   - User-supplied custom message via slots (with content replacement for JSON data)
+	 *   - Default message (for waiting state or non-HTML responses)
+	 *   - Message sent from the server (for HTML responses with a status code)
+	 *   - Returns the constructed message.
 	 * @param 	{string} 		dataFromServer 	- Data received from the server.
 	 * @param 	{number | null} statusCode 		- The HTTP status code of the response (null for "waiting" message).
 	 * @returns {string | null} 				- The constructed message.
-	 * @remarks This method is invoked to prepare a message before displaying a dialog.
 	 * @see {@link showDialog}
+	 *
+	 * * @test self.setMessage('<h1>Foo</h1>', 200) // '<h1>Foo</h1>'
+	 * @test self.setMessage('{"data":"foo"}', 200) // {"data":"foo"}
 	 */
 	setMessage( messageFromServer, statusCode ) {
 		const { waitingElems, errorElems, successElems } = this;
@@ -1227,17 +1240,18 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
-	 * @summary 	Replaces placeholders in a string with values from JSON data.
+	 * @summary This method is used to create dynamic messages based on user input and server data. It replaces placeholders in a string with values from JSON data.
 	 * @description This method performs the following actions:
-	 *  Matches placeholders of the format {{property.path}} within the input string.
-	 *  Extracts property paths from the matched placeholders.
-	 *  Traverses the JSON data to retrieve values for the specified properties.
-	 *  Replaces placeholders with the retrieved values (or stringifies objects if necessary).
-	 *  Returns the modified string with placeholders replaced.
+	 *  - Matches placeholders of the format {{property.path}} within the input string.
+	 *  - Extracts property paths from the matched placeholders.
+	 *  - Traverses the JSON data to retrieve values for the specified properties.
+	 *  - Replaces placeholders with the retrieved values (or stringifies objects if necessary).
+	 *  - Returns the modified string with placeholders replaced.
 	 * @param 	{string} 	userdata - The input string containing placeholders.
 	 * @param 	{any} 		jsondata - The JSON data to use for replacement.
 	 * @returns {string}			 - The string with placeholders replaced.
-	 * @remarks This method is used to create dynamic messages based on user input and server data.
+	 *
+	 * @test self.replacePlaceholders('Hi {{data.name}}', '{"data":{"name":"Foo"}}') // 'Hi Foo'
 	 */
 	replacePlaceholders( userdata, jsondata ) {
 		const placeholderRegex = /{{([^{}]+)}}/g;
@@ -1262,9 +1276,15 @@ export default class WijitForm extends HTMLElement {
 
 	/**
 	 * Replace innerHTML contents of elements containing {{ }} placeholders with json data coming from server.
-	 * @param  {NodeList} 	nodelist	Collection of nodes assigned to a named slot
-	 * @param  {String} 	response	The response from the server
-	 * @return {NodeList}				The collection with placeholders replaced with data
+	 * @param  {NodeList} - nodelist	Collection of nodes assigned to a named slot
+	 * @param  {String} 	- response	The response from the server
+	 * @return {NodeList} - The collection with placeholders replaced with data
+	 *
+	 * @test const div = document.createElement('div');
+	 		div.textContent = '{{status}}';
+			self.append(div);
+	 		const items = self.querySelectorAll('div');
+	 		return self.replaceNodeContents( items, '{"status": 200}' )[0].innerHTML // '<p>200</p>'
 	 */
 	replaceNodeContents( nodeList, response ) {
 		const placeholderRegex = /{{([^{}]+)}}/g;
@@ -1292,8 +1312,12 @@ export default class WijitForm extends HTMLElement {
 		return nodeList;
 	}
 
-	addFocusListeners( form ) {
-		for ( const input of form.elements ) {
+	/**
+	 * Adds event listeners to form inputs which select the full text of the input when it gets focus.
+	 * @param {NodeList} inputs - A NodeList of form inputs
+	 */
+	addFocusListeners( collection ) {
+		for ( const input of collection ) {
 			if ( input.localName === 'textarea' ) continue;
 			input.addEventListener( 'focus', () => {
 				if ( typeof input.select === 'function' ) input.select();
@@ -1317,13 +1341,16 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
-	 * @summary Clears any existing message from the dialog.
-	 * @description This method performs the following actions:
-	 *  Removes error or success css classes from the message container.
-	 *  Resets the slot attributes of waiting, error, and success message elements to their default states.
-	 * @remarks This method is invoked to prepare the dialog for displaying a new message.
+	 * Prepares the dialog for displaying a new message.
+	 * Performs the following actions:
+	 *  - Removes error or success css classes from the message container.
+	 *  - Resets the slot attributes of waiting, error, and success message elements to their default states.
 	 * @see {@link setMessage}
 	 * @see {@link showDialog}
+	 *
+	 * @test const dialog = self.querySelector('dialog') || self.shadowRoot.querySelector('dialog');
+			const container = dialog.querySelector(`#${self.dialogMessageId}`);
+			return container.innerHTML // 'something'
 	 */
 	clearMessage() {
 		const dialog = this.querySelector('dialog') || this.shadowRoot.querySelector('dialog');
@@ -1337,18 +1364,19 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
-	 * @summary Cleans HTML to allow only specific elements and attributes.
-	 * @description This method performs the following actions:
-	 *  Creates a temporary div element and sets its innerHTML to the provided HTML.
-	 *  Iterates through the child nodes of the temporary element.
-	 *  For each element node:
-	 *   Checks if it's in the list of allowed elements (p, span, h1-h6, b, strong, i, hr, br).
-	 *   If not, replaces the element with a text node containing its content.
-	 *   Otherwise, removes any attributes not in the list of allowed attributes (id, class, style).
-	 *   Returns the sanitized HTML content of the temporary element.
-	 * @param {string} html - The HTML to be cleaned.
-	 * @returns {string} - The cleaned HTML.
-	 * @remarks This method is used to sanitize user-provided HTML to prevent potential security risks like cross-site scripting (XSS).
+	 * Cleans HTML to allow only specific elements and attributes in order to sanitize user-provided HTML to prevent potential security risks like cross-site scripting (XSS)
+	 * Performs the following actions:
+	 *  - Creates a temporary div element and sets its innerHTML to the provided HTML.
+	 *  - Iterates through the child nodes of the temporary element.
+	 * - For each element node:
+	 *      - Checks if it's in the list of allowed elements.
+	 *      - If not, replaces the element with a text node containing its content.
+	 * - Removes any attributes not in the list of allowed attributes.
+	 * - Returns the sanitized HTML content.
+	 * @param 	{string} html - The HTML to be cleaned.
+	 * @returns {string} 			- The cleaned HTML.
+	 *
+	 * @test self.cleanHTML('<script>alert("foo")</script>') // 'alert("foo")'
 	 */
 	cleanHTML( html ) {
 		const allowedElements = new Set(['p', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'b', 'strong', 'i', 'hr', 'br']);
@@ -1369,7 +1397,11 @@ export default class WijitForm extends HTMLElement {
 
 				// Filter allowed attributes
 				const allowedAttrs = Array.from(node.attributes).filter(attr => allowedAttributes.has(attr.name));
-				node.attributes.length = 0; // Clear existing attributes
+
+				for (const attr of node.attributes) {
+					node.removeAttribute(attr);
+				}
+
 				for (const attr of allowedAttrs) {
 					node.setAttribute(attr.name, attr.value); // Set allowed attributes
 				}
@@ -1380,15 +1412,17 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
-	 * @summary Validates whether a string is valid JSON.
-	 * @description This method attempts to parse the input string as JSON using two strategies:
+	 * Validates whether a string is valid JSON.
+	 * This method attempts to parse the input string as JSON using two strategies:
 	 *  Direct parsing: It first tries to parse the string directly without any modifications.
 	 *  Minimal adjustments: If direct parsing fails, it performs the following adjustments before attempting to parse again:
 	 *   Removes potentially problematic characters (excluding essential quotes).
 	 *   Encloses word-like sequences in double quotes to ensure proper parsing.
-	 * @param {string} string - The string to be validated.
-	 * @returns {boolean|any} - Returns true if the string is valid JSON, false if invalid, or the parsed JSON object if successful.
-	 * @remarks This method prioritizes direct parsing for efficiency and only applies minimal adjustments if necessary.
+	 * @param 	{string} string - The string to be validated.
+	 * @returns {boolean|object} 	- Returns false if invalid, or the parsed JSON object if successful.
+	 *
+	 * @test typeof self.validateJson( '{"foo":"bar"}' ) === 'object' // true
+	 * @test self.validateJson( "{foo:'bar'}" ) // false
 	 */
 	validateJson( string ) {
 		try {
@@ -1480,9 +1514,20 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
+	 * Gets whether to use user's own css to style the form.
 	 * @returns {boolean}
+	 *
+	 * @test self.customCss // false
 	 */
 	get customCss() { return this.#customCss }
+
+	/**
+	 * Sets whether to use user's own css to style the form
+	 * @param  {boolean} value - true or false
+	 *
+	 * @test self.customCss = true; return self.customCss // true
+	 * @test self.setAttribute('custom-css', ''); return self.customCss // true
+	 */
 	set customCss( value ) {
 		switch (value) {
 		case '':
@@ -1492,24 +1537,48 @@ export default class WijitForm extends HTMLElement {
 			break;
 		default:
 			value = false;
-			if (document.head.querySelector('style#wijit-form-css')) style.remove();
+			const style = document.head.querySelector('style#wijit-form-css');
+			if (style) style.remove();
 		}
 
 		this.#customCss = value;
 	}
 
 	/**
+	 * Returns the id of the dialog element
 	 * @returns {string}
+	 *
+	 * @test self.dialogMessageId // 'dialog-message'
 	 */
 	get dialogMessageId() { return this.#dialogMessageId }
+
+	/**
+	 * If user provides own dialog element, this allows them to set the id of the dialog element so the component can access it.
+	 * @param  {string} value The id of the dialog element
+	 *
+	 * @test self.dialogMessageId = 'foo'; return self.dialogMessageId; // 'foo'
+	 * @test self.setAttribute('dialog-message-id', 'bar');
+	 		return self.dialogMessageId; // 'bar'
+	 */
 	set dialogMessageId( value ) {
 		this.#dialogMessageId = value;
 	}
 
 	/**
+	 * Returns an object representing fetch options
 	 * @returns {object}
-	 */
+	 *
+	 * @test typeof self.fetchOptions // 'object'
 	get fetchOptions() { return this.#fetchOptions; }
+
+	/**
+	 * Sets fetch options
+	 * @param  {object} value An object describing the fetch options
+	 *
+	 * @test self.fetchOptions = {foo:'bar'}; return typeof self.fetchOptions; // 'object'
+	 * @test self.setAttribute('fetch-options', '{foo:"bar"}');
+	 		return typeof self.fetchOptions; // 'object'
+	 */
 	set fetchOptions( value ) {
 		if (typeof value === 'string') {
 			value = this.validateJson(value);
@@ -1529,7 +1598,7 @@ export default class WijitForm extends HTMLElement {
 
 	/**
 	 * Adds to the form a hidden input having a name of "fail"
-	 * @remarks If you use this, make sure the server script handles it and returns an http status code greater than 399.
+	 * If you use this method, make sure the server script handles this input value and returns an http status code greater than 399.
 	 * @param  {string} value Empty string or "true" for true, any other string for false
 	 */
 	set forceError( value ) {
@@ -1560,11 +1629,22 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
+	 * Returns whether to display waiting/confirmation messages as a modal
 	 * @returns {boolean}
+	 *
+	 * @test self.modal // false
 	 */
 	get modal() { return this.#modal; }
+
+	/**
+	 * Set whether to show waiting/confirmation messages as a modal
+	 * @param  {boolean} value true of false
+	 *
+	 * @test self.modal = true; return self.modal // true
+	 * @test self.setAttribute('modal', ''); return self.modal // true
+	 */
 	set modal( value ) {
-		switch (value.toLowerCase()) {
+		switch (value) {
 		case '':
 		case 'true':
 			value = true;
@@ -1577,9 +1657,20 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
+	 * Returns whether to reset form on submit
 	 * @returns {boolean}
+	 *
+	 * @test self.reset // true
 	 */
 	get reset () { return this.#reset; }
+
+	/**
+	 * Sets whether to reset form on submit
+	 * @param  {boolean} value true or false
+	 *
+	 * @test self.reset = false; return self.reset // false
+	 * @test self.setAttribute('reset', ''); return self.reset; // true
+	 */
 	set reset ( value ) {
 		switch (value) {
 		case 'false':
@@ -1595,17 +1686,39 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
+	 * Returns whether data from server is JSON or HTML
 	 * @returns {string}
+	 *
+	 * @test self.response // 'json';
 	 */
 	get response () { return this.#response; }
+
+	/**
+	 * Sets whether data from server is JSON or HTML
+	 * @param  {string} value 'json' or 'html'
+	 *
+	 * @test self.response = 'json'; return self.response // 'json'
+	 * @test self.setAttribute('response', 'html'); return self.response // 'html'
+	 */
 	set response ( value ) {
 		this.#response = value.toLowerCase();
 	}
 
 	/**
+	 * Returns the message to display when an error with the form submission occurs
 	 * @returns {string}
+	 *
+	 * @test self.error // 'something';
 	 */
 	get error () { return this.#error; }
+
+	/**
+	 * Sets the error message to display when an error with the form submission occurs.
+	 * @param  {string} value The error message. Can contain html.
+	 *
+	 * @test self.error = '<p>oopsie</p>'; return self.error // '<p>oopsie</p>'
+	 * @test self.setAttribute('error', '<h1>Error</h1>'); return self.error // '<h1>Error</h1>'
+	 */
 	set error ( value ) {
 		value = this.cleanHTML(value);
 		switch (value) {
@@ -1617,9 +1730,20 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
+	 * Returns the message on successful form submission
 	 * @returns {string}
+	 *
+	 * @test self.success // 'something'
 	 */
 	get success () { return this.#success; }
+
+	/**
+	 * Sets the message to display on successful form submission
+	 * @param  {string} value A string. Can contain html.
+	 *
+	 * @test self.success = '<p>success</p>'; return self.success // '<p>success</p>'
+	 * @test self.setAttribute('success', '<h1>success</h1>'); return self.success // '<h1>success</h1>'
+	 */
 	set success ( value ) {
 		value = this.cleanHTML(value);
 		switch (value) {
@@ -1631,9 +1755,20 @@ export default class WijitForm extends HTMLElement {
 	}
 
 	/**
+	 * Returns the message to display when waiting for a response from the server
 	 * @returns {string}
+	 *
+	 * @test self.waiting // 'something'
 	 */
 	get waiting () { return this.#waiting; }
+
+	/**
+	 * Sets the message to display when waiting for a response from the server
+	 * @param  {string} value A string. Can contain html.
+	 *
+	 * @test self.waiting = '<p>waiting</p>'; return self.waiting // '<p>waiting</p>'
+	 * @test self.setAttribute('waiting', '<h1>waiting</hi>'); return self.waiting // '<h1>waiting</h1>'
+	 */
 	set waiting ( value ) {
 		value = this.cleanHTML(value);
 		switch (value) {
