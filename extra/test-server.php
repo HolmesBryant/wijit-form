@@ -32,7 +32,7 @@ if ($fail && $fail === 'true') {
 	http_response_code(200);
 }
 
-if (!$test) { sleep(1); }
+// if (!$test) { sleep(1); }
 
 header("Content-Type: $accept; charset=UTF-8");
 

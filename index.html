@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Wijit-Form Web Component</title>
     <link rel="stylesheet" href="styles.css">
-    <script type="module" src="src/wijit-form.js"></script>
+    <!-- <script type="module" src="src/wijit-form.js"></script> -->
+    <script type="module" src="dist/wijit-form.min.js"></script>
     <script type="module" src="extra/wijit-code.min.js"></script>
     <script type="module" src="extra/wijit-icon01.js"></script>
 
@@ -44,7 +45,7 @@
       <article id="instructions"></article>
     </details>
     <section id="demo">
-      <wijit-form id="demo-form">
+      <wijit-form id="demo-form" reset="false">
         <form action="test">
           <section class="row">
             <section>
@@ -90,21 +91,21 @@
                 </div>
               </fieldset>
 
-              <fieldset class="row">
-              <legend>modal</legend>
-                <select size="2" onchange="change(event, 'modal')">
+              <div class="start">
+                <label for="demo-modal">modal</label>
+                <select id="demo-modal" size="2" onchange="change(event, 'modal')">
                   <option>True</option>
                   <option selected>False</option>
                 </select>
-              </fieldset>
+             </div>
 
-              <fieldset class="row">
-              <legend>reset</legend>
-                <select size="2" onchange="change(event, 'reset-form')">
-                  <option>True</option>
-                  <option selected>False</option>
-                </select>
-              </fieldset>
+              <!--<div class="start">
+                  <label for="demo-reset">reset</label>
+                  <select id="demo-reset" size="2" onchange="change(event, 'reset')">
+                    <option selected>True</option>
+                    <option>False</option>
+                  </select>
+              </div -->
             </section>
           </section>
 
@@ -130,7 +131,7 @@
       <header><h2>Examples</h2></header>
       <section class="row" id="examples">
         <article>
-          <header><h3>Basic Example</h3></header>
+        <header><h3>Basic Example</h3></header>
           <wijit-form id="ex1">
               <form action="test">
                   <div>
@@ -147,7 +148,7 @@
         </article>
 
         <article>
-          <header><h3>HTML Response</h3></header>
+        <header><h3>HTML Response</h3></header>
           <wijit-form response="html" id="ex2">
               <form action="test">
                   <div>
@@ -165,7 +166,7 @@
 
         <article>
           <header><h3>Custom Messages</h3></header>
-          <wijit-form id="ex3">
+          <wijit-form response="json" id="ex3">
               <form action="test">
                   <div>
                       <label for="ex3-name" class="required">Name</label>
@@ -192,18 +193,45 @@
 
         <article>
           <header><h3>Modal</h3></header>
-          <wijit-form modal id="ex4">
-              <form action="test">
-                  <div>
-                      <label for="ex4-name">Name</label>
-                      <input name="name" id="ex4-name" autocomplete="name">
-                  </div>
-                  <div>
-                      <label for="ex4-email">Email</label>
-                      <input type="email" name="email" id="ex4-email" autocomplete="email">
-                  </div>
-                  <button>Spammie!</button>
-              </form>
+            <wijit-form modal id="ex4">
+                <form action="test">
+                    <div>
+                        <label for="ex4-name">Name</label>
+                        <input name="name" id="ex4-name" autocomplete="name">
+                    </div>
+                    <div>
+                        <label for="ex4-email">Email</label>
+                        <input type="email" name="email" id="ex4-email" autocomplete="email">
+                    </div>
+                    <button>Spammie!</button>
+                    <input type="reset">
+                </form>
+            </wijit-form>
+        </article>
+
+        <article>
+        <header><h3>Custom CSS</h3></header>
+          <style>
+            wijit-form#custom {
+              input
+              { background-color: white; }
+
+              label
+              { color: lightsalmon; }
+            }
+          </style>
+          <wijit-form id="custom" custom-css>
+            <form action="test">
+              <div>
+                  <label for="ex5-name">Name</label>
+                  <input name="name" id="ex5-name" autocomplete="name">
+              </div>
+              <div>
+                  <label for="ex5-email">Email</label>
+                  <input type="email" name="email" id="ex5-email" autocomplete="email">
+              </div>
+              <button>Spammie!</button>
+            </form>
           </wijit-form>
         </article>
       </section>

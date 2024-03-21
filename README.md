@@ -64,21 +64,21 @@ All of these attributes are optional
        - Acceptable values: [any string]
        - This is the message displayed when the server reports an error, meaning it sent an http status code greater than 399.
 
-- **response** (default: "json")
+- **response** (default: "html")
     - Acceptable values: ["html", "json"]
     - The Content Type expected from the server.
 
 - **modal** (default: "false")
-    - Acceptable values: ["true", "false"]
-    - Whether to open the confirmation dialog as a modal. A modal dialog/overlay covers the entire screen. When this value is false, the confirmation dialog/overlay only covers the form which was submitted.
+    - Acceptable values: ["", "true", "false"]
+    - Whether to open the confirmation dialog as a modal. A modal dialog/overlay covers the entire screen. When this attribute is missing, or if the value is "false", the confirmation dialog/overlay only covers the form which was submitted.
 
-- **reset-form** (default: "true")
-    - Acceptable values: ["true", "false"]
-    - Whether to reset the form after it is submitted.
+- **reset** (default: "true")
+    - Acceptable values: ["", true", "false"]
+    - Whether to reset the form after it is submitted. An empty string resolves to "true".
 
 - **custom-css** (default: "false")
-    - Acceptable values: ["true", "false"]
-    - Whether to use your own custom css styles on the form instead of the default styles.
+    - Acceptable values: ["", "true", "false"]
+    - Whether to use your own custom css styles on the form instead of the default styles. An empty string evaluates to "true".
 
 ## Custom Messages
 
@@ -205,9 +205,26 @@ In addition to providing a value attribute, also add a data-value attribute whos
 
 ## Custom CSS ##
 
-By default, the component styles the form and fields with it's own default css styles. If you wish to use your own styles, add this attribute. You may give the attribute a value of "true", or you may omit the value. This will prevent the component from inserting its own css into the document head.
+By default, the component styles the form and fields with it's own default css styles. If you wish to use your own styles, add this attribute. You may give the attribute a value of "true", or you may omit the value. This will prevent the component from inserting its own css into the document head. Your css should prefix all selectors with "wijit-form".
 
+	// index.html
 	<wijit-form custom-css>...</wijit-form>
+
+	// styles.css
+	wijit-form input { ... }
+	wijit-form div { ... }
+
+If you have more than one wijit-form in the page and only one of them is using custom css, your css selectors must target the specific form that you want to style.
+
+    //index.html
+    <!-- uses custom css -->
+    <wijit-form id="custom" custom-css>...</wijit-form>
+    <!-- uses default styles -->
+    <wijit-form>...</wijit-form>
+
+    // styles.css
+    wijit-form#custom input { ... }
+    wijit-form#custom div { ... }
 
 ## Using the Default CSS ##
 
