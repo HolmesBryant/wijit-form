@@ -60,10 +60,11 @@ body * {
     { border: 1px solid var(--border-color); }
 
 
+    hr,
     details,
     article,
     section,
-    hr
+    summary
     { border-radius: .5rem; }
 
 /**** Text ****/

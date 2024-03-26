@@ -487,6 +487,7 @@ export default class WijitForm extends HTMLElement {
 			    wijit-form button,
 					wijit-form input {
 			    	min-height: var(--min);
+			    	max-height: var(--min);
 			    	min-width: var(--min);
 			    	padding: var(--pad);
 					}
@@ -517,7 +518,6 @@ export default class WijitForm extends HTMLElement {
 						overflow-x: hidden;
 						overflow-y: auto;
 						padding: var(--pad);
-				  	min-inline-size: var(--min-panel);
 					}
 
 					wijit-form header {
@@ -658,11 +658,13 @@ export default class WijitForm extends HTMLElement {
 						gap: var(--gap);
 						overflow: auto;
 						padding: var(--pad);
-				  	min-inline-size: var(--min-panel);
 					}
 
 					wijit-form section + section
 					{ margin: 1rem 0; }
+
+					wijit-form section.row section + section
+					{ margin: 0; }
 
 					wijit-form select {
 			    	min-height: var(--min);
@@ -731,7 +733,6 @@ export default class WijitForm extends HTMLElement {
 
 					wijit-form .space-between {
 						justify-content: space-between;
-
 					}
 
 					wijit-form .row.space-between {
