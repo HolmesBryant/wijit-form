@@ -5,10 +5,25 @@ This component serves simply as a convenience to make styling forms and configur
 Demo: [https://holmesbryant.github.io/wijit-form/](https://holmesbryant.github.io/wijit-form/)
 
 ## Changelog
-- v1.01
-    - Fixed some css issues
-    - Added css for input type="range"
-- v1.02
+- v1.1.1: Edited CSS
+	- removed
+	    - section { overflow: auto }
+	- added
+	    - section { margin: 1rem 0 }
+	    - select:not([size]) { max-height: var(--min) }
+	    - section { flex-wrap: nowrap; }
+	    - section.row { flex-wrap: wrap }
+	    - section > section { margin: 0; padding: 0; }
+	    - .fb240 { flex-basis: 240px; }
+	    - .fb320 { flex-basis: 320px; }
+	    - .fb480 { flex-basis: 480px; }
+	    - .fb768 { flex-basis: 768px; }
+	    - .fb1024 { flex-basis: 1024px; }
+
+- v1.1.0
+    - Changed "resetForm" attribute to "reset"
+
+- v1.0.2
     - changed css variable names:
         - --bg1 to --bg1-color
 	    - --bg2 to --bg2-color
@@ -18,8 +33,10 @@ Demo: [https://holmesbryant.github.io/wijit-form/](https://holmesbryant.github.i
 	    - --fail to --fail-color
 	    - --pass to --pass-color
 	    - --accent to --accent-color
-- v1.03
-    - Changed "resetForm" attribute to "reset"
+
+- v1.0.1
+    - Fixed some css issues
+    - Added css for input type="range"
 
 ## Features
 

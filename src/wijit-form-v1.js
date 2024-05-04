@@ -150,6 +150,7 @@ export default class WijitForm extends HTMLElement {
 		this.shadowRoot.innerHTML = `
 			<style id="wijit-form-css">
 				@layer wijit-form {
+
 					wijit-form {
 				    --accent-color: dodgerblue;
 				    --bg1-color: rgb(250,250,250);
@@ -484,8 +485,7 @@ export default class WijitForm extends HTMLElement {
 			    }
 
 			    wijit-form button,
-			    wijit-form select:not([size]),
-					wijit-form input:not([type="image"]) {
+					wijit-form input {
 			    	min-height: var(--min);
 			    	max-height: var(--min);
 			    	min-width: var(--min);
@@ -506,8 +506,8 @@ export default class WijitForm extends HTMLElement {
 					{ align-items: center; }
 
 					wijit-form div > *,
-					wijit-form section > *,
-					wijit-form fieldset > *
+					wijit-form fieldset > *,
+					wijit-form section > *
 					{ flex: 1; }
 
 					wijit-form fieldset {
@@ -630,10 +630,8 @@ export default class WijitForm extends HTMLElement {
 					}
 
 					wijit-form option {
-						align-items: center;
-						display: flex;
+						padding: 1rem;
 						min-height: var(--min);
-						padding: 0 .5rem;
 					}
 
 					wijit-form progress {
@@ -654,17 +652,12 @@ export default class WijitForm extends HTMLElement {
 					{ min-height: 1rem; }
 
 					wijit-form section {
-            display: flex;
-            flex-direction: column;
-            flex-wrap: nowrap;
-            gap: var(--gap);
-						margin: 1rem 0;
-            padding: var(--pad);
-					}
-
-					wijit-form section > section {
-						margin: 0;
-						padding: 0;
+						display: flex;
+						flex-direction: column;
+						flex-wrap: wrap;
+						gap: var(--gap);
+						overflow: auto;
+						padding: var(--pad);
 					}
 
 					wijit-form section + section
@@ -702,7 +695,6 @@ export default class WijitForm extends HTMLElement {
 					wijit-form .space-between > *
 					{ flex: 0 1 max-content; }
 
-
 					wijit-form .center {
 						justify-content: center;
 						align-items: center;
@@ -729,10 +721,7 @@ export default class WijitForm extends HTMLElement {
 					{ flex-direction: column-reverse; }
 
 					wijit-form .row
-					{
-						flex-direction: row;
-						flex-wrap: wrap;
-					}
+					{ flex-direction: row; }
 
 					wijit-form .row.reverse
 					{ flex-direction: row-reverse; }
@@ -765,26 +754,6 @@ export default class WijitForm extends HTMLElement {
 
 					wijit-form .flex2 {
 						flex: 2;
-					}
-
-					wijit-form .fb240 {
-						flex-basis: 240px;
-					}
-
-					wijit-form .fb320 {
-						flex-basis: 320px;
-					}
-
-					wijit-form .fb480 {
-						flex-basis: 480px;
-					}
-
-					wijit-form .fb768 {
-						flex-basis: 768px;
-					}
-
-					wijit-form .fb1024 {
-						flex-basis: 1024px;
 					}
 			</style>
 
