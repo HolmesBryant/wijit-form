@@ -485,7 +485,7 @@ export default class WijitForm extends HTMLElement {
 
 			    wijit-form button,
 			    wijit-form select:not([size]),
-					wijit-form input:not([type="image"]) {
+					wijit-form input {
 			    	min-height: var(--min);
 			    	max-height: var(--min);
 			    	min-width: var(--min);
@@ -727,6 +727,14 @@ export default class WijitForm extends HTMLElement {
 
 					wijit-form .reverse
 					{ flex-direction: column-reverse; }
+
+					wigit-form .left {
+						align-items: start;
+					}
+
+					wijit-form .right {
+						align-items: end;
+					}
 
 					wijit-form .row
 					{
@@ -1822,5 +1830,3 @@ export default class WijitForm extends HTMLElement {
 }
 
 document.addEventListener('DOMContentLoaded', customElements.define('wijit-form', WijitForm));
-
-
