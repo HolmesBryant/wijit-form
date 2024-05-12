@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Wijit-Form Web Component</title>
     <link rel="stylesheet" href="extra/styles.css">
-    <script type="module" src="src/wijit-form.js"></script>
+    <!-- <script type="module" src="src/wijit-form.js"></script> -->
+    <script type="module" src="dist/wijit-form.min.js"></script>
     <script type="module" src="extra/wijit-code.min.js"></script>
     <script type="module" src="extra/wijit-icon01.js"></script>
 
@@ -22,16 +23,24 @@
         --fail: hsl(6, 93%, 80%);
         --pass: hsl(112, 70%, 75%);
         --accent: lightskyblue;
+        opacity: 0;
+        transition: opacity .5s;
+      }
 
-        @media (prefers-color-scheme: dark) {
+      wijit-form:defined {
+        opacity: 1;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        wijit-form {
             --text: rgb(240,240,240);
             --bg1: rgb(35,35,35);
             --bg2: rgb(40,40,40);
             --bg3: rgb(60,60,60);
             --accent: dodgerblue;
             --border: dimgray;
+          }
         }
-      }
     </style>
 </head>
 <body>

@@ -5,6 +5,7 @@ This component serves simply as a convenience to make styling forms and configur
 Demo: [https://holmesbryant.github.io/wijit-form/](https://holmesbryant.github.io/wijit-form/)
 
 ## Changelog
+- v1.1.2: Minor changes to make this component more compatible with wijit-menu.
 - v1.1.1: Edited CSS
 	- removed
 	    - section { overflow: auto }
