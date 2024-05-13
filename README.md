@@ -250,7 +250,7 @@ The default CSS uses flexbox for layout.
 
 It is necessary to follow some conventions in order to use the default styles successfully.
 
-- Place everything in one of the following elements:
+- Place everything in one of the following containers:
     - div
     - fieldset
     - section
@@ -260,8 +260,8 @@ It is necessary to follow some conventions in order to use the default styles su
     - To place the label under the input, add `class="reverse"` to the containing div.
     - To place the label beside the input, add `class="row"` to the containing div.
     - To place the label beside the input, but after it, add `class="row reverse"` to the containing div.
-- sections and fieldsets are meant to hold a group of controls.
-    - By default, all controls inside section and fieldset tags are stacked vertically.
+- sections and fieldsets can hold a group of divs as well as other sections and fieldsets.
+    - By default, all direct children of sections and fieldsets are stacked vertically.
     - To place these items side-by-side, add `class="row"` to the containing section or fieldset.
 - You can nest sections and fieldsets.
 - Additional css classes are also provided. These are:
