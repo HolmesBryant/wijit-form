@@ -50,7 +50,7 @@ Demo: [https://holmesbryant.github.io/wijit-form/](https://holmesbryant.github.i
 - Use the component's default css to style the form, or use your own styles.
 
 ## Usage
-Add the script to your page:
+Add the script to your page. Be sure to include `type="module`.
 		
 	<script type="module" src="/wijit-form.js"></script>
 
@@ -100,7 +100,7 @@ All of these attributes are optional
 
 ## Custom Messages
 
-Instead of displaying the component's default messages, you can display whatever (HTML) message the server sends or you can display your own **waiting**, **success** and/or **error** messages. You may set these messages by either attributes or slots.
+Instead of displaying the component's default messages, you can display whatever (HTML) message the server sends or you can display your own **waiting**, **success** and/or **error** messages. You may set these messages via either attributes or slots.
 
 If you don't define a **waiting** message, the component's default message will display.
 
@@ -250,7 +250,7 @@ The default CSS uses flexbox for layout.
 
 It is necessary to follow some conventions in order to use the default styles successfully.
 
-- Place everything in one of the following elements:
+- Place everything in one of the following containers:
     - div
     - fieldset
     - section
@@ -260,18 +260,16 @@ It is necessary to follow some conventions in order to use the default styles su
     - To place the label under the input, add `class="reverse"` to the containing div.
     - To place the label beside the input, add `class="row"` to the containing div.
     - To place the label beside the input, but after it, add `class="row reverse"` to the containing div.
-- sections and fieldsets are meant to hold a group of controls.
-    - By default, all controls inside section and fieldset tags are stacked vertically.
+- Sections and fieldsets can hold a group of divs as well as other sections and fieldsets.
+    - By default, all direct children of sections and fieldsets are stacked vertically.
     - To place these items side-by-side, add `class="row"` to the containing section or fieldset.
-- You can nest sections and fieldsets.
 - Additional css classes are also provided. These are:
     - "center" : Prevents children from stretching and centers them in the container.
-	- "start" : Prevents children from stretching and stacks them at the start of the container.
-	- "end" : Prevents children from stretching and stacks them at the end of the container.
-	- "space-around" : Behaves like the css property `space-around`
-	- "space-between" : behaves like the css property `space-between`
-	- "nowrap" : Prevents children from wrapping to a new row.
-	- "flex0" : Sets flex:0 on the element
-	- "flex1" : Sets flex:1 on the element
-	- "flex2" : Sets flex:2 on the element
-- Any element that is not an input, select, textarea, label, progress, fieldset or section may need custom css.
+    - "start" : Prevents children from stretching and stacks them at the start of the container.
+    - "end" : Prevents children from stretching and stacks them at the end of the container.
+    - "space-around" : Behaves like the css value `space-around`
+    - "space-between" : behaves like the css value `space-between`
+    - "nowrap" : Prevents children from wrapping to a new row.
+    - "flex0" : Sets flex:0 on the element
+    - "flex1" : Sets flex:1 on the element
+    - "flex2" : Sets flex:2 on the element
