@@ -6,7 +6,7 @@
  * @author Holmes Bryant <https://github.com/HolmesBryant>
  * @license GPL-3.0
  */
-export default class WijitForm extends HTMLElement {
+export class WijitForm extends HTMLElement {
 	/**
 	 * @private
 	 * @type {boolean}
@@ -1058,4 +1058,8 @@ export default class WijitForm extends HTMLElement {
 	}
 }
 
-document.addEventListener('DOMContentLoaded', customElements.define('wijit-form', WijitForm));
+document.addEventListener('DOMContentLoaded', () => {
+	if (!customElements.get('wijit-form')) {
+		customElements.define('wijit-form', WijitForm);
+	}
+});
